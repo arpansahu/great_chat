@@ -183,7 +183,7 @@ MIDDLEWARE = [
 Create Procfile and include this code snippet in it.
 ```
 release: ./release-tasks.sh
-web: gunicorn django_starter.wsgi
+web: gunicorn great_chat.wsgi
 ```
 Create a release-tasks.sh and include this code snippet in it.
 ```
@@ -333,7 +333,7 @@ RUN pip3 install -r requirements.txt
 EXPOSE 8016
 
 CMD python manage.py collectstatic
-CMD gunicorn --bind 0.0.0.0:8016 django_starter.wsgi
+CMD gunicorn --bind 0.0.0.0:8016 great_chat.wsgi
 ```
 
 Create a file named docker-compose.yml and add following lines in it
@@ -345,11 +345,11 @@ services:
   web:
     build: .
     env_file: ./.env
-    command: bash -c "python manage.py makemigrations && python manage.py migrate && gunicorn --bind 0.0.0.0:8016 django_starter.wsgi"
-    image: django_starter
-    container_name: django_starter
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && gunicorn --bind 0.0.0.0:8016 great_chat.wsgi"
+    image: great_chat
+    container_name: great_chat
     volumes:
-      - .:/django_starter
+      - .:/great_chat
     ports:
       - "8016:8016"
     restart: unless-stopped
@@ -986,7 +986,7 @@ pipeline {
         stage('Dependencies') {
             steps {
                 script {
-                    sh "sudo cp /root/projectenvs/django_starter/.env /var/lib/jenkins/workspace/django_starter"
+                    sh "sudo cp /root/projectenvs/great_chat/.env /var/lib/jenkins/workspace/great_chat"
                 }
             }
         }
@@ -1062,9 +1062,9 @@ Note: agent {label 'local'} is used to specify which node will execute the jenki
 
 * Configure a Jenkins project from jenkins ui located at https://jenkins.arpansahu.me
 
-Make sure to use Pipline project and name it whatever you want I have named it as django_starter
+Make sure to use Pipline project and name it whatever you want I have named it as great_chat
 
-![Jenkins Project for borcelle CRM Configuration File](/django_starter-Config-Jenkins-.png)
+![Jenkins Project for borcelle CRM Configuration File](/great_chat-Config-Jenkins-.png)
 
 In this above picture you can see credentials right? you can add your github credentials
 from Manage Jenkins on home Page --> Manage Credentials

@@ -4,11 +4,11 @@ services:
   web:
     build: .
     env_file: ./.env
-    command: bash -c "python manage.py makemigrations && python manage.py migrate && gunicorn --bind 0.0.0.0:8016 django_starter.wsgi"
-    image: django_starter
-    container_name: django_starter
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && gunicorn --bind 0.0.0.0:8016 great_chat.wsgi"
+    image: great_chat
+    container_name: great_chat
     volumes:
-      - .:/django_starter
+      - .:/great_chat
     ports:
       - "8016:8016"
     restart: unless-stopped

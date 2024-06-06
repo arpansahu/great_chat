@@ -3,7 +3,7 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 
 
 # Create your models here.
-from django_starter.models import AbstractBaseModel
+from great_chat.models import AbstractBaseModel
 
 
 class MyAccountManager(BaseUserManager):

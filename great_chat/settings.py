@@ -46,7 +46,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'account',
-    'custom_tag_app'
+    'custom_tag_app',
+    'real_time_chat',
+    
 ]
 
 MIDDLEWARE = [

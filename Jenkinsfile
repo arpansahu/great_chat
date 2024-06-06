@@ -4,7 +4,7 @@ pipeline {
         stage('Dependencies') {
             steps {
                 script {
-                    sh "sudo cp /root/projectenvs/django_starter/.env /var/lib/jenkins/workspace/django_starter"
+                    sh "sudo cp /root/projectenvs/great_chat/.env /var/lib/jenkins/workspace/great_chat"
                 }
             }
         }

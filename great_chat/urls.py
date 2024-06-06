@@ -13,7 +13,7 @@ from account.views import (
 
 )
 
-from .view import (
+from real_time_chat.views import (
      HomeView,
 )
 
