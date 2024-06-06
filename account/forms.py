@@ -119,11 +119,11 @@ class AccountAuthenticationForm(forms.ModelForm):
 class AccountUpdateForm(forms.ModelForm):
     class Meta:
         model = Account
-        fields = ('email', 'username')
+        fields = ('email', 'username', 'profile_photo')
         widgets = {
             'email': forms.TextInput(attrs={'class': 'form-control'}),
             'username': forms.TextInput(attrs={'class': 'form-control'}),
-
+            'profile_photo': forms.FileInput(attrs={'class': 'form-control'})
         }
 
     def clean_email(self):

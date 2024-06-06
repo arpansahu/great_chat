@@ -27,14 +27,11 @@
 {% endblock stylesheets %}
 
 {% block content %}
-{% comment %} <div class="container-fluid py-4">
-    
-</div> {% endcomment %}
-{% include 'chats/chat.html' %}
-{% endblock content %}
 <div class="container-fluid py-4">
-        <h4> Start Your own Project</h4>
-</div>
+    {% include 'chats/chat.html' %}
+</div> 
+
+{% endblock content %}
 <!-- Specific JS goes HERE -->
 {% block javascripts %}
     <script>

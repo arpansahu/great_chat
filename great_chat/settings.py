@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'account',
     'custom_tag_app',
     'real_time_chat',
-    
+    # cleans up unused media
+    'django_cleanup.apps.CleanupConfig'
 ]
 
 MIDDLEWARE = [

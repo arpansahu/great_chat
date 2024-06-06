@@ -15,6 +15,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.generic import FormView, RedirectView
 from django.utils.translation import gettext_lazy as _
 
+from django.views.generic import ListView, UpdateView, DetailView, CreateView, FormView
 from account.forms import RegistrationForm, AccountAuthenticationForm, AccountUpdateForm, PasswordResetForm, LoginForm
 from django.conf import settings
 from django.contrib.auth.views import PasswordContextMixin
@@ -177,14 +178,29 @@ class AccountView(View):
                 "username": request.user.username,
             }
         )
+        context["account"] = Account.objects.get(email=request.user.email)
         context['account_form'] = form
         return render(request, 'account/account.html', context)
 
     def post(self, request, *args, **kwargs):
         context = {}
-        form = AccountUpdateForm(request.POST, instance=request.user)
+        form = AccountUpdateForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
+            print(form.__dict__)
             form.save()
 
+        context["account"] = Account.objects.get(email=request.user.email)
         context['account_form'] = form
         return render(request, 'account/account.html', context)
+
+# @method_decorator(login_required(redirect_field_name=''), name='dispatch')
+# class AccountUpdateView(UpdateView):
+#     template_name = 'account/account.html'
+#     model = Account
+#     form_class = AccountUpdateForm
+#     success_url = '/account'
+
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         return context
+
