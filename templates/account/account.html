@@ -97,40 +97,6 @@
     </div>
 </section>
 
-<!-- Include Cropper.js library -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
-
-<script>
-  // Initialize Cropper.js
-  const image = document.getElementById('image');
-  const cropper = new Cropper(image, {
-      aspectRatio: 1, // Square aspect ratio
-      viewMode: 2, // Display full image in preview area
-      autoCropArea: 1, // Always crop entire image
-      crop(event) {
-          // Optional: Handle crop event
-      }
-  });
-
-  // Trigger image cropping on button click
-  const cropButton = document.getElementById('cropButton');
-  cropButton.addEventListener('click', () => {
-      const canvas = cropper.getCroppedCanvas({
-          width: 150, // Output width
-          height: 150, // Output height
-      });
-
-      // Optional: Convert canvas to blob for uploading
-      canvas.toBlob((blob) => {
-          // Optionally, upload the cropped image blob
-      });
-  });
-</script>
-
-
-
-
-
 {% endblock content %}
 
 
