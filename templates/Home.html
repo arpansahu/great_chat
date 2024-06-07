@@ -5,40 +5,42 @@
 <!-- Specific CSS goes HERE -->
 {% block stylesheets %}
 <style>
-    textarea{
-  display: block;
-  box-sizing: padding-box;
-  overflow: hidden;
+    textarea {
+        display: block;
+        box-sizing: padding-box;
+        overflow: hidden;
+        padding: 10px;
+        width: auto;
+        font-size: 14px;
+        margin: 50px auto;
+        border-radius: 6px;
+        box-shadow: 2px 2px 8px rgba(black, .3);
+        border: 0;
+    }
 
-  padding: 10px;
-  width: auto;
-  font-size: 14px;
-  margin: 50px auto;
-  border-radius: 6px;
-  box-shadow: 2px 2px 8px rgba(black, .3);
-  border: 0;
+    textarea:focus {
+        border: none;
+        outline: none;
+    }
 
-  &:focus{
-    border: none;
-    outline: none;
-  }
-}
+    .message-bubble::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        right: -10px;
+        width: 0;
+        height: 0;
+        border-width: 10px;
+        border-style: solid;
+        border-color: transparent transparent #25D366 #25D366;
+        transform: rotate(45deg);
+        transform-origin: 0 0;
+    }
 
-  .message-bubble::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    right: -10px;
-    width: 0;
-    height: 0;
-    border-width: 10px;
-    border-style: solid;
-    border-color: transparent transparent #25D366 #25D366;
-    transform: rotate(45deg);
-    transform-origin: 0 0;
-  }
-  
-  
+    #chat_container {
+        max-height: 60vh; /* Adjust as needed */
+        overflow-y: auto;
+    }
 </style>
 {% endblock stylesheets %}
 
@@ -53,63 +55,63 @@
         </div>        
         <div id='chat_container' class="overflow-y-auto grow">
           <ul id='chat_messages' class="flex flex-col justify-end gap-2 p-4">
-              <li style="margin-bottom: 15px;">
-                <div style="text-align: right; position: relative;">
-                  <span class="message-bubble rounded-lg px-4 py-2" style="background-color: #25D366; display: inline-block; border-radius: 12px; position: relative;">
-                    Hi, how is everybody?
+            <li style="margin-bottom: 15px;">
+              <div style="text-align: right; position: relative;">
+                <span class="message-bubble rounded-lg px-4 py-2" style="background-color: #25D366; display: inline-block; border-radius: 12px; position: relative;">
+                  Hi, how is everybody?
+                </span>
+              </div>
+            </li>
+            <li style="margin-bottom: 15px;">
+              <div style="display: flex; align-items: flex-start; position: relative;">
+                <img src="https://pbs.twimg.com/profile_images/508601156767997952/fFTdKUf2_400x400.jpeg" alt="User Profile" style="width: 50px; height: 50px; border-radius: 50%; margin-right: 10px;">
+                <div style="position: relative;">
+                  <span class="px-4 py-2" style="background-color: #ffffff; display: inline-block; border-radius: 12px 12px 12px 0; position: relative;">
+                    Not bad, thanks for asking! My day has been quite productive so far. 
+                              I've been diving into fixing some bugs in the codebase, which can be a nightmare sometimes, 
+                              but I got them at the end. It's always satisfying to track down those buggers and make the application 
+                              finally work. How about you? How's your day been?
+                    <span style="position: absolute; bottom: 10px; left: -10px; width: 0; height: 0; border: 10px solid transparent; border-right-color: #ffffff; border-left: 0; border-bottom: 0; margin-bottom: -10px;"></span>
                   </span>
                 </div>
-              </li>
-              <li style="margin-bottom: 15px;">
-                <div style="display: flex; align-items: flex-start; position: relative;">
-                  <img src="https://pbs.twimg.com/profile_images/508601156767997952/fFTdKUf2_400x400.jpeg" alt="User Profile" style="width: 50px; height: 50px; border-radius: 50%; margin-right: 10px;">
-                  <div style="position: relative;">
-                    <span class="px-4 py-2" style="background-color: #ffffff; display: inline-block; border-radius: 12px 12px 12px 0; position: relative;">
-                      Not bad, thanks for asking! My day has been quite productive so far. 
-                                I've been diving into fixing some bugs in the codebase, which can be a nightmare sometimes, 
-                                but I got them at the end. It's always satisfying to track down those buggers and make the application 
-                                finally work. How about you? How's your day been?
-                      <span style="position: absolute; bottom: 10px; left: -10px; width: 0; height: 0; border: 10px solid transparent; border-right-color: #ffffff; border-left: 0; border-bottom: 0; margin-bottom: -10px;"></span>
-                    </span>
-                  </div>
+              </div>
+            </li>
+            <li style="margin-bottom: 15px;">
+              <div style="display: flex; align-items: flex-start; position: relative;">
+                <img src="https://cdn.dribbble.com/userupload/12910688/file/original-d33b34f28a79a4b085edec17d83870ba.png" alt="User Profile" style="width: 50px; height: 50px; border-radius: 50%; margin-right: 10px;">
+                <div style="position: relative;">
+                  <span class="px-4 py-2" style="background-color: #ffffff; display: inline-block; border-radius: 12px 12px 12px 0; position: relative;">
+                      Wonderful!
+                    <span style="position: absolute; bottom: 10px; left: -10px; width: 0; height: 0; border: 10px solid transparent; border-right-color: #ffffff; border-left: 0; border-bottom: 0; margin-bottom: -10px;"></span>
+                  </span>
                 </div>
-              </li>
-              <li style="margin-bottom: 15px;">
-                <div style="display: flex; align-items: flex-start; position: relative;">
-                  <img src="https://cdn.dribbble.com/userupload/12910688/file/original-d33b34f28a79a4b085edec17d83870ba.png" alt="User Profile" style="width: 50px; height: 50px; border-radius: 50%; margin-right: 10px;">
-                  <div style="position: relative;">
-                    <span class="px-4 py-2" style="background-color: #ffffff; display: inline-block; border-radius: 12px 12px 12px 0; position: relative;">
-                        Wonderful!
-                      <span style="position: absolute; bottom: 10px; left: -10px; width: 0; height: 0; border: 10px solid transparent; border-right-color: #ffffff; border-left: 0; border-bottom: 0; margin-bottom: -10px;"></span>
-                    </span>
-                  </div>
+              </div>
+            </li>
+            <li style="margin-bottom: 15px;">
+              <div style="display: flex; align-items: flex-start; position: relative;">
+                <img src="https://pbs.twimg.com/profile_images/508601156767997952/fFTdKUf2_400x400.jpeg" alt="User Profile" style="width: 50px; height: 50px; border-radius: 50%; margin-right: 10px;">
+                <div style="position: relative;">
+                  <span class="px-4 py-2" style="background-color: #ffffff; display: inline-block; border-radius: 12px 12px 12px 0; position: relative;">
+                    Not bad, thanks for asking! My day has been quite productive so far. 
+                              I've been diving into fixing some bugs in the codebase, which can be a nightmare sometimes, 
+                              but I got them at the end. It's always satisfying to track down those buggers and make the application 
+                              finally work. How about you? How's your day been?
+                    <span style="position: absolute; bottom: 10px; left: -10px; width: 0; height: 0; border: 10px solid transparent; border-right-color: #ffffff; border-left: 0; border-bottom: 0; margin-bottom: -10px;"></span>
+                  </span>
                 </div>
-              </li>
-              <li style="margin-bottom: 15px;">
-                <div style="display: flex; align-items: flex-start; position: relative;">
-                  <img src="https://pbs.twimg.com/profile_images/508601156767997952/fFTdKUf2_400x400.jpeg" alt="User Profile" style="width: 50px; height: 50px; border-radius: 50%; margin-right: 10px;">
-                  <div style="position: relative;">
-                    <span class="px-4 py-2" style="background-color: #ffffff; display: inline-block; border-radius: 12px 12px 12px 0; position: relative;">
-                      Not bad, thanks for asking! My day has been quite productive so far. 
-                                I've been diving into fixing some bugs in the codebase, which can be a nightmare sometimes, 
-                                but I got them at the end. It's always satisfying to track down those buggers and make the application 
-                                finally work. How about you? How's your day been?
-                      <span style="position: absolute; bottom: 10px; left: -10px; width: 0; height: 0; border: 10px solid transparent; border-right-color: #ffffff; border-left: 0; border-bottom: 0; margin-bottom: -10px;"></span>
-                    </span>
-                  </div>
+              </div>
+            </li>
+            <li style="margin-bottom: 15px;">
+              <div style="display: flex; align-items: flex-start; position: relative;">
+                <img src="https://cdn.dribbble.com/userupload/12910688/file/original-d33b34f28a79a4b085edec17d83870ba.png" alt="User Profile" style="width: 50px; height: 50px; border-radius: 50%; margin-right: 10px;">
+                <div style="position: relative;">
+                  <span class="px-4 py-2" style="background-color: #ffffff; display: inline-block; border-radius: 12px 12px 12px 0; position: relative;">
+                      Wonderful!
+                    <span style="position: absolute; bottom: 10px; left: -10px; width: 0; height: 0; border: 10px solid transparent; border-right-color: #ffffff; border-left: 0; border-bottom: 0; margin-bottom: -10px;"></span>
+                  </span>
                 </div>
-              </li>
-              <li style="margin-bottom: 15px;">
-                <div style="display: flex; align-items: flex-start; position: relative;">
-                  <img src="https://cdn.dribbble.com/userupload/12910688/file/original-d33b34f28a79a4b085edec17d83870ba.png" alt="User Profile" style="width: 50px; height: 50px; border-radius: 50%; margin-right: 10px;">
-                  <div style="position: relative;">
-                    <span class="px-4 py-2" style="background-color: #ffffff; display: inline-block; border-radius: 12px 12px 12px 0; position: relative;">
-                        Wonderful!
-                      <span style="position: absolute; bottom: 10px; left: -10px; width: 0; height: 0; border: 10px solid transparent; border-right-color: #ffffff; border-left: 0; border-bottom: 0; margin-bottom: -10px;"></span>
-                    </span>
-                  </div>
-                </div>
-              </li>
+              </div>
+            </li>
           </ul>
         </div>
         <div>
@@ -123,8 +125,6 @@
     </div>
   </div>
 </div>
-
-
 {% endblock content %}
 <!-- Specific JS goes HERE -->
 {% block javascripts %}
