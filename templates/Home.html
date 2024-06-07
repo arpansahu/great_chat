@@ -23,13 +23,107 @@
     outline: none;
   }
 }
+
+  .message-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: -10px;
+    width: 0;
+    height: 0;
+    border-width: 10px;
+    border-style: solid;
+    border-color: transparent transparent #25D366 #25D366;
+    transform: rotate(45deg);
+    transform-origin: 0 0;
+  }
+  
+  
 </style>
 {% endblock stylesheets %}
 
 {% block content %}
 <div class="container-fluid py-4">
-    {% include 'chats/chat.html' %}
-</div> 
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="card mb-4" style="background-color: #075E54;">
+        <!-- Chat window content can go here -->  
+        <div class="row-cols-1 text-center rounded-3" style="color: white; font-weight: bold;">
+          <span id="online-count" style="color: white;">3</span> online
+        </div>        
+        <div id='chat_container' class="overflow-y-auto grow">
+          <ul id='chat_messages' class="flex flex-col justify-end gap-2 p-4">
+              <li style="margin-bottom: 15px;">
+                <div style="text-align: right; position: relative;">
+                  <span class="message-bubble rounded-lg px-4 py-2" style="background-color: #25D366; display: inline-block; border-radius: 12px; position: relative;">
+                    Hi, how is everybody?
+                  </span>
+                </div>
+              </li>
+              <li style="margin-bottom: 15px;">
+                <div style="display: flex; align-items: flex-start; position: relative;">
+                  <img src="https://pbs.twimg.com/profile_images/508601156767997952/fFTdKUf2_400x400.jpeg" alt="User Profile" style="width: 50px; height: 50px; border-radius: 50%; margin-right: 10px;">
+                  <div style="position: relative;">
+                    <span class="px-4 py-2" style="background-color: #ffffff; display: inline-block; border-radius: 12px 12px 12px 0; position: relative;">
+                      Not bad, thanks for asking! My day has been quite productive so far. 
+                                I've been diving into fixing some bugs in the codebase, which can be a nightmare sometimes, 
+                                but I got them at the end. It's always satisfying to track down those buggers and make the application 
+                                finally work. How about you? How's your day been?
+                      <span style="position: absolute; bottom: 10px; left: -10px; width: 0; height: 0; border: 10px solid transparent; border-right-color: #ffffff; border-left: 0; border-bottom: 0; margin-bottom: -10px;"></span>
+                    </span>
+                  </div>
+                </div>
+              </li>
+              <li style="margin-bottom: 15px;">
+                <div style="display: flex; align-items: flex-start; position: relative;">
+                  <img src="https://cdn.dribbble.com/userupload/12910688/file/original-d33b34f28a79a4b085edec17d83870ba.png" alt="User Profile" style="width: 50px; height: 50px; border-radius: 50%; margin-right: 10px;">
+                  <div style="position: relative;">
+                    <span class="px-4 py-2" style="background-color: #ffffff; display: inline-block; border-radius: 12px 12px 12px 0; position: relative;">
+                        Wonderful!
+                      <span style="position: absolute; bottom: 10px; left: -10px; width: 0; height: 0; border: 10px solid transparent; border-right-color: #ffffff; border-left: 0; border-bottom: 0; margin-bottom: -10px;"></span>
+                    </span>
+                  </div>
+                </div>
+              </li>
+              <li style="margin-bottom: 15px;">
+                <div style="display: flex; align-items: flex-start; position: relative;">
+                  <img src="https://pbs.twimg.com/profile_images/508601156767997952/fFTdKUf2_400x400.jpeg" alt="User Profile" style="width: 50px; height: 50px; border-radius: 50%; margin-right: 10px;">
+                  <div style="position: relative;">
+                    <span class="px-4 py-2" style="background-color: #ffffff; display: inline-block; border-radius: 12px 12px 12px 0; position: relative;">
+                      Not bad, thanks for asking! My day has been quite productive so far. 
+                                I've been diving into fixing some bugs in the codebase, which can be a nightmare sometimes, 
+                                but I got them at the end. It's always satisfying to track down those buggers and make the application 
+                                finally work. How about you? How's your day been?
+                      <span style="position: absolute; bottom: 10px; left: -10px; width: 0; height: 0; border: 10px solid transparent; border-right-color: #ffffff; border-left: 0; border-bottom: 0; margin-bottom: -10px;"></span>
+                    </span>
+                  </div>
+                </div>
+              </li>
+              <li style="margin-bottom: 15px;">
+                <div style="display: flex; align-items: flex-start; position: relative;">
+                  <img src="https://cdn.dribbble.com/userupload/12910688/file/original-d33b34f28a79a4b085edec17d83870ba.png" alt="User Profile" style="width: 50px; height: 50px; border-radius: 50%; margin-right: 10px;">
+                  <div style="position: relative;">
+                    <span class="px-4 py-2" style="background-color: #ffffff; display: inline-block; border-radius: 12px 12px 12px 0; position: relative;">
+                        Wonderful!
+                      <span style="position: absolute; bottom: 10px; left: -10px; width: 0; height: 0; border: 10px solid transparent; border-right-color: #ffffff; border-left: 0; border-bottom: 0; margin-bottom: -10px;"></span>
+                    </span>
+                  </div>
+                </div>
+              </li>
+          </ul>
+        </div>
+        <div>
+          <div class="row-cols-1 rounded-3 mb-3">
+              <form id="chat_message_form" method="POST">
+                  <input class="form-control" type="text" name="message" placeholder="Add message ..." maxlength="150">
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 {% endblock content %}
 <!-- Specific JS goes HERE -->
