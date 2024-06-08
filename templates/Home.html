@@ -14,7 +14,7 @@
         font-size: 14px;
         margin: 50px auto;
         border-radius: 6px;
-        box-shadow: 2px 2px 8px rgba(black, .3);
+        box-shadow: 2px 2px 8px rgba(0, 0, 0, .3);
         border: 0;
     }
 
@@ -43,6 +43,7 @@
         overflow-y: auto;
     }
 
+
     #chat_container::-webkit-scrollbar-thumb {
       background: white; /* Orange color for scroll thumb */
       border-radius: 10px;
@@ -54,64 +55,73 @@
     }
 
     .chat-input-container {
-        display: flex;
-        align-items: center;
-        border-radius: 0 0 12px 12px;
-        overflow: hidden;
-        background-color: white;
-    }
+      display: flex;
+      align-items: center;
+      border-radius: 12px;
+      overflow: hidden;
+      background-color: white;
+      padding: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
 
-    .chat-input-container input {
-        border-radius: 0 0 0 12px;
-        border: none;
-        flex-grow: 1;
-        padding: 10px;
-    }
-    #chat_container::-webkit-scrollbar {
-      width: 12px;
-    }
+  .chat-input-container input {
+      flex-grow: 1;
+      border: none;
+      padding: 10px;
+      border-radius: 12px;
+      margin-right: 10px;
+      transition: opacity 0.5s ease-in-out; /* For input text fade-out effect */
+  }
 
-    #chat_container::-webkit-scrollbar-track {
-      background-color: #ece5dd; /* Match chat background */
-    }
+  .chat-input-container button {
+      background-color: #075E54;
+      border: none;
+      padding: 10px;
+      border-radius: 50%;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+  }
 
-    .chat-input-container button {
-        background-color: #25D366;
-        border: none;
-        padding: 10px;
-        border-radius: 0 0 12px 0;
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+  .chat-input-container button i {
+      font-size: 20px;
+  }
 
-    .chat-input-container button i {
-        font-size: 20px;
-    }
+  .chat-input-container button:hover {
+      background-color: #064C47;
+  }
+  .new-message {
+    display: none; /* Initially hidden */
+    opacity: 0; /* Initially invisible */
+    transition: opacity 0.5s ease-in-out; /* Fade-in effect */
+  }
 
-    .chat-input-container button:hover {
-        background-color: #20b358;
-    }
-    ul {
+  .new-message.show {
+      display: block; /* Make visible */
+      opacity: 1; /* Fully visible */
+  }
+
+  ul {
       list-style: none; /* Remove list bullets */
       padding: 0;
       margin: 0;
-    }
-    body, html {
+  }
+
+  body, html {
       margin: 0;
       padding: 0;
       height: 100%;
   }
-  
-    .whatsapp-background {
-        height: 100vh;
-        background-color: #ece5dd;
-        background-image: radial-gradient(circle, rgba(0,0,0,0.1) 1px, transparent 1px);
-        background-size: 20px 20px;
-    }
-    
 
+  .whatsapp-background {
+      height: 100vh;
+      background-color: #ece5dd;
+      background-image: radial-gradient(circle, rgba(0,0,0,0.1) 1px, transparent 1px);
+      background-size: 20px 20px;
+  }
 </style>
 {% endblock stylesheets %}
 
@@ -132,16 +142,14 @@
             {% endfor %}
           </ul>
         </div>
-        <div class="row-cols-1 rounded-3">
-          {% comment %} <form id="chat_message_form" method="POST" > {% endcomment %}
-          <form id="chat_message_form" 
-            hx-post="{% url 'home' %}"
-            hx-target="chat_messages"
-            hx-swap="beforeend"
-          >
+        <div class="row-cols-1 rounded-2;">
+         <form id="chat_message_form" method="POST" action="{% url 'home' %}" class="chat-input-container">
             {% csrf_token %}
-            {{form}}
-          </form>
+            <input type="text" name="body" placeholder="Add a message ..." class="form-control" maxlength="300" autofocus="True" required="" id="id_body">
+            <button type="submit" class="send-button">
+                <i class="fa fa-paper-plane" aria-hidden="true"></i>
+            </button>
+        </form>
         </div>
         </div>
       </div>
@@ -151,18 +159,42 @@
 {% endblock content %}
 <!-- Specific JS goes HERE -->
 {% block javascripts %}
-    
-      <script>
+<script>
+    $(document).ready(function() {
+        $('#chat_message_form').on('submit', function(event) {
+            event.preventDefault(); // Prevent the form from submitting via the browser
 
-        function scrollToBottom(time=0) {
-            setTimeout(function() {
-                const container = document.getElementById('chat_container');
-                container.scrollTop = container.scrollHeight;
-            }, time);
-        }
-        scrollToBottom()
-    
-    </script>
+            // Fade out the input text
+            $('#id_body').css('opacity', '0');
+
+            $.ajax({
+                type: 'POST',
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                success: function(response) {
+                    // Create a temporary container to hold the new message
+                    var tempContainer = $('<div></div>').html(response);
+                    var newMessage = tempContainer.find('li').addClass('new-message');
+                    
+                    // Append the new message to the chat_messages list
+                    $('#chat_messages').append(newMessage);
+                    
+                    // Trigger the fade-in effect
+                    setTimeout(function() {
+                        newMessage.addClass('show');
+                    }, 10); // Delay for CSS transition to take effect
+
+                    // Clear the input field and reset opacity
+                    $('#id_body').val('').css('opacity', '1');
+                    
+                    // Scroll to the bottom of the chat container
+                    $('#chat_container').scrollTop($('#chat_container')[0].scrollHeight);
+                },
+                error: function(xhr, errmsg, err) {
+                    console.error('Error: ' + errmsg);
+                }
+            });
+        });
+    });
+</script>
 {% endblock javascripts %}
-
-

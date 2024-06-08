@@ -9,27 +9,21 @@ def HomeView(request):
     chat_group = get_object_or_404(ChatGroup, group_name='public-chat')
     chat_messages = GroupMessage.objects.filter(group=chat_group).prefetch_related().all()[:30]
     form = ChatMessageCreateForm()
-    print(request.__dict__)
-    print('----------------------------------------------------------------')
-    print(request.htmx.__dict__)
 
-    if request.htmx:
-        print("htmxcalled called --------------------------------")
-        form = ChatMessageCreateForm(request.POST) 
+    if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        form = ChatMessageCreateForm(request.POST)
         if form.is_valid():
             message = form.save(commit=False)
             message.author = request.user
             message.group = chat_group
             message.save()
-            
-            print('htmxcalled --------- ---------------------')
+
             context = {
                 'message': message,
                 'user': request.user
             }
             return render(request, 'chats/partials/chat_message_p.html', context)
-
-
+    
     context['chat_messages'] = chat_messages
     context['form'] = form
     return render(request, 'Home.html', context)
