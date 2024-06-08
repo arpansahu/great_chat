@@ -46,9 +46,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_htmx',
+
     'account',
+    'check_service_health',
     'custom_tag_app',
     'real_time_chat',
+    
     # cleans up unused media
     'django_cleanup.apps.CleanupConfig'
 ]
@@ -232,7 +235,7 @@ LOGIN_REDIRECT_URL = "/"
 MAIL_JET_API_KEY = config('MAIL_JET_API_KEY')
 MAIL_JET_API_SECRET = config('MAIL_JET_API_SECRET')
 
-#Caching
+# Caching
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -240,8 +243,19 @@ CACHES = {
     }
 }
 
-CHANNEL_LAYERS = {
-    'default': {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
+
+if not DEBUG:
+    CHANNEL_LAYERS = {
+        'default': {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        }
     }
-}
+else:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [(config('REDISCLOUD_URL'))],
+            },
+        },
+    }
