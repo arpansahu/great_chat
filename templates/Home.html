@@ -23,6 +23,11 @@
         outline: none;
     }
 
+    .fade-out {
+        transition: opacity 0.5s ease-in-out; /* Fade-out effect */
+        opacity: 0;
+    }
+
     .message-bubble::after {
         content: '';
         position: absolute;
@@ -146,17 +151,20 @@
         </div>        
         <div id='chat_container' class="overflow-y-auto grow whatsapp-background">
 
-          <ul id='chat_messages' class="flex flex-col justify-end gap-2 p-4" st>
+          <ul id='chat_messages' class="flex flex-col justify-end gap-2 p-4">
             {% for message in chat_messages reversed %}
             {% include 'chats/chat_message.html' %}
             {% endfor %}
           </ul>
         </div>
         <div class="row-cols-1 rounded-3">
-         <form id="chat_message_form" method="POST" action="{% url 'home' %}" class="chat-input-container">
+         <form id="chat_message_form" method="POST" action="{% url 'home' %}" class="chat-input-container" 
+            hx-post="{% url 'home' %}" 
+            hx-target="#chat_messages" 
+            hx-swap="beforeend">
             {% csrf_token %}
-            <input type="text" name="body" placeholder="Add a message ..." class="form-control" maxlength="300" autofocus="True" required="" id="id_body">
-            <button type="submit" class="send-button">
+            <input type="text" name="body" placeholder="Add a message ..." class="form-control" maxlength="300" autofocus="True" required="" id="id_body" aria-label="Message input">
+            <button type="submit" class="send-button" aria-label="Send message">
                 <i class="fa fa-paper-plane" aria-hidden="true"></i>
             </button>
         </form>
@@ -169,44 +177,40 @@
 {% endblock content %}
 <!-- Specific JS goes HERE -->
 {% block javascripts %}
+<script src="https://unpkg.com/htmx.org@1.9.12"></script>
 <script>
-    $(document).ready(function() {
-                            // Scroll to the bottom of the chat container
-                            $('#chat_container').scrollTop($('#chat_container')[0].scrollHeight);
-        $('#chat_message_form').on('submit', function(event) {
-            event.preventDefault(); // Prevent the form from submitting via the browser
+    // Function to scroll to the bottom of the chat container
+    function scrollToBottom() {
+        var chatContainer = document.getElementById('chat_container');
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
 
-            // Fade out the input text
-            $('#id_body').css('opacity', '0');
+    // Scroll to bottom on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        scrollToBottom();
+    });
 
-            $.ajax({
-                type: 'POST',
-                url: $(this).attr('action'),
-                data: $(this).serialize(),
-                success: function(response) {
-                    // Create a temporary container to hold the new message
-                    var tempContainer = $('<div></div>').html(response);
-                    var newMessage = tempContainer.find('li').addClass('new-message');
-                    
-                    // Append the new message to the chat_messages list
-                    $('#chat_messages').append(newMessage);
-                    
-                    // Trigger the fade-in effect
-                    setTimeout(function() {
-                        newMessage.addClass('show');
-                    }, 10); // Delay for CSS transition to take effect
+    // Function to fade out the input message
+    function fadeOutMessage(inputElement) {
+        inputElement.classList.add('fade-out');
+        setTimeout(function() {
+            inputElement.value = '';
+            inputElement.classList.remove('fade-out');
+        }, 500); // Duration of the fade-out effect
+    }
 
-                    // Clear the input field and reset opacity
-                    $('#id_body').val('').css('opacity', '1');
-                    
-                    // Scroll to the bottom of the chat container
-                    $('#chat_container').scrollTop($('#chat_container')[0].scrollHeight);
-                },
-                error: function(xhr, errmsg, err) {
-                    console.error('Error: ' + errmsg);
-                }
-            });
-        });
+    // Scroll to bottom when a new message is sent and fade out the input message
+    document.getElementById('chat_message_form').addEventListener('submit', function(event) {
+        var inputElement = document.getElementById('id_body');
+        fadeOutMessage(inputElement);
+        setTimeout(scrollToBottom, 100); // Adjust the timeout if needed
+    });
+
+    // Add fade-in effect to new messages
+    document.body.addEventListener('htmx:afterSwap', function(evt) {
+        if (evt.detail.target.id === 'chat_messages') {
+            scrollToBottom();
+        }
     });
 </script>
 {% endblock javascripts %}

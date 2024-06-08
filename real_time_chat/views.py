@@ -10,7 +10,7 @@ def HomeView(request):
     chat_messages = GroupMessage.objects.filter(group=chat_group).prefetch_related().all()[:30]
     form = ChatMessageCreateForm()
 
-    if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
+    if request.method == 'POST' and request.headers.get('HX-Request') == 'true':
         form = ChatMessageCreateForm(request.POST)
         if form.is_valid():
             message = form.save(commit=False)
@@ -23,7 +23,7 @@ def HomeView(request):
                 'user': request.user
             }
             return render(request, 'chats/partials/chat_message_p.html', context)
-    
+
     context['chat_messages'] = chat_messages
     context['form'] = form
-    return render(request, 'Home.html', context)
+    return render(request, 'home.html', context)
