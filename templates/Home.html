@@ -41,90 +41,100 @@
         min-height: 55vh;
         max-height: 55vh; /* Reduced by an additional 20% */
         overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #ffffff #ece5dd; /* thumb color and track color */
     }
 
+    #chat_container::-webkit-scrollbar {
+        width: 12px;
+    }
+
+    #chat_container::-webkit-scrollbar-track {
+        background: #ece5dd; /* Track color to match background */
+    }
 
     #chat_container::-webkit-scrollbar-thumb {
-      background: white; /* Orange color for scroll thumb */
-      border-radius: 10px;
-      box-shadow: 0 0 10px #FFA500; /* Glowing effect */
+        background-color: #ffffff; /* Scroll thumb color */
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.8); /* Glowing effect */
+        border: 3px solid #ece5dd; /* Matching the background */
     }
 
     #chat_container::-webkit-scrollbar-thumb:hover {
-        background: #FAFDF3; /* Darker orange on hover */
+        background-color: #FAFDF3; /* Slightly darker on hover */
     }
 
     .chat-input-container {
-      display: flex;
-      align-items: center;
-      border-radius: 12px;
-      overflow: hidden;
-      background-color: white;
-      padding: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
+        display: flex;
+        align-items: center;
+        border-radius: 12px;
+        overflow: hidden;
+        background-color: white;
+        padding: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
 
-  .chat-input-container input {
-      flex-grow: 1;
-      border: none;
-      padding: 10px;
-      border-radius: 12px;
-      margin-right: 10px;
-      transition: opacity 0.5s ease-in-out; /* For input text fade-out effect */
-  }
+    .chat-input-container input {
+        flex-grow: 1;
+        border: none;
+        padding: 10px;
+        border-radius: 12px;
+        margin-right: 10px;
+        transition: opacity 0.5s ease-in-out; /* For input text fade-out effect */
+    }
 
-  .chat-input-container button {
-      background-color: #075E54;
-      border: none;
-      padding: 10px;
-      border-radius: 50%;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-  }
+    .chat-input-container button {
+        background-color: #075E54;
+        border: none;
+        padding: 10px;
+        border-radius: 50%;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+    }
 
-  .chat-input-container button i {
-      font-size: 20px;
-  }
+    .chat-input-container button i {
+        font-size: 20px;
+    }
 
-  .chat-input-container button:hover {
-      background-color: #064C47;
-  }
-  .new-message {
-    display: none; /* Initially hidden */
-    opacity: 0; /* Initially invisible */
-    transition: opacity 0.5s ease-in-out; /* Fade-in effect */
-  }
+    .chat-input-container button:hover {
+        background-color: #064C47;
+    }
 
-  .new-message.show {
-      display: block; /* Make visible */
-      opacity: 1; /* Fully visible */
-  }
+    .new-message {
+        display: none; /* Initially hidden */
+        opacity: 0; /* Initially invisible */
+        transition: opacity 0.5s ease-in-out; /* Fade-in effect */
+    }
 
-  ul {
-      list-style: none; /* Remove list bullets */
-      padding: 0;
-      margin: 0;
-  }
+    .new-message.show {
+        display: block; /* Make visible */
+        opacity: 1; /* Fully visible */
+    }
 
-  body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-  }
+    ul {
+        list-style: none; /* Remove list bullets */
+        padding: 0;
+        margin: 0;
+    }
 
-  .whatsapp-background {
-      height: 100vh;
-      background-color: #ece5dd;
-      background-image: radial-gradient(circle, rgba(0,0,0,0.1) 1px, transparent 1px);
-      background-size: 20px 20px;
-  }
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+    }
+
+    .whatsapp-background {
+        height: 100vh;
+        background-color: #ece5dd;
+        background-image: radial-gradient(circle, rgba(0,0,0,0.1) 1px, transparent 1px);
+        background-size: 20px 20px;
+    }
 </style>
 {% endblock stylesheets %}
-
 {% block content %}
 <div class="container-fluid py-4">
   <div class="row justify-content-center">
@@ -142,7 +152,7 @@
             {% endfor %}
           </ul>
         </div>
-        <div class="row-cols-1 rounded-2;">
+        <div class="row-cols-1 rounded-3">
          <form id="chat_message_form" method="POST" action="{% url 'home' %}" class="chat-input-container">
             {% csrf_token %}
             <input type="text" name="body" placeholder="Add a message ..." class="form-control" maxlength="300" autofocus="True" required="" id="id_body">
@@ -161,6 +171,8 @@
 {% block javascripts %}
 <script>
     $(document).ready(function() {
+                            // Scroll to the bottom of the chat container
+                            $('#chat_container').scrollTop($('#chat_container')[0].scrollHeight);
         $('#chat_message_form').on('submit', function(event) {
             event.preventDefault(); // Prevent the form from submitting via the browser
 
