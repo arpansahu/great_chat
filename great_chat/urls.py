@@ -25,7 +25,7 @@ urlpatterns = [
     # Admin URL
     path('admin/', admin.site.urls),
 
-    path('', HomeView.as_view(), name='home'),
+    path('', HomeView, name='home'),
 
     # autocomplete views
 

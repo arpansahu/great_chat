@@ -176,6 +176,7 @@ class AccountView(View):
             initial={
                 "email": request.user.email,
                 "username": request.user.username,
+                "name": request.user.name
             }
         )
         context["account"] = Account.objects.get(email=request.user.email)
@@ -192,15 +193,3 @@ class AccountView(View):
         context["account"] = Account.objects.get(email=request.user.email)
         context['account_form'] = form
         return render(request, 'account/account.html', context)
-
-# @method_decorator(login_required(redirect_field_name=''), name='dispatch')
-# class AccountUpdateView(UpdateView):
-#     template_name = 'account/account.html'
-#     model = Account
-#     form_class = AccountUpdateForm
-#     success_url = '/account'
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         return context
-

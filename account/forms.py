@@ -21,7 +21,7 @@ from mailjet_rest import Client
 class CustomAccountCreationForm(UserCreationForm):
     class Meta:
         model = Account
-        fields = ('email', 'username', 'password1', 'password2', 'profile_photo')
+        fields = ('email', 'username', 'name', 'password1', 'password2', 'profile_photo')
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -42,7 +42,7 @@ class CustomAccountCreationForm(UserCreationForm):
 class CustomAccountUpdateForm(UserChangeForm):
     class Meta:
         model = Account
-        fields = ('email', 'username', 'is_active', 'is_staff', 'is_admin', 'profile_photo')
+        fields = ('email', 'username', 'is_active', 'is_staff', 'is_admin', 'profile_photo', 'name')
 
     # Override the __init__ method to customize the form if needed
     def __init__(self, *args, **kwargs):
@@ -154,10 +154,11 @@ class AccountAuthenticationForm(forms.ModelForm):
 class AccountUpdateForm(forms.ModelForm):
     class Meta:
         model = Account
-        fields = ('email', 'username', 'profile_photo')
+        fields = ('email', 'username', 'profile_photo', 'name')
         widgets = {
             'email': forms.TextInput(attrs={'class': 'form-control'}),
             'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
             'profile_photo': forms.FileInput(attrs={'class': 'form-control'})
         }
 

@@ -1,19 +1,35 @@
-from django.shortcuts import render
-
-# Create your views here.
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import ChatGroup, GroupMessage
+from .forms import ChatMessageCreateForm
 
-# Create your views here.
-from django.urls import reverse
-from django.utils.decorators import method_decorator
-from django.views.generic import View
+@login_required(redirect_field_name='')
+def HomeView(request):
+    context = {}
+    chat_group = get_object_or_404(ChatGroup, group_name='public-chat')
+    chat_messages = GroupMessage.objects.filter(group=chat_group).prefetch_related().all()[:30]
+    form = ChatMessageCreateForm()
+    print(request.__dict__)
+    print('----------------------------------------------------------------')
+    print(request.htmx.__dict__)
+
+    if request.htmx:
+        print("htmxcalled called --------------------------------")
+        form = ChatMessageCreateForm(request.POST) 
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.author = request.user
+            message.group = chat_group
+            message.save()
+            
+            print('htmxcalled --------- ---------------------')
+            context = {
+                'message': message,
+                'user': request.user
+            }
+            return render(request, 'chats/partials/chat_message_p.html', context)
 
 
-@method_decorator(login_required(redirect_field_name=''), name='dispatch')
-class HomeView(View):
-    def get(self, request, *args, **kwargs):
-        context ={}
-        return render(self.request, template_name='Home.html', context=context)
-
+    context['chat_messages'] = chat_messages
+    context['form'] = form
+    return render(request, 'Home.html', context)

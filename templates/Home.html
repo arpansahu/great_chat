@@ -38,9 +38,80 @@
     }
 
     #chat_container {
+        min-height: 55vh;
         max-height: 55vh; /* Reduced by an additional 20% */
         overflow-y: auto;
     }
+
+    #chat_container::-webkit-scrollbar-thumb {
+      background: white; /* Orange color for scroll thumb */
+      border-radius: 10px;
+      box-shadow: 0 0 10px #FFA500; /* Glowing effect */
+    }
+
+    #chat_container::-webkit-scrollbar-thumb:hover {
+        background: #FAFDF3; /* Darker orange on hover */
+    }
+
+    .chat-input-container {
+        display: flex;
+        align-items: center;
+        border-radius: 0 0 12px 12px;
+        overflow: hidden;
+        background-color: white;
+    }
+
+    .chat-input-container input {
+        border-radius: 0 0 0 12px;
+        border: none;
+        flex-grow: 1;
+        padding: 10px;
+    }
+    #chat_container::-webkit-scrollbar {
+      width: 12px;
+    }
+
+    #chat_container::-webkit-scrollbar-track {
+      background-color: #ece5dd; /* Match chat background */
+    }
+
+    .chat-input-container button {
+        background-color: #25D366;
+        border: none;
+        padding: 10px;
+        border-radius: 0 0 12px 0;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .chat-input-container button i {
+        font-size: 20px;
+    }
+
+    .chat-input-container button:hover {
+        background-color: #20b358;
+    }
+    ul {
+      list-style: none; /* Remove list bullets */
+      padding: 0;
+      margin: 0;
+    }
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+  }
+  
+    .whatsapp-background {
+        height: 100vh;
+        background-color: #ece5dd;
+        background-image: radial-gradient(circle, rgba(0,0,0,0.1) 1px, transparent 1px);
+        background-size: 20px 20px;
+    }
+    
+
 </style>
 {% endblock stylesheets %}
 
@@ -48,75 +119,28 @@
 <div class="container-fluid py-4">
   <div class="row justify-content-center">
     <div class="col-12 col-md-6 col-lg-4">
-      <div class="card mb-4" style="background-color: #075E54;">
+      <div class="card mb-4" style="background-color: #ece5dd;">
         <!-- Chat window content can go here -->  
-        <div class="row-cols-1 text-center rounded-3" style="color: white; font-weight: bold;">
-          <span id="online-count" style="color: white;">3</span> online
+        <div class="row-cols-1 text-center rounded-3" style="background-color: #ece5dd;font-weight: bold; color: #25D366;">
+          <span id="online-count">3</span> online
         </div>        
-        <div id='chat_container' class="overflow-y-auto grow">
-          <ul id='chat_messages' class="flex flex-col justify-end gap-2 p-4">
-            <li style="margin-bottom: 15px;">
-              <div style="text-align: right; position: relative;">
-                <span class="message-bubble rounded-lg px-4 py-2" style="background-color: #25D366; display: inline-block; border-radius: 12px; position: relative;">
-                  Hi, how is everybody?
-                </span>
-              </div>
-            </li>
-            <li style="margin-bottom: 15px;">
-              <div style="display: flex; align-items: flex-start; position: relative;">
-                <img src="https://pbs.twimg.com/profile_images/508601156767997952/fFTdKUf2_400x400.jpeg" alt="User Profile" style="width: 50px; height: 50px; border-radius: 50%; margin-right: 10px;">
-                <div style="position: relative;">
-                  <span class="px-4 py-2" style="background-color: #ffffff; display: inline-block; border-radius: 12px 12px 12px 0; position: relative;">
-                    Not bad, thanks for asking! My day has been quite productive so far. 
-                              I've been diving into fixing some bugs in the codebase, which can be a nightmare sometimes, 
-                              but I got them at the end. It's always satisfying to track down those buggers and make the application 
-                              finally work. How about you? How's your day been?
-                    <span style="position: absolute; bottom: 10px; left: -10px; width: 0; height: 0; border: 10px solid transparent; border-right-color: #ffffff; border-left: 0; border-bottom: 0; margin-bottom: -10px;"></span>
-                  </span>
-                </div>
-              </div>
-            </li>
-            <li style="margin-bottom: 15px;">
-              <div style="display: flex; align-items: flex-start; position: relative;">
-                <img src="https://cdn.dribbble.com/userupload/12910688/file/original-d33b34f28a79a4b085edec17d83870ba.png" alt="User Profile" style="width: 50px; height: 50px; border-radius: 50%; margin-right: 10px;">
-                <div style="position: relative;">
-                  <span class="px-4 py-2" style="background-color: #ffffff; display: inline-block; border-radius: 12px 12px 12px 0; position: relative;">
-                      Wonderful!
-                    <span style="position: absolute; bottom: 10px; left: -10px; width: 0; height: 0; border: 10px solid transparent; border-right-color: #ffffff; border-left: 0; border-bottom: 0; margin-bottom: -10px;"></span>
-                  </span>
-                </div>
-              </div>
-            </li>
-            <li style="margin-bottom: 15px;">
-              <div style="display: flex; align-items: flex-start; position: relative;">
-                <img src="https://pbs.twimg.com/profile_images/508601156767997952/fFTdKUf2_400x400.jpeg" alt="User Profile" style="width: 50px; height: 50px; border-radius: 50%; margin-right: 10px;">
-                <div style="position: relative;">
-                  <span class="px-4 py-2" style="background-color: #ffffff; display: inline-block; border-radius: 12px 12px 12px 0; position: relative;">
-                    Not bad, thanks for asking! My day has been quite productive so far. 
-                              I've been diving into fixing some bugs in the codebase, which can be a nightmare sometimes, 
-                              but I got them at the end. It's always satisfying to track down those buggers and make the application 
-                              finally work. How about you? How's your day been?
-                    <span style="position: absolute; bottom: 10px; left: -10px; width: 0; height: 0; border: 10px solid transparent; border-right-color: #ffffff; border-left: 0; border-bottom: 0; margin-bottom: -10px;"></span>
-                  </span>
-                </div>
-              </div>
-            </li>
-            <li style="margin-bottom: 15px;">
-              <div style="display: flex; align-items: flex-start; position: relative;">
-                <img src="https://cdn.dribbble.com/userupload/12910688/file/original-d33b34f28a79a4b085edec17d83870ba.png" alt="User Profile" style="width: 50px; height: 50px; border-radius: 50%; margin-right: 10px;">
-                <div style="position: relative;">
-                  <span class="px-4 py-2" style="background-color: #ffffff; display: inline-block; border-radius: 12px 12px 12px 0; position: relative;">
-                      Wonderful!
-                    <span style="position: absolute; bottom: 10px; left: -10px; width: 0; height: 0; border: 10px solid transparent; border-right-color: #ffffff; border-left: 0; border-bottom: 0; margin-bottom: -10px;"></span>
-                  </span>
-                </div>
-              </div>
-            </li>
+        <div id='chat_container' class="overflow-y-auto grow whatsapp-background">
+
+          <ul id='chat_messages' class="flex flex-col justify-end gap-2 p-4" st>
+            {% for message in chat_messages reversed %}
+            {% include 'chats/chat_message.html' %}
+            {% endfor %}
           </ul>
         </div>
         <div class="row-cols-1 rounded-3">
-          <form id="chat_message_form" method="POST">
-            <input class="form-control" type="text" name="message" placeholder="Add message ..." maxlength="150" style="border-radius: 0 0 12px 12px;">
+          {% comment %} <form id="chat_message_form" method="POST" > {% endcomment %}
+          <form id="chat_message_form" 
+            hx-post="{% url 'home' %}"
+            hx-target="chat_messages"
+            hx-swap="beforeend"
+          >
+            {% csrf_token %}
+            {{form}}
           </form>
         </div>
         </div>
@@ -127,7 +151,18 @@
 {% endblock content %}
 <!-- Specific JS goes HERE -->
 {% block javascripts %}
-    <script>
+    
+      <script>
+
+        function scrollToBottom(time=0) {
+            setTimeout(function() {
+                const container = document.getElementById('chat_container');
+                container.scrollTop = container.scrollHeight;
+            }, time);
+        }
+        scrollToBottom()
     
     </script>
 {% endblock javascripts %}
+
+
