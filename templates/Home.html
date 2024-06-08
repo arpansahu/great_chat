@@ -159,9 +159,10 @@
         </div>
         <div class="row-cols-1 rounded-3">
          <form id="chat_message_form" method="POST" action="{% url 'home' %}" class="chat-input-container" 
-            hx-post="{% url 'home' %}" 
-            hx-target="#chat_messages" 
-            hx-swap="beforeend">
+            hx-ext="ws"
+            ws-connect="/ws/chatroom/public-chat"
+            ws-send
+            _="on htms:afterRequest reset() me">
             {% csrf_token %}
             <input type="text" name="body" placeholder="Add a message ..." class="form-control" maxlength="300" autofocus="True" required="" id="id_body" aria-label="Message input">
             <button type="submit" class="send-button" aria-label="Send message">
@@ -177,7 +178,7 @@
 {% endblock content %}
 <!-- Specific JS goes HERE -->
 {% block javascripts %}
-<script src="https://unpkg.com/htmx.org@1.9.12"></script>
+
 <script>
     // Function to scroll to the bottom of the chat container
     function scrollToBottom() {
