@@ -146,16 +146,21 @@
     <div class="col-12 col-md-6 col-lg-4">
       <div class="card mb-4" style="background-color: #ece5dd;">
         <!-- Chat window content can go here -->  
-        <div class="row-cols-1 text-center rounded-3" style="background-color: #ece5dd;font-weight: bold; color: #25D366;">
-          <span id="online-count">3</span> online
-        </div>        
+        {% comment %} <div class="row-cols-1 text-center rounded-3" style="background-color: #ece5dd;font-weight: bold; color: #25D366;">
+          <div id="online-icon" class="gray-dot absolute top-2 left-2"></div>
+          <span id="online-count"></span> online
+        </div>         {% endcomment %}
+        <div class="row-cols-1 text-center rounded-3" style="font-weight: bold;">
+        <div id="online-icon"></div>
+        <span id="online-count" class="pr-1"></span> online
+        </div>
         <div id='chat_container' class="overflow-y-auto grow whatsapp-background">
-
           <ul id='chat_messages' class="flex flex-col justify-end gap-2 p-4">
             {% for message in chat_messages reversed %}
             {% include 'chats/chat_message.html' %}
             {% endfor %}
           </ul>
+          
         </div>
         <div class="row-cols-1 rounded-3">
          <form id="chat_message_form" method="POST" action="{% url 'home' %}" class="chat-input-container" 
