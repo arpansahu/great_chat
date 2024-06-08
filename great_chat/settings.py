@@ -239,3 +239,9 @@ CACHES = {
         "LOCATION": config('REDISCLOUD_URL'),
     }
 }
+
+CHANNEL_LAYERS = {
+    'default': {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    }
+}

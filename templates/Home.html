@@ -162,7 +162,7 @@
             hx-ext="ws"
             ws-connect="/ws/chatroom/public-chat"
             ws-send
-            _="on htms:wsAfterSend reset() me">
+            _="on htms:wsAfter reset() me">
             {% csrf_token %}
             <input type="text" name="body" placeholder="Add a message ..." class="form-control" maxlength="300" autofocus="True" required="" id="id_body" aria-label="Message input">
             <button type="submit" class="send-button" aria-label="Send message">
@@ -205,13 +205,6 @@
         var inputElement = document.getElementById('id_body');
         fadeOutMessage(inputElement);
         setTimeout(scrollToBottom, 100); // Adjust the timeout if needed
-    });
-
-    // Add fade-in effect to new messages
-    document.body.addEventListener('htmx:afterSwap', function(evt) {
-        if (evt.detail.target.id === 'chat_messages') {
-            scrollToBottom();
-        }
     });
 </script>
 {% endblock javascripts %}
