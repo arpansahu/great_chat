@@ -12,8 +12,8 @@
     }
 
     #chat_container {
-        min-height: 53vh;
-        max-height: 53vh; /* Reduced by an additional 20% */
+        min-height: 48vh;
+        max-height: 48vh; /* Reduced by an additional 20% */
         overflow-y: auto;
         scrollbar-width: thin;
         scrollbar-color: black white; /* thumb color and track color */
@@ -154,6 +154,9 @@
                     </a>
                     <a class="btn btn-block btn-social btn-github" href="https://github.com/arpansahu">
                         <span style="margin-right: 10px"></span> Group Chats
+                    </a>
+                    <a class="btn btn-block btn-social btn-github" href="{% url 'create-group' %}">
+                        <i class="fas fa-plus" style="color: white; margin-right: 10px;"></i>
                     </a>
                     <a id="global_chat" class="btn btn-block btn-social btn-github" href="{% url 'chat' %}">
                         <span style="margin-right: 10px"></span> Global Chat
