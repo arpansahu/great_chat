@@ -18,7 +18,7 @@ from account.views import (
 )
 
 from real_time_chat.views import (
-     HomeView,
+     home_view,
      ChatView,
      ProfileView,
      GetOrCreateChatroomView,
@@ -28,7 +28,7 @@ urlpatterns = [
     # Admin URL
     path('admin/', admin.site.urls, name='admin'),
 
-    path('', HomeView.as_view(), name='home'),
+    path('', home_view, name='home'),
     path('profile', ProfileView.as_view(), name='profile'),
 
     #private chat

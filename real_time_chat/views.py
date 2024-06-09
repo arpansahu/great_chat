@@ -8,7 +8,7 @@ from .forms import ChatMessageCreateForm
 from django.views.generic import View
 from django.utils.decorators import method_decorator
 from account.models import Account
-
+from django.db.models import OuterRef, Subquery, Max
 from django.shortcuts import get_object_or_404, render
 from django.http import Http404
 from django.views import View
@@ -17,13 +17,35 @@ from django.template.loader import render_to_string
 from django.http import JsonResponse
 
 
-class HomeView(LoginRequiredMixin, View):
-    redirect_field_name = ''
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.db.models import OuterRef, Subquery
 
-    def get(self, request):
-        return render(request, 'home.html')
+@login_required
+def home_view(request):
+    current_user = request.user
+    print(f"Current User: {current_user}")
 
+    # Subquery to get the latest message ID for each chat group
+    latest_messages = GroupMessage.objects.filter(
+        group=OuterRef('group'),
+        group__members=current_user,
+        group__is_private=True
+    ).order_by('-created').values('id')[:1]
 
+    # Filter the GroupMessage queryset using the subquery
+    private_group_messages = GroupMessage.objects.filter(
+        id__in=Subquery(latest_messages)
+    ).order_by('-created')
+    
+    # Print the queryset for debugging
+    print(f"Private Group Messages: {private_group_messages.query}")
+
+    context = {
+        'private_chat_messages': private_group_messages,
+         'current_user': request.user,
+    }
+    return render(request, 'home.html', context)
 
 class ChatView(LoginRequiredMixin, View):
     redirect_field_name = ''
