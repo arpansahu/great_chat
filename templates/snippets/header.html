@@ -17,11 +17,14 @@
     </div>
     <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
       <div class="ms-md-auto pe-md-3 d-flex align-items-center justify-content-end">
-        
-        <div id="autocomplete" class="autocomplete" style="margin-right: 20px">
-            <input class="autocomplete-input" name="user-email" id="user-email" value="{{ email }}" placeholder="Search User Via Email..."/>
-            <ul class="autocomplete-result-list"></ul>
-        </div>
+        <form method="POST" action="{% url 'profile' %}">
+          {% csrf_token %}
+          <div id="autocomplete" class="autocomplete" style="margin-right: 20px">
+              <input class="autocomplete-input" name="email_id" id="email_id" value="{{ email }}" placeholder="Search User Via Email..."/>
+              <ul class="autocomplete-result-list"></ul>
+          </div>
+          <input type="submit" value="Search" class="btn bg-gradient-success w-auto " >
+        </form>
         <ul class="navbar-nav">
           <li class="nav-item d-flex align-items-center">
             {% if request.user.is_admin %}

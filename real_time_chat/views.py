@@ -137,6 +137,19 @@ class ProfileView(LoginRequiredMixin, View):
         }
         return render(request, 'chats/profile.html', context)
 
+    def post(self, request, *args, **kwargs):
+        user_email = request.POST.get('email_id')
+
+        if not user_email:
+            # Handle the case where user_email is not provided
+            return render(request, 'error/error_404.html')
+
+        account = get_object_or_404(Account, email=user_email)
+        context = {
+            "account": account
+        }
+        return render(request, 'chats/profile.html', context)
+
     
 # views for javascript functions
 @login_required()
