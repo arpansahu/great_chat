@@ -19,14 +19,22 @@ from account.views import (
 
 from real_time_chat.views import (
      HomeView,
+     ChatView,
+     ProfileView,
+     GetOrCreateChatroomView,
 )
 
 urlpatterns = [
     # Admin URL
-    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls, name='admin'),
 
-    path('', HomeView, name='home'),
+    path('', HomeView.as_view(), name='home'),
+    path('profile', ProfileView.as_view(), name='profile'),
 
+    #private chat
+    path('chat', ChatView.as_view(), name='chat'),
+    path('chat/<username>', GetOrCreateChatroomView.as_view(), name="start-chat"),
+    path('chat/room/<chatroom_name>', ChatView.as_view(), name="chatroom"),
     # autocomplete views
 
     path('register/', RegistrationView.as_view(), name='register'),
