@@ -136,3 +136,16 @@ class ProfileView(LoginRequiredMixin, View):
             "account": account
         }
         return render(request, 'chats/profile.html', context)
+
+    
+# views for javascript functions
+@login_required()
+def search_users(request):
+    email = request.GET.get('email')
+    payload = []
+    if email:
+        user_objs = Account.objects.filter(email__icontains=email)
+        for objs in user_objs:
+            payload.append(objs.email)
+
+    return JsonResponse({'status': 200, 'data': payload})

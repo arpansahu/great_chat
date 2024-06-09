@@ -14,7 +14,6 @@ from account.views import (
 #     AccountUpdateView,
     RegistrationView,
     activate,
-
 )
 
 from real_time_chat.views import (
@@ -22,6 +21,7 @@ from real_time_chat.views import (
      ChatView,
      ProfileView,
      GetOrCreateChatroomView,
+     search_users
 )
 
 urlpatterns = [
@@ -36,7 +36,9 @@ urlpatterns = [
     path('chat/<username>', GetOrCreateChatroomView.as_view(), name="start-chat"),
     path('chat/room/<chatroom_name>', ChatView.as_view(), name="chatroom"),
     # autocomplete views
+    path('search-user/', search_users, name='user-search'),
 
+    #Auth Views
     path('register/', RegistrationView.as_view(), name='register'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('login/', LoginView.as_view(), name='login'),
