@@ -1,5 +1,5 @@
 from django import forms
-from .models import GroupMessage
+from .models import GroupMessage, ChatGroup
 
 class ChatMessageCreateForm(forms.ModelForm):
     class Meta:
@@ -17,4 +17,15 @@ class ChatMessageCreateForm(forms.ModelForm):
         }
         labels = {
             'body': '',  # This will remove the label text
+        }
+
+class NewGroupForm(forms.ModelForm):
+    
+    class Meta:
+        model = ChatGroup
+        fields = ['group_name', 'group_photo']
+
+        widgets = {
+            'group_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'group_photo': forms.FileInput(attrs={'class': 'form-control'})
         }

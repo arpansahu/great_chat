@@ -149,13 +149,13 @@
         <div class="row text-center rounded-3" style="margin: 20px">
             <ul>
                 <li class="nav-item">
-                    <a class="btn btn-block btn-social btn-github" href="https://github.com/arpansahu/great_chat">
+                    <a class="btn btn-block btn-social btn-github" href="{% url 'home' %}">
                         <span style="margin-right: 10px"></span> Contacts Chats
                     </a>
-                    <a class="btn btn-block btn-social btn-github" href="https://github.com/arpansahu">
+                    <a class="btn btn-block btn-social btn-github" href="{% url 'group_chat_home' %}">
                         <span style="margin-right: 10px"></span> Group Chats
                     </a>
-                    <a class="btn btn-block btn-social btn-github" href="{% url 'create-group' %}">
+                    <a class="btn btn-block btn-social btn-github" href="{% url 'new-group-chat' %}">
                         <i class="fas fa-plus" style="color: white; margin-right: 10px;"></i>
                     </a>
                     <a id="global_chat" class="btn btn-block btn-social btn-github" href="{% url 'chat' %}">
@@ -166,26 +166,80 @@
         </div>
         <div id='chat_container' class="overflow-y-auto grow rounded-3">
             <ul id="whatsapp-contacts" class="flex flex-col gap-4 p-4">
-                <!-- Contact 1 -->
-                {% for message in private_chat_messages %}
-                    <li class="contact-row">
-                        {% with other_member=message.group.members|other_member:current_user %}
-                            <a href="{% url 'chatroom' chatroom_name=message.group.group_name %}">
-                                <img src="{{ other_member.profile_photo.url }}" alt="Profile 1" class="profile-photo">
+                <!-- Private Chat -->
+                {% if private_chat_messages %}
+                    {% for message in private_chat_messages %}
+                        <li class="contact-row">
+                            {% with other_member=message.group.members|other_member:current_user %}
+                                <a href="{% url 'profile' %}?email_id={{ other_member.email }}">
+                                    <img src="{{ other_member.profile_photo.url }}" alt="Profile 1" class="profile-photo">
+                                </a>
+                                <div class="contact-info">
+                                    <p class="name">
+                                        <a href="{% url 'chatroom' chatroom_name=message.group.group_name %}">
+                                            {{ other_member.name }} @{{ other_member.username }}
+                                        </a>
+                                    </p>
+                                    <p class="message">{{ message.body }}</p>
+                                </div>
+                                <p class="time">{{ message.created }}</p>
+                                <div class="message-count">3</div>
+                            {% endwith %}
+                        </li>
+                    {% endfor %}
+                <!-- Group Chat -->
+                {% elif groups %}
+                    {% for group in groups %}
+                        <li class="contact-row">
+                            <a href="{% url 'group_chat_members'%}?group_name={{group.group_name}}">
+                                <img src="{{ group.group_photo.url }}" alt="group photo" class="profile-photo">
                             </a>
                             <div class="contact-info">
                                 <p class="name">
-                                    <a href="{% url 'chatroom' chatroom_name=message.group.group_name %}">
-                                        {{ other_member.name }} @{{ other_member.username }}
+                                    <a href="{% url 'chatroom' chatroom_name=group.group_name %}">
+                                        {{ group.group_name }}
                                     </a>
                                 </p>
-                                <p class="message">{{ message.body }}</p>
+                                <p class="message">
+                                    {% if group.last_message_body %}
+                                        {{ group.last_message_body }}
+                                    {% endif %}
+                                </p>
                             </div>
-                            <p class="time">{{ message.created }}</p>
+                            <p class="time">
+                                {% if group.last_message_created %}
+                                    {{ group.last_message_created }}
+                                {% endif %}
+                            </p>
                             <div class="message-count">3</div>
-                        {% endwith %}
-                    </li>
-                {% endfor %}
+                        </li>
+                    {% endfor %}  
+                {% elif chat_group_object %}
+                    <div class="row text-center rounded-3" style="margin: 20px">
+                        <ul>
+                            <li class="nav-item">
+                                <a href="{% url 'chatroom' chatroom_name=chat_group_object.group_name %}">
+                                    <img src="{{ chat_group_object.group_photo.url }}" alt="group chat photo" class="profile-photo"> {{ chat_group_object.group_name }}
+                                </a>        
+                            </li>   
+                        </ul>
+                    </div>
+                        
+                    {% for groups_member in chat_group_object.members.all %}
+                        <li class="contact-row">
+                            <a href="{% url 'profile' %}?email_id={{ groups_member.email }}">
+                                <img src="{{ groups_member.profile_photo.url }}" alt="groups_member photo" class="profile-photo">
+                            </a>
+                            <div class="contact-info">
+                                <p class="name">
+                                    <a href="{% url 'profile' %}?email_id={{ groups_member.email }}">
+                                        {{ groups_member.name }} @{{ groups_member.username }}
+                                    </a>
+                                </p>
+                            </div>
+                        </li>
+                    {% endfor %} 
+                {% endif %}
             </ul>
         </div>
         <div class="search-container">

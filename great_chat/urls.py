@@ -21,7 +21,10 @@ from real_time_chat.views import (
      ChatView,
      ProfileView,
      GetOrCreateChatroomView,
-     search_users
+     search_users,
+     create_group_chat_view,
+     group_chat_home_view,
+     group_chat_members_view
 )
 
 urlpatterns = [
@@ -29,12 +32,21 @@ urlpatterns = [
     path('admin/', admin.site.urls, name='admin'),
 
     path('', home_view, name='home'),
-    path('profile', ProfileView.as_view(), name='profile'),
+    path('group_chat_home/', group_chat_home_view, name='group_chat_home'),
 
+    path('profile', ProfileView.as_view(), name='profile'),
+    path('group_chat_members_view', group_chat_members_view, name='group_chat_members'),
+    #public chat
+    path('chat', ChatView.as_view(), name='chat'), 
     #private chat
-    path('chat', ChatView.as_view(), name='chat'),
+
     path('chat/<username>', GetOrCreateChatroomView.as_view(), name="start-chat"),
     path('chat/room/<chatroom_name>', ChatView.as_view(), name="chatroom"),
+
+    #Group Chat
+    path('chat/new_groupchat/', create_group_chat_view, name='new-group-chat'), 
+
+
     # autocomplete views
     path('search-user/', search_users, name='user-search'),
 

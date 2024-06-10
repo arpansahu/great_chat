@@ -9,6 +9,8 @@ class ChatGroup(AbstractBaseModel):
     users_online = models.ManyToManyField(Account, related_name='online_in_groups', blank=True)
     members = models.ManyToManyField(Account, related_name='chat_groups', blank=True)
     is_private = models.BooleanField(default=False)
+    admin = models.ForeignKey(Account, related_name="groupchats",blank=True, null=True, on_delete=models.SET_NULL)
+    group_photo = models.ImageField(upload_to='profile_photos/', blank=True, null=True, default='profile_photos/group_chat.png')
 
     def __str__(self):
         return self.group_name

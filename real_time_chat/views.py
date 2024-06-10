@@ -4,7 +4,7 @@ from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from .models import ChatGroup, GroupMessage
-from .forms import ChatMessageCreateForm
+from .forms import ChatMessageCreateForm, NewGroupForm
 from django.views.generic import View
 from django.utils.decorators import method_decorator
 from account.models import Account
@@ -21,6 +21,62 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.db.models import OuterRef, Subquery
 
+@login_required
+def create_group_chat_view(request):
+    form = NewGroupForm()
+
+    if request.method == 'POST':
+        form = NewGroupForm(request.POST)
+        if form.is_valid():
+            new_group_chat = form.save(commit=False)
+            new_group_chat.admin = request.user
+            new_group_chat.save()
+            new_group_chat.members.add(request.user)
+            return redirect('chatroom', new_group_chat.group_name )
+
+    context = {
+        'form': form,
+    }
+    return render(request, 'chats/create_groupchat.html', context)
+
+@login_required
+def group_chat_home_view(request):
+    current_user = request.user
+
+    # Subquery to get the last message for each group
+    last_message_body_subquery = GroupMessage.objects.filter(
+        group=OuterRef('pk')
+    ).order_by('-created').values('body')[:1]
+
+    last_message_created_subquery = GroupMessage.objects.filter(
+        group=OuterRef('pk')
+    ).order_by('-created').values('created')[:1]
+    
+    groups = ChatGroup.objects.filter(members=current_user, is_private=False).annotate(
+        last_message_body=(last_message_body_subquery),
+        last_message_created=(last_message_created_subquery),
+    )
+
+    context = {
+        'groups': groups,
+        'current_user': request.user,
+    }
+    return render(request, 'home.html', context)
+
+@login_required
+def group_chat_members_view(request):
+    current_user = request.user
+    group_name = request.GET.get('group_name')
+    chat_group_object = ChatGroup.objects.get(group_name=group_name)
+   
+    print(chat_group_object.group_name)
+    print(chat_group_object.members.all())
+
+    context = {
+        'chat_group_object': chat_group_object,
+    }
+    return render(request, 'home.html', context)
+    
 @login_required
 def home_view(request):
     current_user = request.user
@@ -46,6 +102,8 @@ def home_view(request):
          'current_user': request.user,
     }
     return render(request, 'home.html', context)
+
+
 
 class ChatView(LoginRequiredMixin, View):
     redirect_field_name = ''
