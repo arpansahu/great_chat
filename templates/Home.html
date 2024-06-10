@@ -163,16 +163,16 @@
             <ul>
                 <li class="nav-item">
                     <a class="btn btn-block btn-social btn-github" href="{% url 'home' %}">
-                        <span style="margin-right: 10px"></span> Contacts Chats
+                        <span style="margin-right: 10px"></span> Contacts
                     </a>
                     <a class="btn btn-block btn-social btn-github" href="{% url 'group_chat_home' %}">
-                        <span style="margin-right: 10px"></span> Group Chats
+                        <span style="margin-right: 10px"></span> Groups
                     </a>
                     <a class="btn btn-block btn-social btn-github" href="{% url 'new-group-chat' %}">
-                        <i class="fas fa-plus" style="color: white; margin-right: 10px;"></i>
+                        <i class="fas fa-plus" style="color: white; margin-right: 10px;">New Group</i>
                     </a>
                     <a id="global_chat" class="btn btn-block btn-social btn-github" href="{% url 'chat' %}">
-                        <span style="margin-right: 10px"></span> Global Chat
+                        <span style="margin-right: 10px"></span> Global
                     </a>
                 </li>   
             </ul>
@@ -243,13 +243,19 @@
                                 <button id="copyButton" class="btn btn-block btn-social btn-github" data-link="{{ request.scheme }}://{{ request.get_host }}{{ request.host }}{% url 'chatroom' chatroom_name=chat_group_object.group_name %}" onclick="copyLink()">
                                     <span style="margin-right: 10px"></span> Group Link
                                 </button>
-                                <span id="feedback">Link copied to clipboard!</span>
-                                <a class="btn btn-block btn-social btn-github" href="{% url 'edit-group-chat' chat_group_object.group_name %}">
-                                    <span style="margin-right: 10px"></span> Edit
-                                </a>
-                                <a id="global_chat" class="btn btn-block btn-social btn-github bg-danger" href="{% url 'chat' %}" >
-                                    <span style="margin-right: 10px"></span> Delete
-                                </a>
+                                {% if request.user == chat_group_object.admin %}
+                                    <span id="feedback">Link copied to clipboard!</span>
+                                    <a class="btn btn-block btn-social btn-github" href="{% url 'edit-group-chat' chat_group_object.group_name %}">
+                                        <span style="margin-right: 10px"></span> Edit
+                                    </a>
+                                    <a id="global_chat" class="btn btn-block btn-social btn-github bg-danger" href="{% url 'delete-group-chat' group_name=chat_group_object.group_name  %}" >
+                                        <span style="margin-right: 10px"></span> Delete
+                                    </a>
+                                {% else %}
+                                    <a id="global_chat" class="btn btn-block btn-social btn-github bg-danger" href="{% url 'leave-group-chat' group_name=chat_group_object.group_name  %}" >
+                                        <span style="margin-right: 10px"></span> Leave
+                                    </a>
+                                {% endif %}
                             </li>   
                         </ul>    
                     </div>
@@ -272,7 +278,7 @@
             </ul>
         </div>
         <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Search Chats">
+            <input type="text" id="searchInput" placeholder="Search">
             <i class="fa fa-search search-icon" aria-hidden="true"></i>
         </div>
       </div>

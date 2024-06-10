@@ -65,13 +65,13 @@
         <div class="container">
             <div class="row">
                 <div class="question-wrapper">
-                    <h1>Delete this chatroom?</h1>
+                    <h1>Leave this chatroom?</h1>
                     <h2>"{{ chat_group.group_name }}"</h2>
                 </div>
                 <div class="card-body">
                     <form role="form text-left" method="post" enctype="multipart/form-data">
                         {% csrf_token %}
-                        <button type="submit" class="button-red">Yes, delete</button>
+                        <button type="submit" class="button-red">Yes, Leave</button>
                         <a class="button-gray" href="{{ request.META.HTTP_REFERER }}">Cancel</a>
                     </form>
                 </div>

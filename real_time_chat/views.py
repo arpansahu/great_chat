@@ -21,10 +21,42 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.db.models import OuterRef, Subquery
 
+
+@login_required
+def delete_group_chat_view(request, group_name):
+    chat_group = get_object_or_404(ChatGroup, group_name=group_name)
+
+    if request.user != chat_group.admin:
+        return redirect('group_chat_members', group_name=group_name)
+        
+    if request.method == 'POST':    
+        chat_group.delete()
+        return redirect('group_chat_home')
+
+
+    return render(request, 'chats/chatroom_delete.html', {'chat_group': chat_group})
+    
+@login_required
+def leave_group_chat_view(request, group_name):
+    chat_group = get_object_or_404(ChatGroup, group_name=group_name)
+
+
+    if request.user == chat_group.admin:
+        return redirect('group_chat_members', group_name=group_name)
+        
+    if request.method == 'POST':
+        chat_group.members.remove(request.user)
+        return redirect('group_chat_home')
+
+    return render(request, 'chats/chatroom_leave.html', {'chat_group': chat_group})
+
 @login_required
 def edit_group_chat_view(request, group_name):
     chat_group = get_object_or_404(ChatGroup, group_name=group_name)
 
+    if request.user != chat_group.admin:
+        return redirect('group_chat_members', group_name=group_name)
+        
     if request.method == 'POST':
         form = EditGroupForm(request.POST, instance=chat_group)
         if form.is_valid():

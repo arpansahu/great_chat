@@ -157,62 +157,110 @@
 {% endblock stylesheets %}
 {% block content %}
 <div class="container-fluid py-4">
-  <div class="row justify-content-center">
-    <div class="col-12 col-md-6 col-lg-4">
-      <div class="card mb-4" style="background-color: #ece5dd;">
-        {% if chat_group.group_name and not chat_group.is_private %}
-        <div class="row-cols-1 text-center rounded-3" style="background-color: #ece5dd; color: white;">
-            <a href="{% url 'profile' %}?email_id={{ other_user.email }}">
-                <img id="profile-photo" src="{{ chat_group.group_photo.url }}" class="rounded-circle mb-3" alt="Group Photo" width="50" height="50">
-            </a>
-            <span id="online" style="margin-left: 2px; font-weight: bold;">{{ chat_group.group_name }}</span>
-        </div>
-        {% endif %}
-        <div class="row-cols-1 text-center rounded-3" style="background-color: #ece5dd; color: white;">
-            <div style="display: flex; align-items: center; justify-content: center;">
-                {% if other_user %}
-                    <div id="online-icon" style="background-color: gray;"></div>
-                    <a href="{% url 'profile' %}?email_id={{ other_user.email }}">
-                    <img id="profile-photo" src="{{ other_user.profile_photo.url }}" class="rounded-circle mb-3" alt="Profile Photo" width="50" height="50">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card mb-4" style="background-color: #ece5dd;">
+                {% if chat_group.group_name and not chat_group.is_private %}
+                <div class="row-cols-1 text-center rounded-3" style="background-color: #ece5dd; color: white;">
+                    <a href="{% url 'group_chat_members' group_name=chat_group.group_name %}">
+                        <img id="profile-photo" src="{{ chat_group.group_photo.url }}" class="rounded-circle mb-3" alt="Group Photo" width="50" height="50">
+                        {{ chat_group.group_name }}
                     </a>
-                    <span id="other_user_name" style="margin-left: 2px; font-weight: bold; font-size:smaller">{{other_user.name}}</span>
-                    <span id="other_user_username" style="margin-left: 2px; font-size: smaller;">@{{other_user.username}}</span>
-                {% else %}
-                    <div id="online-icon" style="background-color: gray;"></div>
-                    <span id="online-count" class="fade-in-scale" style="font-weight: bold;"></span>
-                    <span id="online" style="margin-left: 2px; font-weight: bold;">Online</span>
+                    <span id="online" style="margin-left: 2px; font-weight: bold;"></span>
+                </div>
+                {% endif %}
+                <div class="row-cols-1 text-center rounded-3" style="background-color: #ece5dd; color: white;">
+                    <div style="display: flex; align-items: center; justify-content: center;">
+                        {% if other_user %}
+                            <div id="online-icon" style="background-color: gray;"></div>
+                            <a href="{% url 'profile' %}?email_id={{ other_user.email }}">
+                            <img id="profile-photo" src="{{ other_user.profile_photo.url }}" class="rounded-circle mb-3" alt="Profile Photo" width="50" height="50">
+                            </a>
+                            <span id="other_user_name" style="margin-left: 2px; font-weight: bold; font-size:smaller">{{other_user.name}}</span>
+                            <span id="other_user_username" style="margin-left: 2px; font-size: smaller;">@{{other_user.username}}</span>
+                        {% else %}
+                            <div id="online-icon" style="background-color: gray;"></div>
+                            <span id="online-count" class="fade-in-scale" style="font-weight: bold;"></span>
+                            <span id="online" style="margin-left: 2px; font-weight: bold;">Online</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div id='chat_container' class="overflow-y-auto grow whatsapp-background">
+                    <ul id='chat_messages' class="flex flex-col justify-end gap-2 p-4">
+                    {% for message in chat_messages reversed %}
+                    {% include 'chats/chat_message.html' %}
+                    {% endfor %}
+                    </ul>
+                </div>
+                <div class="row-cols-1 rounded-3">
+                    <form id="chat_message_form" method="POST" action="{% url 'home' %}" class="chat-input-container" 
+                        hx-ext="ws"
+                        ws-connect="/ws/chatroom/{{ chatroom_name }}"
+                        ws-send
+                        _="on htms:wsAfter reset() me">
+                        {% csrf_token %}
+                        <input type="text" name="body" placeholder="Add a message ..." class="form-control" maxlength="300" autofocus="True" required="" id="id_body" aria-label="Message input">
+                        <button type="submit" class="send-button" aria-label="Send message">
+                            <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                        </button>
+                    </form>
+                </div>  
+                {% if chat_group.group_name and not chat_group.is_private and request.user != chat_group.admin %}
+                <div class="row-cols-1 rounded-3">
+                    <button id="leave_button" class="btn btn-social bg-gradient-faded-danger" style="margin-top: 10px" value={{chat_group.group_name}}>
+                        <span style="margin-right: 10px"></span> Leave
+                    </button>
+                </div>  
                 {% endif %}
             </div>
         </div>
-        <div id='chat_container' class="overflow-y-auto grow whatsapp-background">
-          <ul id='chat_messages' class="flex flex-col justify-end gap-2 p-4">
-            {% for message in chat_messages reversed %}
-            {% include 'chats/chat_message.html' %}
-            {% endfor %}
-          </ul>
-        </div>
-        <div class="row-cols-1 rounded-3">
-         <form id="chat_message_form" method="POST" action="{% url 'home' %}" class="chat-input-container" 
-            hx-ext="ws"
-            ws-connect="/ws/chatroom/{{ chatroom_name }}"
-            ws-send
-            _="on htms:wsAfter reset() me">
-            {% csrf_token %}
-            <input type="text" name="body" placeholder="Add a message ..." class="form-control" maxlength="300" autofocus="True" required="" id="id_body" aria-label="Message input">
-            <button type="submit" class="send-button" aria-label="Send message">
-                <i class="fa fa-paper-plane" aria-hidden="true"></i>
-            </button>
-        </form>
-        </div>
-        </div>
-      </div>
     </div>
-  </div>
 </div>
+
+
+<!-- Leave Group Chat Modal -->
+<div class="modal fade" id="leave-Modal" tabindex="-1" aria-labelledby="leave-ModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-gradient">
+            <div class="modal-header bg-gradient-dark">
+                <h5 class="modal-title text-white" id="leave-ModalLabel">Are you sure you want to leave this group?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center text-black-50">
+                This action cannot be undone.
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="confirm_leave_button">Submit</button>
+                <button type="button" class="btn bg-gradient-dark" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Alert Modal -->
+<div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-gradient">
+            <div class="modal-header bg-gradient-info">
+                <h5 class="modal-title text-white" id="alertModalLabel">Alert</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="alert alert-danger text-white font-weight-bold" role="alert" id="alert_modal_text">
+                    Successfully Left Chat
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn bg-gradient-dark" data-bs-dismiss="modal" id="alert_close_button">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 {% endblock content %}
 <!-- Specific JS goes HERE -->
 {% block javascripts %}
-
 <script>
     // Function to scroll to the bottom of the chat container
     function scrollToBottom() {
@@ -240,5 +288,55 @@
         fadeOutMessage(inputElement);
         setTimeout(scrollToBottom, 100); // Adjust the timeout if needed
     });
+
+    $.ajaxSetup({
+        beforeSend: function (xhr, settings) {
+            if (settings.type == 'POST' || settings.type == 'PUT' || settings.type == 'DELETE') {
+                function getCookie(name) {
+                    var cookieValue = null;
+                    if (document.cookie && document.cookie != '') {
+                        var cookies = document.cookie.split(';');
+                        for (var i = 0; i < cookies.length; i++) {
+                            var cookie = jQuery.trim(cookies[i]);
+                            // Does this cookie string begin with the name we want?
+                            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                break;
+                            }
+                        }
+                    }
+                    return cookieValue;
+                }
+                if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                    // Only send the token to relative URLs i.e. locally.
+                    xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+                }
+            }
+        }
+    });
+
+    $(document).on("click", "#leave_button", function() {
+        $("#leave-Modal").modal('show');
+    });
+
+    $(document).on("click", "#confirm_leave_button", function() {
+        var group_name = document.getElementById('leave_button').value;
+        
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'leave-group-chat' 'GROUP_NAME_PLACEHOLDER' %}".replace('GROUP_NAME_PLACEHOLDER', group_name),
+            data: {},
+            dataType: 'json',
+            success: function(data) {
+                $('#alert_modal_text').text(data.message)
+                $("#alertModal").modal('show');
+            },
+            error: function(data){
+                $('#alert_modal_text').text(data.message)
+                $("#alertModal").modal('show');
+            }
+        });
+    });
 </script>
 {% endblock javascripts %}
+
