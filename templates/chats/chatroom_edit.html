@@ -1,37 +1,73 @@
-{% extends 'layouts/box.html' %}
-
-{% block content %} 
-
-<h1>Edit Chat</h1>
-
-<form method="post">
-    {% csrf_token %}
-    {{ form }}
-
-    <div class="my-4">
-    <h2>Members</h2>
-    {% for member in chat_group.members.all %}
-    <div class="flex justify-between items-center">
-        <div class="flex items-center gap-2 py-2">
-            <img class="w-14 h-14 rounded-full object-cover" src="{{ member.profile.avatar }}" />
-            <div>
-                <span class="font-bold">{{ member.profile.name }}</span> 
-                <span class="text-sm font-light text-gray-600">@{{ member.username }}</span>
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<section>
+    <div class="page-header section-height-75">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-4 col-lg-5 col-md-6 d-flex flex-column mx-auto">
+                    <div class="card card-plain mt-6">
+                        <div class="card-header pb-0 text-left bg-transparent">
+                            <div class="card-body">
+                              <form role="form text-left" method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="mb-3 text-center">
+                                  <img id="profile-photo" src="{{ chat_group.group_photo.url }}" 
+                                        class="rounded-circle mb-3" alt="Profile Photo" width="150" height="150">
+                                  <br>
+                                  {{ account_form.profile_photo }}
+                                </div>
+                                <label>Group Photo</label>
+                                <div class="mb-3 text-center">
+                                    {{ form.group_photo }}
+                                </div>
+                                <label>Name</label>
+                                <div class="mb-3">
+                                  {{ form.group_name }}
+                                </div>
+                                <div class="form-group">
+                                  {{ form.members.label_tag }}
+                                  <div>
+                                      {% for member in form.members %}
+                                          <label for="{{ member.id_for_label }}">
+                                              <input type="checkbox" name="{{ form.members.name }}" value="{{ member.data.value }}"
+                                              id="{{ member.id_for_label }}"
+                                              {% if member.data.value == form.admin_user_id %} disabled checked {% else %}
+                                              {% if member.data.value in form.initial_members_ids %} checked {% endif %}
+                                              {% endif %}>
+                                              {{ member.choice_label }}
+                                          </label><br>
+                                      {% endfor %}
+                                  </div>
+                                  <p>{{ form.members.help_text }}</p>
+                                  </div>
+                                <div class="text-center">
+                                  <button type="submit" name="create" class="btn bg-gradient-info w-100 mt-4 mb-0">Edit Group</button>
+                                </div>
+                              </form>
+                            </div>
+                            <div class="card-footer text-center pt-0 px-lg-2 px-1">
+                              <p class="mb-4 text-sm mx-auto">
+                                  Want to delete Chat Group?
+                                  <a href="{% url 'password_change' %}" class="text-info text-gradient font-weight-bold">
+                                      Click here..
+                                  </a>
+                              </p>
+                          </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        
-        {% if member != chat_group.admin %}
-        <div class="inline-block pr-4">
-            <input type="checkbox" name="remove_members" value="{{ member.id }}" class="relative p-5 cursor-pointer appearance-none rounded-md border after:absolute after:left-0 after:top-0 after:h-full after:w-full after:bg-[url('https://img.icons8.com/ffffff/32/multiply.png')] after:bg-center checked:bg-red-500 hover:ring hover:ring-gray-300 focus:outline-none" />
-        </div>
-        {% endif %}
-    </div> 
-    {% endfor %}
     </div>
+</section>
 
-    <button class="mt-2" type="submit">Update</button>
-</form>
+{% endblock content %}
 
-<a href="{% url 'chatroom-delete' chat_group.group_name %}" class="flex justify-end mt-4 text-gray-400 hover:text-red-500" >Delete Chatroom</a>
 
-{% endblock %}
+
+
+
+
+
+

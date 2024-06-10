@@ -4,7 +4,7 @@ from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from .models import ChatGroup, GroupMessage
-from .forms import ChatMessageCreateForm, NewGroupForm
+from .forms import ChatMessageCreateForm, NewGroupForm, EditGroupForm
 from django.views.generic import View
 from django.utils.decorators import method_decorator
 from account.models import Account
@@ -20,6 +20,21 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.db.models import OuterRef, Subquery
+
+@login_required
+def edit_group_chat_view(request, group_name):
+    chat_group = get_object_or_404(ChatGroup, group_name=group_name)
+
+    if request.method == 'POST':
+        form = EditGroupForm(request.POST, instance=chat_group)
+        if form.is_valid():
+            form.save()
+            return redirect('group_chat_members', group_name=chat_group.group_name)
+    else:
+        form = EditGroupForm(instance=chat_group)
+
+    return render(request, 'chats/chatroom_edit.html', {'form': form, 'chat_group': chat_group})
+    
 
 @login_required
 def create_group_chat_view(request):
@@ -64,9 +79,10 @@ def group_chat_home_view(request):
     return render(request, 'home.html', context)
 
 @login_required
-def group_chat_members_view(request):
+def group_chat_members_view(request, group_name):
     current_user = request.user
-    group_name = request.GET.get('group_name')
+    group_name = group_name
+
     chat_group_object = ChatGroup.objects.get(group_name=group_name)
    
     print(chat_group_object.group_name)
@@ -74,6 +90,7 @@ def group_chat_members_view(request):
 
     context = {
         'chat_group_object': chat_group_object,
+        'group_name': group_name
     }
     return render(request, 'home.html', context)
     
@@ -141,6 +158,11 @@ class ChatView(LoginRequiredMixin, View):
                 if member != request.user:
                     other_user = member
                     break
+                    
+        #means its a group chat
+        if chat_group.group_name:
+            if request.user not in chat_group.members.all():
+                chat_group.members.add(request.user)
 
         context = {
             'chat_messages': chat_messages,

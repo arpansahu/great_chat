@@ -24,7 +24,8 @@ from real_time_chat.views import (
      search_users,
      create_group_chat_view,
      group_chat_home_view,
-     group_chat_members_view
+     group_chat_members_view,
+     edit_group_chat_view
 )
 
 urlpatterns = [
@@ -35,7 +36,7 @@ urlpatterns = [
     path('group_chat_home/', group_chat_home_view, name='group_chat_home'),
 
     path('profile', ProfileView.as_view(), name='profile'),
-    path('group_chat_members_view', group_chat_members_view, name='group_chat_members'),
+    path('group_chat_members/<str:group_name>', group_chat_members_view, name='group_chat_members'),
     #public chat
     path('chat', ChatView.as_view(), name='chat'), 
     #private chat
@@ -45,7 +46,7 @@ urlpatterns = [
 
     #Group Chat
     path('chat/new_groupchat/', create_group_chat_view, name='new-group-chat'), 
-
+    path('chat/edit_groupchat/<str:group_name>/', edit_group_chat_view, name='edit-group-chat'),
 
     # autocomplete views
     path('search-user/', search_users, name='user-search'),

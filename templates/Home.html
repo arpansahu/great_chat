@@ -140,6 +140,19 @@
         font-weight: bold; /* Bold text */
     }
 </style>
+<style>
+    #copyButton {
+    }
+
+    #copyButton:hover {
+        background-color: #45a049;
+    }
+
+    #feedback {
+        color: green;
+        display: none;
+    }
+</style>
 {% endblock stylesheets %}
 {% block content %}
 <div class="container-fluid py-4">
@@ -191,7 +204,7 @@
                 {% elif groups %}
                     {% for group in groups %}
                         <li class="contact-row">
-                            <a href="{% url 'group_chat_members'%}?group_name={{group.group_name}}">
+                            <a href="{% url 'group_chat_members' group_name=group.group_name %}">
                                 <img src="{{ group.group_photo.url }}" alt="group photo" class="profile-photo">
                             </a>
                             <div class="contact-info">
@@ -224,7 +237,23 @@
                             </li>   
                         </ul>
                     </div>
-                        
+                    <div class="row text-center rounded-3" style="margin: 20px">
+                        <ul>
+                            <li class="nav-item">
+                                <button id="copyButton" class="btn btn-block btn-social btn-github" data-link="{{ request.scheme }}://{{ request.get_host }}{{ request.host }}{% url 'chatroom' chatroom_name=chat_group_object.group_name %}" onclick="copyLink()">
+                                    <span style="margin-right: 10px"></span> Group Link
+                                </button>
+                                <span id="feedback">Link copied to clipboard!</span>
+                                <a class="btn btn-block btn-social btn-github" href="{% url 'edit-group-chat' chat_group_object.group_name %}">
+                                    <span style="margin-right: 10px"></span> Edit
+                                </a>
+                                <a id="global_chat" class="btn btn-block btn-social btn-github bg-danger" href="{% url 'chat' %}" >
+                                    <span style="margin-right: 10px"></span> Delete
+                                </a>
+                            </li>   
+                        </ul>    
+                    </div>
+
                     {% for groups_member in chat_group_object.members.all %}
                         <li class="contact-row">
                             <a href="{% url 'profile' %}?email_id={{ groups_member.email }}">
@@ -278,5 +307,38 @@
     document.addEventListener('DOMContentLoaded', function() {
         scrollToBottom();
     });
+</script>
+<script>
+    function copyLink() {
+        // Get the button element
+        var copyButton = document.getElementById("copyButton");
+
+        // Get the link from the data-link attribute
+        var link = copyButton.getAttribute("data-link");
+
+        // Create a temporary input element to hold the link
+        var tempInput = document.createElement("input");
+        tempInput.value = link;
+        document.body.appendChild(tempInput);
+
+        // Select the text in the temporary input
+        tempInput.select();
+        tempInput.setSelectionRange(0, 99999); // For mobile devices
+
+        // Copy the text to the clipboard
+        document.execCommand("copy");
+
+        // Remove the temporary input element
+        document.body.removeChild(tempInput);
+
+        // Show feedback message
+        var feedback = document.getElementById("feedback");
+        feedback.style.display = "inline";
+
+        // Hide the feedback message after 2 seconds
+        setTimeout(function() {
+            feedback.style.display = "none";
+        }, 2000);
+    }
 </script>
 {% endblock javascripts %}
