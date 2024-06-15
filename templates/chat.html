@@ -206,7 +206,7 @@
                         </button>
                     </form>
                 </div>  
-                {% if chat_group.group_name and not chat_group.is_private and request.user != chat_group.admin %}
+                {% if chat_group.group_name and not chat_group.is_private and request.user != chat_group.admin and not chat_group.is_public %}
                 <div class="row-cols-1 rounded-3">
                     <button id="leave_button" class="btn btn-social bg-gradient-faded-danger" style="margin-top: 10px" value={{chat_group.group_name}}>
                         <span style="margin-right: 10px"></span> Leave

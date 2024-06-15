@@ -11,6 +11,8 @@ class ChatGroup(AbstractBaseModel):
     is_private = models.BooleanField(default=False)
     admin = models.ForeignKey(Account, related_name="groupchats",blank=True, null=True, on_delete=models.SET_NULL)
     group_photo = models.ImageField(upload_to='profile_photos/', blank=True, null=True, default='profile_photos/group_chat.png')
+    file = models.FileField(upload_to='files/', blank=True, null=True)
+    is_public = models.BooleanField(default=False)
 
     def __str__(self):
         return self.group_name

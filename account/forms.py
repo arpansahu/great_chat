@@ -214,7 +214,7 @@ class PasswordResetForm(forms.Form):
                 {
                     "From": {
                         "Email": "admin@arpansahu.me",
-                        "Name": "Greate Chat"
+                        "Name": "Great Chat"
                     },
                     "To": [
                         {

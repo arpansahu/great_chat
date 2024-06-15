@@ -99,7 +99,7 @@ def group_chat_home_view(request):
         group=OuterRef('pk')
     ).order_by('-created').values('created')[:1]
     
-    groups = ChatGroup.objects.filter(members=current_user, is_private=False).annotate(
+    groups = ChatGroup.objects.filter(members=current_user, is_private=False, is_public=False).annotate(
         last_message_body=(last_message_body_subquery),
         last_message_created=(last_message_created_subquery),
     )
