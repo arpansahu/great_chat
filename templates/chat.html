@@ -205,6 +205,10 @@
                         _="on htmx:wsAfter reset() me">
                         {% csrf_token %}
                         <input type="text" name="body" placeholder="Add a message ..." class="form-control" maxlength="300" autofocus="True" required="" id="id_body" aria-label="Message input">
+                        <!-- File Upload Button -->
+                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#fileUploadModal" aria-label="Upload file">
+                            <i class="fa fa-paperclip" aria-hidden="true"></i>
+                        </button>
                         <button type="submit" class="send-button" aria-label="Send message">
                             <i class="fa fa-paper-plane" aria-hidden="true"></i>
                         </button>
@@ -253,6 +257,29 @@
     </div>
 </div>
 
+<!-- File Upload Modal -->
+<div class="modal fade" id="fileUploadModal" tabindex="-1" aria-labelledby="fileUploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="fileUploadModalLabel">Upload File</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="chat_file_form" enctype="multipart/form-data"
+                hx-post="{% url 'chat-file-upload' chat_group.group_name %}"
+                hx-target="#chat_messages"
+                hx-swap="beforeend"
+                _="on htmx:beforeRequest reset() me">
+            {% csrf_token %}
+            <input type="file" name="file" id="id_file" aria-label="File input" class="form-control mb-3">
+            <button type="submit" id="upload button" class="btn btn-primary">Upload</button>
+          </form>
+        </div>
+      </div>
+    </div>
+</div>
+
 <!-- Alert Modal -->
 <div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -263,7 +290,7 @@
             </div>
             <div class="modal-body text-center">
                 <div class="alert alert-danger text-white font-weight-bold" role="alert" id="alert_modal_text">
-                    Successfully Left Chat
+                    Random alert Message
                 </div>
             </div>
             <div class="modal-footer justify-content-center">
@@ -339,7 +366,6 @@
 
     $(document).on("click", "#confirm_leave_button", function() {
         var group_name = document.getElementById('leave_button').value;
-        
         $.ajax({
             type: 'POST',
             url: "{% url 'leave-group-chat' 'GROUP_NAME_PLACEHOLDER' %}".replace('GROUP_NAME_PLACEHOLDER', group_name),
@@ -351,6 +377,31 @@
             },
             error: function(data){
                 $('#alert_modal_text').text(data.message)
+                $("#alertModal").modal('show');
+            }
+        });
+    });
+
+    // File upload form submission
+    $('#chat_file_form').on('submit', function(e) {
+        e.preventDefault();
+
+        var formData = new FormData(this);
+
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'chat-file-upload' chat_group.group_name %}",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(data) {
+                $('#fileUploadModal').modal('hide');
+                $('#alert_modal_text').text(data.message);
+                $("#alertModal").modal('show');
+            },
+            error: function(data) {
+                $('#fileUploadModal').modal('hide');
+                $('#alert_modal_text').text(data.message);
                 $("#alertModal").modal('show');
             }
         });
