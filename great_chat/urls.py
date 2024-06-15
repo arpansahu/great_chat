@@ -27,7 +27,8 @@ from real_time_chat.views import (
      group_chat_members_view,
      edit_group_chat_view,
      delete_group_chat_view,
-     leave_group_chat_view
+     leave_group_chat_view, 
+     chat_file_upload,
 )
 
 urlpatterns = [
@@ -39,6 +40,10 @@ urlpatterns = [
 
     path('profile', ProfileView.as_view(), name='profile'),
     path('group_chat_members/<str:group_name>', group_chat_members_view, name='group_chat_members'),
+
+    #utlity for chat
+    path('chat/file_upload/<str:group_name>',chat_file_upload , name='chat-file-upload'),
+
     #public chat
     path('chat', ChatView.as_view(), name='chat'), 
     #private chat

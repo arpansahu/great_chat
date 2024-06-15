@@ -11,7 +11,6 @@ class ChatGroup(AbstractBaseModel):
     is_private = models.BooleanField(default=False)
     admin = models.ForeignKey(Account, related_name="groupchats",blank=True, null=True, on_delete=models.SET_NULL)
     group_photo = models.ImageField(upload_to='profile_photos/', blank=True, null=True, default='profile_photos/group_chat.png')
-    file = models.FileField(upload_to='files/', blank=True, null=True)
     is_public = models.BooleanField(default=False)
 
     def __str__(self):
@@ -20,10 +19,16 @@ class ChatGroup(AbstractBaseModel):
 class GroupMessage(AbstractBaseModel):
     group = models.ForeignKey(ChatGroup, related_name="chat_messages", on_delete=models.CASCADE)
     author = models.ForeignKey(Account, on_delete=models.CASCADE)
-    body = models.CharField(max_length=300)
+    body = models.CharField(max_length=300, blank=True, null=True)
+    file = models.FileField(upload_to='files/', blank=True, null=True)
 
     def __str__(self):
         return f"{self.author.username} : {self.body}"
         
     class Meta:
         ordering = ['-created']
+
+    def is_image(self):
+        if self.file:
+            return self.file.name.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp'))
+        return False

@@ -14,9 +14,9 @@ from django.http import Http404
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.template.loader import render_to_string
-from django.http import JsonResponse
-
-
+from django.http import JsonResponse, HttpResponse
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.db.models import OuterRef, Subquery
@@ -41,7 +41,7 @@ def leave_group_chat_view(request, group_name):
     chat_group = get_object_or_404(ChatGroup, group_name=group_name)
 
 
-    if request.user == chat_group.admin:
+    if not chat_group.admin or request.user == chat_group.admin :
         return redirect('group_chat_members', group_name=group_name)
         
     if request.method == 'POST':
@@ -49,6 +49,26 @@ def leave_group_chat_view(request, group_name):
         return redirect('group_chat_home')
 
     return render(request, 'chats/chatroom_leave.html', {'chat_group': chat_group})
+
+@login_required
+def chat_file_upload(request, group_name):
+    chat_group = get_object_or_404(ChatGroup, group_name=group_name)
+
+
+    if request.htmx and request.FILES:
+        file = request.FILES['file']
+        message = GroupMessage.objects.create(
+            file=file,
+            author = request.user,
+            group = chat_group
+        )
+        channel_layer = get_channel_layer()
+        event = {
+            'type': 'message_handler',
+            'message_id': message.id
+        }
+        async_to_sync(channel_layer.group_send)(group_name, event)
+    return HttpResponse()
 
 @login_required
 def edit_group_chat_view(request, group_name):

@@ -152,7 +152,6 @@
         justify-content: center;
         width: 100%;
     }
-
 </style>
 {% endblock stylesheets %}
 {% block content %}
@@ -160,8 +159,8 @@
     <div class="row justify-content-center">
         <div class="col-12 col-md-6 col-lg-4">
             <div class="card mb-4" style="background-color: #ece5dd;">
-
-                {% if chat_group.group_name and not chat_group.is_private %}
+                {% comment %} group chat {% endcomment %}
+                {% if chat_group.group_name and not chat_group.is_private and not chat_group.is_public %}
                 <div class="row-cols-1 text-center rounded-3" style="background-color: #ece5dd; color: white;">
                     <a href="{% url 'group_chat_members' group_name=chat_group.group_name %}">
                         <img id="profile-photo" src="{{ chat_group.group_photo.url }}" class="rounded-circle mb-3" alt="Group Photo" width="50" height="50">
@@ -172,6 +171,7 @@
                 {% endif %}
                 <div class="row-cols-1 text-center rounded-3" style="background-color: #ece5dd; color: white;">
                     <div style="display: flex; align-items: center; justify-content: center;">
+                        {% comment %} private chat {% endcomment %}
                         {% if other_user %}
                             <div id="online-icon" style="background-color: gray;"></div>
                             <a href="{% url 'profile' %}?email_id={{ other_user.email }}">
@@ -179,7 +179,11 @@
                             </a>
                             <span id="other_user_name" style="margin-left: 2px; font-weight: bold; font-size:smaller">{{other_user.name}}</span>
                             <span id="other_user_username" style="margin-left: 2px; font-size: smaller;">@{{other_user.username}}</span>
+                        {% comment %} public chat {% endcomment %}
                         {% else %}
+                            <a href="{% url 'chat' %}" style="margin: 5px">
+                                {{ chat_group.group_name }}
+                            </a>
                             <div id="online-icon" style="background-color: gray;"></div>
                             <span id="online-count" class="fade-in-scale" style="font-weight: bold;"></span>
                             <span id="online" style="margin-left: 2px; font-weight: bold;">Online</span>
@@ -198,11 +202,22 @@
                         hx-ext="ws"
                         ws-connect="/ws/chatroom/{{ chatroom_name }}"
                         ws-send
-                        _="on htms:wsAfter reset() me">
+                        _="on htmx:wsAfter reset() me">
                         {% csrf_token %}
                         <input type="text" name="body" placeholder="Add a message ..." class="form-control" maxlength="300" autofocus="True" required="" id="id_body" aria-label="Message input">
                         <button type="submit" class="send-button" aria-label="Send message">
                             <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                        </button>
+                    </form>
+                    <form id="chat_file_form" enctype="multipart/form-data"
+                        hx-post="{% url 'chat-file-upload' chat_group.group_name %}"
+                        hx-target="#chat_messages"
+                        hx-swap="beforeend"
+                        _="on htmx:beforeRequest reset() me">
+                        {% csrf_token %}
+                        <input type="file" name="file" id="id_file" aria-label="File input">
+                        <button type="submit" class="send-button" aria-label="Upload file">
+                            <i class="fa fa-upload" aria-hidden="true"></i>
                         </button>
                     </form>
                 </div>  
