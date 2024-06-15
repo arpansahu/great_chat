@@ -4,6 +4,8 @@ from django.template.loader import render_to_string
 from asgiref.sync import async_to_sync
 import json
 from .models import ChatGroup, GroupMessage
+from account.models import Account
+
 class ChatroomConsumer(WebsocketConsumer):
     def connect(self):
         self.user = self.scope['user']
@@ -21,7 +23,6 @@ class ChatroomConsumer(WebsocketConsumer):
         
         self.accept()
 
-
     def disconnect(self, close_code):
         async_to_sync(self.channel_layer.group_discard)(
             self.chatroom_name, self.channel_name
@@ -37,9 +38,9 @@ class ChatroomConsumer(WebsocketConsumer):
         body = text_data_json['body']
 
         message = GroupMessage.objects.create(
-            body = body,
-            author = self.user,
-            group = self.chatroom
+            body=body,
+            author=self.user,
+            group=self.chatroom
         )
      
         event = {
@@ -66,7 +67,7 @@ class ChatroomConsumer(WebsocketConsumer):
     def update_online_count(self):
         online_count = self.chatroom.users_online.count() - 1
         
-        if online_count < 0 :
+        if online_count < 0:
             online_count = 0
 
         event = {
@@ -81,9 +82,9 @@ class ChatroomConsumer(WebsocketConsumer):
     def online_count_handler(self, event):
         online_count = event['online_count']
 
-        chat_messages = ChatGroup.objects.get(group_name=self.chatroom_name).chat_messages.all()[:30]
-        author_ids = set([message.author.id for message in chat_messages])
-        users = Account.object.filter(id__in=author_ids)
+        chat_messages = self.chatroom.chat_messages.all()[:30]
+        author_ids = set(message.author.id for message in chat_messages)
+        users = Account.objects.filter(id__in=author_ids)
 
         context = {
             'online_count': online_count,
