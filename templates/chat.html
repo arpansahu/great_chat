@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %} Greate Chat {% endblock title %}
+{% block title %} Great Chat {% endblock title %}
 {% load custom_tags %}
 <!-- Specific CSS goes HERE -->
 {% block stylesheets %}
@@ -160,6 +160,7 @@
     <div class="row justify-content-center">
         <div class="col-12 col-md-6 col-lg-4">
             <div class="card mb-4" style="background-color: #ece5dd;">
+
                 {% if chat_group.group_name and not chat_group.is_private %}
                 <div class="row-cols-1 text-center rounded-3" style="background-color: #ece5dd; color: white;">
                     <a href="{% url 'group_chat_members' group_name=chat_group.group_name %}">

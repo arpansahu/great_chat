@@ -200,7 +200,7 @@
                             {% endwith %}
                         </li>
                     {% endfor %}
-                <!-- Group Chat -->
+                <!-- Global Chat -->
                 {% elif groups %}
                     {% for group in groups %}
                         <li class="contact-row">
@@ -227,6 +227,7 @@
                             <div class="message-count">3</div>
                         </li>
                     {% endfor %}  
+                <!-- Group Chat -->
                 {% elif chat_group_object %}
                     <div class="row text-center rounded-3" style="margin: 20px">
                         <ul>

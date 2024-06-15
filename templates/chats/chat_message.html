@@ -1,3 +1,39 @@
+<style>
+  .profile-container {
+    position: relative;
+  }
+  
+  .profile-link {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .profile-photo {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: white;
+  }
+  
+  .online-status {
+    position: absolute;
+    bottom: 2px;  /* Adjust this value as needed */
+    right: 2px;   /* Adjust this value as needed */
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid white;
+  }
+  
+  .online {
+    background-color: #4CAF50; /* Green color for online */
+  }
+  
+  .offline {
+    background-color: grey; /* Grey color for offline */
+  }
+</style>
+
 <div id="chat_message" hx-swap-oob="beforeend">
   {% if message.author == user %}
     <li style="margin-bottom: 15px;">
@@ -13,9 +49,12 @@
     {% else %}
     <li style="margin-bottom: 15px;">
       <div style="display: flex; align-items: flex-start; position: relative;">
-        <a href="{% url 'profile' %}?email_id={{ message.author.email }}">
-        <img src="{{ message.author.profile_photo.url }}"  alt="User Profile" style="width: 50px; height: 50px; border-radius: 50%; margin-right: 10px; background-color: white;">
-        </a>
+        <div class="profile-container">
+          <a href="{% url 'profile' %}?email_id={{ message.author.email }}" class="profile-link">
+            <img src="{{ message.author.profile_photo.url }}" alt="User Profile" class="profile-photo">
+            <span class="online-status" id="user--{{ message.author.id }}"></span>
+          </a>
+        </div>
         <div style="position: relative;">
           <span class="px-4 py-2" style="background-color: #ffffff; display: inline-block; border-radius: 12px 12px 12px 0; position: relative;">
             {{ message.body }}  

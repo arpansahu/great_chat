@@ -80,9 +80,19 @@ class ChatroomConsumer(WebsocketConsumer):
     
     def online_count_handler(self, event):
         online_count = event['online_count']
+
+        chat_messages = ChatGroup.objects.get(group_name=self.chatroom_name).chat_messages.all()[:30]
+        author_ids = set([message.author.id for message in chat_messages])
+        users = Account.object.filter(id__in=author_ids)
+
+        context = {
+            'online_count': online_count,
+            'users': users,
+            'chat_group': self.chatroom
+        }
+
         html = render_to_string(
-            "chats/partials/online_count.html", 
-            {'online_count': online_count}
+            "chats/partials/online_count.html", context=context
         )
         self.send(text_data=html)
     
