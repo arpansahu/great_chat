@@ -22,9 +22,13 @@ class GroupMessage(AbstractBaseModel):
     body = models.CharField(max_length=300, blank=True, null=True)
     file = models.FileField(upload_to='files/', blank=True, null=True)
 
+    
     def __str__(self):
-        return f"{self.author.username} : {self.body}"
-        
+        if self.body:
+            return f"{self.author.username} : {self.body}"
+        elif self.file:
+            return f"{self.author.username} : {self.file.name}"
+
     class Meta:
         ordering = ['-created']
 
@@ -32,3 +36,4 @@ class GroupMessage(AbstractBaseModel):
         if self.file:
             return self.file.name.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp'))
         return False
+

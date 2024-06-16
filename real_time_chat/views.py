@@ -116,12 +116,17 @@ def group_chat_home_view(request):
         group=OuterRef('pk')
     ).order_by('-created').values('body')[:1]
 
+    last_message_file_subquery = GroupMessage.objects.filter(
+        group=OuterRef('pk')
+    ).order_by('-created').values('file')[:1]
+
     last_message_created_subquery = GroupMessage.objects.filter(
         group=OuterRef('pk')
     ).order_by('-created').values('created')[:1]
     
     groups = ChatGroup.objects.filter(members=current_user, is_private=False, is_public=False).annotate(
         last_message_body=(last_message_body_subquery),
+        last_message_file=(last_message_file_subquery),
         last_message_created=(last_message_created_subquery),
     )
 
@@ -136,13 +141,13 @@ def group_chat_members_view(request, group_name):
     current_user = request.user
     group_name = group_name
 
-    chat_group_object = ChatGroup.objects.get(group_name=group_name)
+    chat_group_members_object = ChatGroup.objects.get(group_name=group_name)
    
-    print(chat_group_object.group_name)
-    print(chat_group_object.members.all())
+    print(chat_group_members_object.group_name)
+    print(chat_group_members_object.members.all())
 
     context = {
-        'chat_group_object': chat_group_object,
+        'chat_group_members_object': chat_group_members_object,
         'group_name': group_name
     }
     return render(request, 'home.html', context)

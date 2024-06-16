@@ -179,7 +179,7 @@
         </div>
         <div id='chat_container' class="overflow-y-auto grow rounded-3">
             <ul id="whatsapp-contacts" class="flex flex-col gap-4 p-4">
-                <!-- Private Chat -->
+                <!-- Private Chat View-->
                 {% if private_chat_messages %}
                     {% for message in private_chat_messages %}
                         <li class="contact-row">
@@ -193,14 +193,18 @@
                                             {{ other_member.name }} @{{ other_member.username }}
                                         </a>
                                     </p>
+                                    {% if message.body %}
                                     <p class="message">{{ message.body }}</p>
+                                    {% elif message.file %}
+                                    <p class="message">{{ message.file.name }}</p>
+                                    {% endif %}
                                 </div>
                                 <p class="time">{{ message.created }}</p>
                                 <div class="message-count">3</div>
                             {% endwith %}
                         </li>
                     {% endfor %}
-                <!-- Global Chat -->
+                <!-- Group Chat View -->
                 {% elif groups %}
                     {% for group in groups %}
                         <li class="contact-row">
@@ -216,6 +220,8 @@
                                 <p class="message">
                                     {% if group.last_message_body %}
                                         {{ group.last_message_body }}
+                                    {% elif group.last_message_file %}
+                                        {{ group.last_message_file.name}}
                                     {% endif %}
                                 </p>
                             </div>
@@ -227,13 +233,13 @@
                             <div class="message-count">3</div>
                         </li>
                     {% endfor %}  
-                <!-- Group Chat -->
-                {% elif chat_group_object %}
+                <!-- Group Chat Members View -->
+                {% elif chat_group_members_object %}
                     <div class="row text-center rounded-3" style="margin: 20px">
                         <ul>
                             <li class="nav-item">
-                                <a href="{% url 'chatroom' chatroom_name=chat_group_object.group_name %}">
-                                    <img src="{{ chat_group_object.group_photo.url }}" alt="group chat photo" class="profile-photo"> {{ chat_group_object.group_name }}
+                                <a href="{% url 'chatroom' chatroom_name=chat_group_members_object.group_name %}">
+                                    <img src="{{ chat_group_members_object.group_photo.url }}" alt="group chat photo" class="profile-photo"> {{ chat_group_members_object.group_name }}
                                 </a>        
                             </li>   
                         </ul>
@@ -241,19 +247,19 @@
                     <div class="row text-center rounded-3" style="margin: 20px">
                         <ul>
                             <li class="nav-item">
-                                <button id="copyButton" class="btn btn-block btn-social btn-github" data-link="{{ request.scheme }}://{{ request.get_host }}{{ request.host }}{% url 'chatroom' chatroom_name=chat_group_object.group_name %}" onclick="copyLink()">
+                                <button id="copyButton" class="btn btn-block btn-social btn-github" data-link="{{ request.scheme }}://{{ request.get_host }}{{ request.host }}{% url 'chatroom' chatroom_name=chat_group_members_object.group_name %}" onclick="copyLink()">
                                     <span style="margin-right: 10px"></span> Group Link
                                 </button>
-                                {% if request.user == chat_group_object.admin %}
+                                {% if request.user == chat_group_members_object.admin %}
                                     <span id="feedback">Link copied to clipboard!</span>
-                                    <a class="btn btn-block btn-social btn-github" href="{% url 'edit-group-chat' chat_group_object.group_name %}">
+                                    <a class="btn btn-block btn-social btn-github" href="{% url 'edit-group-chat' chat_group_members_object.group_name %}">
                                         <span style="margin-right: 10px"></span> Edit
                                     </a>
-                                    <a id="global_chat" class="btn btn-block btn-social btn-github bg-danger" href="{% url 'delete-group-chat' group_name=chat_group_object.group_name  %}" >
+                                    <a id="global_chat" class="btn btn-block btn-social btn-github bg-danger" href="{% url 'delete-group-chat' group_name=chat_group_members_object.group_name  %}" >
                                         <span style="margin-right: 10px"></span> Delete
                                     </a>
                                 {% else %}
-                                    <a id="global_chat" class="btn btn-block btn-social btn-github bg-danger" href="{% url 'leave-group-chat' group_name=chat_group_object.group_name  %}" >
+                                    <a id="global_chat" class="btn btn-block btn-social btn-github bg-danger" href="{% url 'leave-group-chat' group_name=chat_group_members_object.group_name  %}" >
                                         <span style="margin-right: 10px"></span> Leave
                                     </a>
                                 {% endif %}
@@ -261,7 +267,7 @@
                         </ul>    
                     </div>
 
-                    {% for groups_member in chat_group_object.members.all %}
+                    {% for groups_member in chat_group_members_object.members.all %}
                         <li class="contact-row">
                             <a href="{% url 'profile' %}?email_id={{ groups_member.email }}">
                                 <img src="{{ groups_member.profile_photo.url }}" alt="groups_member photo" class="profile-photo">

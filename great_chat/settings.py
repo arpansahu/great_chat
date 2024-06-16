@@ -178,7 +178,7 @@ if not DEBUG:
         AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
         AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
         AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
-        AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME')
+        AWS_S3_REGION_NAME = 'us-east-005'
 
         AWS_S3_ENDPOINT = f's3.{AWS_S3_REGION_NAME}.backblazeb2.com'
         AWS_S3_ENDPOINT_URL = f'https://{AWS_S3_ENDPOINT}'
@@ -205,6 +205,37 @@ if not DEBUG:
         PRIVATE_MEDIA_LOCATION = 'portfolio/great_chat/private'
         PRIVATE_FILE_STORAGE = 'great_chat.storage_backends.PrivateMediaStorage'
 
+    elif BUCKET_TYPE == 'MINIO':
+        AWS_ACCESS_KEY_ID = 'k7k93ed0kNTEsmFjvoFq'
+        AWS_SECRET_ACCESS_KEY = 'NkBNwsiM0zkEhVt4A1QANTRQsMfrQYJTXh1GNlYg'
+        AWS_STORAGE_BUCKET_NAME = 'arpansahu-one-bucket'
+        AWS_S3_REGION_NAME = 'us-east-1'  # MinIO doesn't require this, but boto3 does
+        AWS_S3_ENDPOINT_URL = 'https://minio.arpansahu.me'
+        AWS_DEFAULT_ACL = 'public-read'
+        AWS_S3_OBJECT_PARAMETERS = {
+            'CacheControl': 'max-age=86400',
+        }
+        AWS_LOCATION = 'static'
+        AWS_QUERYSTRING_AUTH = False
+        AWS_HEADERS = {
+            'Access-Control-Allow-Origin': '*',
+        }
+
+        # s3 static settings
+        AWS_STATIC_LOCATION = 'portfolio/great_chat/static'
+        STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}/{AWS_STATIC_LOCATION}/'
+        STATICFILES_STORAGE = 'great_chat.storage_backends.StaticStorage'
+
+        # s3 public media settings
+        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/great_chat/media'
+        MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}/{AWS_PUBLIC_MEDIA_LOCATION}/'
+        DEFAULT_FILE_STORAGE = 'great_chat.storage_backends.PublicMediaStorage'
+
+        # s3 private media settings
+        PRIVATE_MEDIA_LOCATION = 'portfolio/great_chat/private'
+        PRIVATE_FILE_STORAGE = 'great_chat.storage_backends.PrivateMediaStorage'
+
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 else:
     # Static files (CSS, JavaScript, Images)
@@ -259,3 +290,35 @@ else:
             },
         },
     }
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.core.management.commands.collectstatic': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
