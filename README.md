@@ -330,10 +330,10 @@ COPY . .
 
 RUN pip3 install -r requirements.txt
 
-EXPOSE 8016
+EXPOSE 8002
 
 CMD python manage.py collectstatic
-CMD gunicorn --bind 0.0.0.0:8016 great_chat.wsgi
+CMD gunicorn --bind 0.0.0.0:8002 great_chat.wsgi
 ```
 
 Create a file named docker-compose.yml and add following lines in it
@@ -345,13 +345,13 @@ services:
   web:
     build: .
     env_file: ./.env
-    command: bash -c "python manage.py makemigrations && python manage.py migrate && gunicorn --bind 0.0.0.0:8016 great_chat.wsgi"
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && daphne --bind 0.0.0.0:8002 great_chat.asgi:application"
     image: great_chat
     container_name: great_chat
     volumes:
       - .:/great_chat
     ports:
-      - "8016:8016"
+      - "8002:8002"
     restart: unless-stopped
 ```
 

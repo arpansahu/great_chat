@@ -206,9 +206,9 @@ if not DEBUG:
         PRIVATE_FILE_STORAGE = 'great_chat.storage_backends.PrivateMediaStorage'
 
     elif BUCKET_TYPE == 'MINIO':
-        AWS_ACCESS_KEY_ID = 'k7k93ed0kNTEsmFjvoFq'
-        AWS_SECRET_ACCESS_KEY = 'NkBNwsiM0zkEhVt4A1QANTRQsMfrQYJTXh1GNlYg'
-        AWS_STORAGE_BUCKET_NAME = 'arpansahu-one-bucket'
+        AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+        AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
         AWS_S3_REGION_NAME = 'us-east-1'  # MinIO doesn't require this, but boto3 does
         AWS_S3_ENDPOINT_URL = 'https://minio.arpansahu.me'
         AWS_DEFAULT_ACL = 'public-read'

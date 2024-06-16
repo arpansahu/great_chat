@@ -4,11 +4,11 @@ services:
   web:
     build: .
     env_file: ./.env
-    command: bash -c "python manage.py makemigrations && python manage.py migrate && gunicorn --bind 0.0.0.0:8016 great_chat.wsgi"
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && daphne --bind 0.0.0.0:8002 great_chat.asgi:application"
     image: great_chat
     container_name: great_chat
     volumes:
       - .:/great_chat
     ports:
-      - "8016:8016"
+      - "8002:8002"
     restart: unless-stopped

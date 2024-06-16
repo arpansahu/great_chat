@@ -8,7 +8,7 @@ COPY . .
 
 RUN pip3 install -r requirements.txt
 
-EXPOSE 8016
+EXPOSE 8002
 
 CMD python manage.py collectstatic
-CMD gunicorn --bind 0.0.0.0:8016 great_chat.wsgi
+CMD gunicorn --bind 0.0.0.0:8002 great_chat.wsgi
