@@ -235,7 +235,7 @@ if not DEBUG:
         PRIVATE_MEDIA_LOCATION = 'portfolio/great_chat/private'
         PRIVATE_FILE_STORAGE = 'great_chat.storage_backends.PrivateMediaStorage'
 
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+    
 
 else:
     # Static files (CSS, JavaScript, Images)
@@ -245,8 +245,8 @@ else:
 
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
     MEDIA_URL = '/media/'
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"), ]
 
 # Default primary key field type
