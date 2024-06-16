@@ -20,7 +20,7 @@ from asgiref.sync import async_to_sync
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.db.models import OuterRef, Subquery
-
+from django.urls import reverse
 
 @login_required
 def delete_group_chat_view(request, group_name):
@@ -46,7 +46,8 @@ def leave_group_chat_view(request, group_name):
         
     if request.method == 'POST':
         chat_group.members.remove(request.user)
-        return redirect('group_chat_home')
+        redirect_url = reverse('group_chat_home')
+        return JsonResponse({'redirect_url': redirect_url})
 
     return render(request, 'chats/chatroom_leave.html', {'chat_group': chat_group})
 

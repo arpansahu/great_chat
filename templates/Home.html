@@ -316,6 +316,21 @@
     });
 </script>
 <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        if (localStorage.getItem('showSuccessAlert') === 'true') {
+            localStorage.removeItem('showSuccessAlert');
+            Swal.fire({
+                title: 'Success!',
+                text: 'You have successfully left the group chat.',
+                icon: 'success',
+                timer: 5000,
+                timerProgressBar: true,
+                showConfirmButton: false,
+                position: 'top',
+                toast: true
+            });
+        }
+    });
     function copyLink() {
         // Get the button element
         var copyButton = document.getElementById("copyButton");

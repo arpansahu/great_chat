@@ -213,17 +213,6 @@
                             <i class="fa fa-paper-plane" aria-hidden="true"></i>
                         </button>
                     </form>
-                    <form id="chat_file_form" enctype="multipart/form-data"
-                        hx-post="{% url 'chat-file-upload' chat_group.group_name %}"
-                        hx-target="#chat_messages"
-                        hx-swap="beforeend"
-                        _="on htmx:beforeRequest reset() me">
-                        {% csrf_token %}
-                        <input type="file" name="file" id="id_file" aria-label="File input">
-                        <button type="submit" class="send-button" aria-label="Upload file">
-                            <i class="fa fa-upload" aria-hidden="true"></i>
-                        </button>
-                    </form>
                 </div>  
                 {% if chat_group.group_name and not chat_group.is_private and request.user != chat_group.admin and not chat_group.is_public %}
                 <div class="row-cols-1 rounded-3">
@@ -277,28 +266,6 @@
           </form>
         </div>
       </div>
-    </div>
-</div>
-
-<!-- Alert Modal -->
-<div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content bg-gradient">
-            <div class="modal-header bg-gradient-info">
-                <h5 class="modal-title text-white" id="alertModalLabel">Alert</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center">
-                <div class="alert alert-danger text-white font-weight-bold" role="alert" id="alert_modal_text">
-                    Random alert Message
-                </div>
-            </div>
-            <div class="modal-footer justify-content-center">
-                <a href="{% url 'group_chat_home' %}">
-                <button type="button" class="btn bg-gradient-dark" data-bs-dismiss="modal" id="alert_close_button">Close</button>
-                <a>
-            </div>
-        </div>
     </div>
 </div>
 
@@ -372,12 +339,19 @@
             data: {},
             dataType: 'json',
             success: function(data) {
-                $('#alert_modal_text').text(data.message)
-                $("#alertModal").modal('show');
+                if (data.redirect_url) {
+                    localStorage.setItem('showSuccessAlert', 'true');
+                    window.location.href = data.redirect_url;
+                }
             },
-            error: function(data){
-                $('#alert_modal_text').text(data.message)
-                $("#alertModal").modal('show');
+            error: function(data) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An error occurred while trying to leave the group chat.',
+                    icon: 'error',
+                    showConfirmButton: true,
+                    position: 'top',
+                });
             }
         });
     });
@@ -385,9 +359,7 @@
     // File upload form submission
     $('#chat_file_form').on('submit', function(e) {
         e.preventDefault();
-
         var formData = new FormData(this);
-
         $.ajax({
             type: 'POST',
             url: "{% url 'chat-file-upload' chat_group.group_name %}",
@@ -396,13 +368,25 @@
             contentType: false,
             success: function(data) {
                 $('#fileUploadModal').modal('hide');
-                $('#alert_modal_text').text(data.message);
-                $("#alertModal").modal('show');
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'File Send Successfull.',
+                    icon: 'success',
+                    timer: 1000,
+                    timerProgressBar: true,
+                    showConfirmButton: false,
+                    position: 'top-end',
+                });
             },
             error: function(data) {
                 $('#fileUploadModal').modal('hide');
-                $('#alert_modal_text').text(data.message);
-                $("#alertModal").modal('show');
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Something went wrong, please try again..',
+                    icon: 'error',
+                    showConfirmButton: true,
+                    position: 'top-end',
+                });
             }
         });
     });
