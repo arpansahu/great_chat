@@ -78,35 +78,42 @@
         padding: 10px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
-
+    
     .chat-input-container input {
         flex-grow: 1;
         border: none;
         padding: 10px;
         border-radius: 12px;
         margin-right: 10px;
-        transition: opacity 0.5s ease-in-out; /* For input text fade-out effect */
+        height: 40px; /* Set a fixed height */
+        box-sizing: border-box;
     }
-
-    .chat-input-container button {
+    
+    .chat-input-container .btn {
         background-color: #075E54;
         border: none;
-        padding: 10px;
+        width: 40px; /* Set a fixed width */
+        height: 40px; /* Set a fixed height */
         border-radius: 50%;
         color: white;
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 40px;
-        height: 40px;
+        padding: 0;
+        margin-right: 5px; /* Add margin for spacing between buttons */
     }
-
-    .chat-input-container button i {
+    
+    .chat-input-container .btn i {
         font-size: 20px;
+        color: white; /* Ensure the icons have the same color */
     }
-
-    .chat-input-container button:hover {
+    
+    .chat-input-container .btn:hover {
         background-color: #064C47;
+    }
+    
+    .chat-input-container .btn:last-child {
+        margin-right: 0; /* Remove margin for the last button */
     }
 
     .new-message {
@@ -197,23 +204,24 @@
                     {% endfor %}
                     </ul>
                 </div>
-                <div class="row-cols-1 rounded-3">
+               <div class="row-cols-1 rounded-3">
                     <form id="chat_message_form" method="POST" action="{% url 'home' %}" class="chat-input-container" 
                         hx-ext="ws"
                         ws-connect="/ws/chatroom/{{ chatroom_name }}"
                         ws-send
                         _="on htmx:wsAfter reset() me">
                         {% csrf_token %}
-                        <input type="text" name="body" placeholder="Add a message ..." class="form-control" maxlength="300" autofocus="True" required="" id="id_body" aria-label="Message input">
+                        <input type="text" name="body" placeholder="Add a message ..." class="form-control" maxlength="300" autofocus="True" required="" id="id_body" aria-label="Message input" >
                         <!-- File Upload Button -->
-                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#fileUploadModal" aria-label="Upload file">
+                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#fileUploadModal" aria-label="Upload file" style="margin-top: 15px">
                             <i class="fa fa-paperclip" aria-hidden="true"></i>
                         </button>
-                        <button type="submit" class="send-button" aria-label="Send message">
+                        <!-- Send Message Button -->
+                        <button type="submit" class="btn send-button" aria-label="Send message" style="margin-top: 15px">
                             <i class="fa fa-paper-plane" aria-hidden="true"></i>
                         </button>
                     </form>
-                </div>  
+                </div>
                 {% if chat_group.group_name and not chat_group.is_private and request.user != chat_group.admin and not chat_group.is_public %}
                 <div class="row-cols-1 rounded-3">
                     <button id="leave_button" class="btn btn-social bg-gradient-faded-danger" style="margin-top: 10px" value={{chat_group.group_name}}>
