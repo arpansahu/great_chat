@@ -143,9 +143,6 @@ def group_chat_members_view(request, group_name):
 
     chat_group_members_object = ChatGroup.objects.get(group_name=group_name)
    
-    print(chat_group_members_object.group_name)
-    print(chat_group_members_object.members.all())
-
     context = {
         'chat_group_members_object': chat_group_members_object,
         'group_name': group_name
@@ -155,7 +152,6 @@ def group_chat_members_view(request, group_name):
 @login_required
 def home_view(request):
     current_user = request.user
-    print(f"Current User: {current_user}")
 
     # Subquery to get the latest message ID for each chat group
     latest_messages = GroupMessage.objects.filter(
@@ -168,9 +164,6 @@ def home_view(request):
     private_group_messages = GroupMessage.objects.filter(
         id__in=Subquery(latest_messages)
     ).order_by('-created')
-    
-    # Print the queryset for debugging
-    print(f"Private Group Messages: {private_group_messages.query}")
 
     context = {
         'private_chat_messages': private_group_messages,

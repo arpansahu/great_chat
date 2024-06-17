@@ -18,8 +18,6 @@ class Command(BaseCommand):
             verify=certifi.where(),
         )
 
-        print(s3_client)
-
         # Define local media directory and S3 bucket name
         local_media_dir = settings.MEDIA_ROOT
         bucket_name = settings.AWS_STORAGE_BUCKET_NAME
