@@ -240,27 +240,12 @@ CACHES = {
 }
 ```
 
-
-## Deployment on AWS EC2/ Home Server Ubuntu 22.0 LTS
-Previously This project was hosted on Heroku, but so I started hosting this and all other projects in a 
-Single EC2 Machine, which costed me a lot, so now I have shifted all the projects into my own Home Server with 
-Ubuntu 22.0 LTS Server, except for portfolio project at https://www.arpansahu.me along with Nginx 
-
-
-Now there is EC2 server running with a nginx server and arpansahu.me portfolio
-Nginx forward https://school-chale-hum.arpansahu.me/ to Home Server 
-
-Multiple Projects are running inside dockers so all projects are dockerized.
-You can refer to all projects on https://www.arpansahu.me/projects
-
-Every project have different port on which its running predefined inside Dockerfile and docker-compose.yml
-
-![EC2 and Home Server along with Nginx Arrangement](https://github.com/arpansahu/borcelle_crm/blob/master/ec2_and_home_server.png?raw=true)
+(https://github.com/arpansahu/common_readme/blob/main/Docker%20Readme/intro.md)
 
 
 ### Step 1: Dockerizing
 
-For more information, see the [README of Other Repo](https://github.com/arpansahu/common_readme/blob/main/Docker%20Readme/docker_installation.md).
+For more information, see the [README of Docker Installation](https://github.com/arpansahu/common_readme/blob/main/Docker%20Readme/docker_installation.md).
 
 Now in your Git Repository
 
@@ -319,469 +304,7 @@ if you remove this tag it will be attached to terminal, and you will be able to 
 
 ### Step2: Serving the requests from Nginx
 
-Installing Nginx server
-
-```
-sudo apt-get install nginx
-```
-
-Starting Nginx and checking its status 
-
-```
-sudo systemctl start nginx
-sudo systemctl status nginx
-```
-
-#### Modify DNS Configurations
-
-Add these two records to your DNS Configurations
-```
-A Record	*	0.227.49.244 (public ip of ec2)	Automatic
-A Record	@	0.227.49.244 (public ip of ec2)	Automatic
-```
-
-Note: now you will be able to see nhinx running page if you open public ip of the machine
-
-Make Sure your EC2 security Group have this entry inbound rules 
-
-```
-random-hash-id	IPv4	HTTP	TCP	80	0.0.0.0/0	–
-```
-
-Open a new Nginx Configuration file name can be anything i am choosing arpansahu since my domain is arpansahu.me. there is already a default configuration file but we will leave it like that only
-
-```
-sudo vi /etc/nginx/sites-available/arpansahu
-```
-
-paste this content in the above file
-
-```
-server_tokens               off;
-access_log                  /var/log/nginx/supersecure.access.log;
-error_log                   /var/log/nginx/supersecure.error.log;
-
-server {
-  server_name               school-chale-hum.arpansahu.me;        
-  listen                    80;
-  location / {
-    proxy_pass              http://{ip_of_home_server}:8014;
-    proxy_set_header        Host $host;
-  }
-}
-```
-
-Basically this single Nginx File will be hosting all the multiple projects which I have listed before also.
-
-Checking if configurations fie is correct
-
-```
-sudo service nginx configtest /etc/nginx/sites-available/arpansahu
-```
-
-Now you need to symlink this file to the sites-enabled directory:
-
-``` 
-cd /etc/nginx/sites-enabled
-sudo ln -s ../sites-available/arpansahu
-```
-
-Restarting Nginx Server 
-```
-sudo systemctl restart nginx
-```
-
-Now It's time to enable HTTPS for this server
-
-### Step 3: Enabling HTTPS 
-
-1. Base Domain:  Enabling https for base domain only or a single sub domain
-
-    To allow visitors to access your site over HTTPS, you’ll need an SSL/TLS certificate that sits on your web server. Certificates are issued by a Certificate Authority (CA).We’ll use a free CA called Let’s Encrypt. To actually install the certificate, you can use the Certbot client, which gives you an utterly painless step-by-step series of prompts.
-    Before starting with Certbot, you can tell Nginx up front to disable TLS version 1.0 and 1.1 in favor of versions 1.2 and 1.3. TLS 1.0 is end-of-life (EOL), while TLS 1.1 contained several vulnerabilities that were fixed by TLS 1.2. To do this, open the file /etc/nginx/nginx.conf. Find the following line:
-    
-    Open nginx.conf file end change ssl_protocols 
-    
-    ```
-    sudo vi /etc/nginx/nginx.conf
-    
-    From ssl_protocols TLSv1 TLSv1.1 TLSv1.2; to ssl_protocols TLSv1.2 TLSv1.3;
-    ```
-    
-    Use this command to verify if nginx.conf file is correct or not
-    
-    ```
-    sudo nginx -t
-    ```
-    
-    Now you’re ready to install and use Certbot, you can use snap to install Certbot:
-    
-    ```
-    sudo snap install --classic certbot
-    sudo ln -s /snap/bin/certbot /usr/bin/certbot
-    ```
-    
-    Now installing certificate
-    
-    ```
-    sudo certbot --nginx --rsa-key-size 4096 --no-redirect
-    ```
-    
-    It will be asking for domain name then you can enter your base domain 
-    I have generated ssl for school-chale-hum.arpansahu.me
-    
-    Then a few questions will be asked by them answer them all and done your ssl certificate will be geerated
-    
-    Now These lines will be added to your # Nginx configuration: /etc/nginx/sites-available/arpansahu
-    
-    ```
-    listen 443 ssl;
-    ssl_certificate /etc/letsencrypt/live/www.supersecure.codes/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/www.supersecure.codes/privkey.pem;
-    include /etc/letsencrypt/options-ssl-nginx.conf;
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
-    ```
-    
-    Redirecting HTTP to HTTPS
-    Open nginx configuration file  and make it like this
-
-    ```
-    sudo vi /etc/nginx/sites-available/arpansahu
-    ```
-    ```
-    server_tokens               off;
-    access_log                  /var/log/nginx/supersecure.access.log;
-    error_log                   /var/log/nginx/supersecure.error.log;
-     
-    server {
-      server_name               school-chale-hum.arpansahu.me;
-      listen                    80;
-      return                    307 https://$host$request_uri;
-    }
-    
-    server {
-    
-      location / {
-        proxy_pass              http://{ip_of_home_server}:8014;
-        proxy_set_header        Host $host;
-        
-        listen 443 ssl; # managed by Certbot
-        ssl_certificate /etc/letsencrypt/live/arpansahu.me/fullchain.pem; # managed by Certbot
-        ssl_certificate_key /etc/letsencrypt/live/arpansahu.me/privkey.pem; # managed by Certbot
-        include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-        ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
-    }                          
-    ``` 
-    
-    You can dry run and check weather it's renewal is working or not
-    ```
-    sudo certbot renew --dry-run
-    ```
-    
-    Note: this process was for borcelle-crm.arpansahu.me and not for all subdomains.
-        For all subdomains we will have to setup a wildcard ssl certificate
-
-
-2. Enabling a Wildcard certificate
-
-    Here we will enable ssl certificate for all subdomains at once
-    
-    Run following Command
-    ```
-    sudo certbot certonly --manual --preferred-challenges dns
-    ```
-    
-    Again you will be asked domain name and here you will use *.arpansahu.me. and second domain you will use is
-    arpansahu.me.
-    
-    Now, you should be having a question in your mind that why we are generating ssl for arpansahu.me separately.
-    It's because Let's Encrupt does not include base doamin with wildcard certificates for subdomains.
-
-    After running above command you will see a message similar to this
-    
-    ```
-    Saving debug log to /var/log/letsencrypt/letsencrypt.log
-    Please enter the domain name(s) you would like on your certificate (comma and/or
-    space separated) (Enter 'c' to cancel): *.arpansahu.me
-    Requesting a certificate for *.arpansahu.me
-    
-    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    Please deploy a DNS TXT record under the name:
-    
-    _acme-challenge.arpansahu.me.
-    
-    with the following value:
-    
-    dpWCxvq3mARF5iGzSfaRNXwmdkUSs0wgsTPhSaX1gK4
-    
-    Before continuing, verify the TXT record has been deployed. Depending on the DNS
-    provider, this may take some time, from a few seconds to multiple minutes. You can
-    check if it has finished deploying with aid of online tools, such as the Google
-    Admin Toolbox: https://toolbox.googleapps.com/apps/dig/#TXT/_acme-challenge.arpansahu.me.
-    Look for one or more bolded line(s) below the line ';ANSWER'. It should show the
-    value(s) you've just added.
-   
-    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    Press Enter to Continue
-    ```
-   
-    You will be given a dns challenge called ACME challenger you have to create a dns TXT record in DNS.
-    Similar to below record.
-    
-    ```
-    TXT Record	_acme-challenge	dpWCxvq3mARF5iGzSfaRNXwmdkUSs0wgsTPhSaX1gK4	5 Automatic
-    ```
-    
-    Now, use this url to verify records are updated or not
-
-    https://toolbox.googleapps.com/apps/dig/#TXT/_acme-challenge.arpansahu.me (arpansahu.me is domain)
-
-    If its verified then press enter the terminal as mentioned above
-    
-    Then your certificate will be generated
-    ```
-    Successfully received certificate.
-    Certificate is saved at: /etc/letsencrypt/live/arpansahu.me-0001/fullchain.pem            (use this in your nginx configuration file)
-    Key is saved at:         /etc/letsencrypt/live/arpansahu.me-0001/privkey.pem
-    This certificate expires on 2023-01-20.
-    These files will be updated when the certificate renews.
-    ```
-    
-    You can notice here, certificate generated is arpansahu.me-0001 and not arpansahu.me
-    because we already generated a certificate named arpansahu.me
-    
-    So remember to delete it before generating this wildcard certificate
-    using command
-
-    ```
-    sudo certbot delete
-    ```
-    
-    Note: This certificate will not be renewed automatically. Auto-renewal of --manual certificates requires the use of an authentication hook script (--manual-auth-hook) but one was not provided. To renew this certificate, repeat this same certbot command before the certificate's expiry date.
-
-3. Generating Wildcard SSL certificate and Automating its renewal
-
-    1. Modify your ec2 inbound rules 
-    
-      ```
-      –	sgr-0219f1387d28c96fb	IPv4	DNS (TCP)	TCP	53	0.0.0.0/0	–	
-      –	sgr-01b2b32c3cee53aa9	IPv4	SSH	TCP	22	0.0.0.0/0	–
-      –	sgr-0dfd03bbcdf60a4f7	IPv4	HTTP	TCP	80	0.0.0.0/0	–
-      –	sgr-02668dff944b9b87f	IPv4	HTTPS	TCP	443	0.0.0.0/0	–
-      –	sgr-013f089a3f960913c	IPv4	DNS (UDP)	UDP	53	0.0.0.0/0	–
-      ```
-    
-   2. Install acme-dns Server
-
-      * Create folder for acme-dns and change directory
-
-        ```
-         sudo mkdir /opt/acme-dns
-         cd !$
-        ```
-      * Download and extract tar with acme-dns from GitHub
-
-        ```
-        sudo curl -L -o acme-dns.tar.gz \
-        https://github.com/joohoi/acme-dns/releases/download/v0.8/acme-dns_0.8_linux_amd64.tar.gz
-        sudo tar -zxf acme-dns.tar.gz
-        ```
-      * List files
-        ```
-        sudo ls
-        ```
-      * Clean Up
-        ```
-        sudo rm acme-dns.tar.gz
-        ```
-      * Create soft link
-        ```
-        sudo ln -s \
-        /opt/acme-dns/acme-dns /usr/local/bin/acme-dns
-        ```
-      * Create a minimal acme-dns user
-         ```
-         sudo adduser \
-         --system \	
-         --gecos "acme-dns Service" \
-         --disabled-password \
-         --group \
-         --home /var/lib/acme-dns \
-         acme-dns
-        ```
-      * Update default acme-dns config compare with IP from the AWS console. CAn't bind to the public address need to use private one.
-        ```
-        ip addr
-	  
-        sudo mkdir -p /etc/acme-dns
-	  
-        sudo mv /opt/acme-dns/config.cfg /etc/acme-dns/
-	  
-        sudo vim /etc/acme-dns/config.cfg
-        ```
-      
-      * Replace
-        ```
-        listen = "127.0.0.1:53” to listen = “private ip of the ec2 instance” 172.31.93.180:53(port will be 53)
- 
-        Similarly Edit other details mentioned below  
-
-        # domain name to serve the requests off of
-        domain = "auth.arpansahu.me"
-        # zone name server
-        nsname = "auth.arpansahu.me"
-        # admin email address, where @ is substituted with .
-        nsadmin = "admin@arpansahu.me"
-
-
-        records = [
-          # domain pointing to the public IP of your acme-dns server
-           "auth.arpansahu.me. A 44.199.177.138. (public elastic ip)”,
-          # specify that auth.example.org will resolve any *.auth.example.org records
-           "auth.arpansahu.me. NS auth.arpansahu.me.”,
-        ]
-	
-        [api]
-        # listen ip eg. 127.0.0.1
-        ip = "127.0.0.1”. (Changed)
-
-        # listen port, eg. 443 for default HTTPS
-        port = "8080" (Changed).         ——— we will use port 8090 because we will also use Jenkins which will be running on 8080 port
-        # possible values: "letsencrypt", "letsencryptstaging", "cert", "none"
-        tls = "none"   (Changed)
-
-        ```
-      * Move the systemd service and reload
-        ```
-        cat acme-dns.service
-     
-        sudo mv \
-        acme-dns.service /etc/systemd/system/acme-dns.service
-	  
-        sudo systemctl daemon-reload
-        ```
-      * Start and enable acme-dns server
-        ```
-        sudo systemctl enable acme-dns.service
-        sudo systemctl start acme-dns.service
-        ```
-      * Check acme-dns for posible errors
-        ```
-        sudo systemctl status acme-dns.service
-        ```
-      * Use journalctl to debug in case of errors
-         ```
-         journalctl --unit acme-dns --no-pager --follow
-         ```
-      * Create A record for your domain
-         ```
-         auth.arpansahu.me IN A <public-ip>
-         ```
-      * Create NS record for auth.arpansahu.me pointing to auth.arpansahu.me. This means, that auth.arpansahu.me is
-        responsible for any *.auth.arpansahu.me records
-        ```
-        auth.arpansahu.me IN NS auth.arpansahu.me
-        ```
-      * Your DNS record will be looking like this
-        ```
-        A Record	auth	44.199.177.138	Automatic	
-        NS Record	auth	auth.arpansahu.me.	Automatic
-        ```
-      * Test acme-dns server (Split the screen)
-        ```
-        journalctl -u acme-dns --no-pager --follow
-        ```
-      * From local host try to resolve random DNS record
-        ```
-        dig api.arpansahu.me
-        dig api.auth.arpansahu.me
-        dig 7gvhsbvf.auth.arpansahu.me
-        ``` 
-        
-   3. Install acme-dns-client 
-     ```
-     sudo mkdir /opt/acme-dns-client
-     cd !$
-    
-     sudo curl -L \
-     -o acme-dns-client.tar.gz \
-     https://github.com/acme-dns/acme-dns-client/releases/download/v0.2/acme-dns-client_0.2_linux_amd64.tar.gz
-    
-     sudo tar -zxf acme-dns-client.tar.gz
-     ls
-     sudo rm acme-dns-client.tar.gz
-     sudo ln -s \
-     /opt/acme-dns-client/acme-dns-client /usr/local/bin/acme-dns-client 
-     ```
-   4. Install Certbot
-     ```
-     cd
-     sudo snap install core; sudo snap refresh core
-     sudo snap install --classic certbot
-     sudo ln -s /snap/bin/certbot /usr/bin/certbot
-     ```
-    Note: you can skip step4 if Certbot is already installed
-
-    5. Get Letsencrypt Wildcard Certificate
-       * Create a new acme-dns account for your domain and set it up
-         ```
-         sudo acme-dns-client register \
-         -d arpansahu.me -s http://localhost:8090
-         ```
-         Note: When we edited acme-dns config file there we mentioned the port 8090 and thats why we are using this port here also
-       * Creating Another DNS Entry 
-         ```
-         CNAME Record	_acme-challenge	e6ac0f0a-0358-46d6-a9d3-8dd41f44c7ec.auth.arpansahu.me.	Automatic
-         ```
-         Same as an entry is needed to be added to complete one time challenge as in previously we did.
-       * Check the entry is added successfully or not
-         ```
-         dig _acme-challenge.arpansahu.me
-         ```
-       * Get wildcard certificate
-         ```
-         sudo certbot certonly \
-         --manual \
-         --test-cert \ 
-         --preferred-challenges dns \ 
-         --manual-auth-hook 'acme-dns-client' \ 
-         -d ‘*.arpansahu.me’ -d arpansahu.me
-         ```
-         Note: Here we have to mention both the base and wildcard domain names with -d since let's encrypt don't provide base domain ssl by default in wildcard domain ssl
-       *Verifying the certificate
-         ```
-         sudo openssl x509 -text -noout \
-         -in /etc/letsencrypt/live/arpansahu.me/fullchain.pem
-         ```
-       * Renew certificate (test)
-         ```
-         sudo certbot renew \
-         --manual \ 
-         --test-cert \ 
-         --dry-run \ 
-         --preferred-challenges dns \
-         --manual-auth-hook 'acme-dns-client'       
-         ```
-       * Renew certificate (actually)
-         ```
-         sudo certbot renew \
-         --manual \
-         --preferred-challenges dns \
-         --manual-auth-hook 'acme-dns-client'       
-         ```
-       * Check the entry is added successfully or not
-         ```
-         dig _acme-challenge.arpansahu.me
-         ```
-    6. Setup Auto-Renew for Letsencrypt WILDCARD Certificate
-       * Setup cronjob
-         ```
-         sudo crontab -e
-         ```
-       * Add following lines to the file
-         ```
-         0 */12 * * * certbot renew --manual --test-cert --preferred-challenges dns --manual-auth-hook 'acme-dns-client'
-         ```
+For more information, see the [README of Nginx Setup](https://github.com/arpansahu/common_readme/blob/main/AWS%20Deployment/nginx.md).
 
 After all these steps your Nginx configuration file located at /etc/nginx/sites-available/arpansahu will be looking similar to this
 
@@ -792,7 +315,7 @@ error_log                   /var/log/nginx/supersecure.error.log;
 
 server {
     listen         80;
-    server_name    school-chale-hum.arpansahu.me;
+    server_name    great-chat.arpansahu.me;
     # force https-redirects
     if ($scheme = http) {
         return 301 https://$server_name$request_uri;
@@ -801,15 +324,13 @@ server {
     location / {
          proxy_pass              http://{ip_of_home_server}:8014;
          proxy_set_header        Host $host;
-         proxy_set_header    X-Forwarded-Proto $scheme;
+         proxy_set_header        X-Forwarded-Proto $scheme;
 
 	 # WebSocket support
          proxy_http_version 1.1;
          proxy_set_header Upgrade $http_upgrade;
          proxy_set_header Connection "upgrade";
     }
-   
-	
 
     listen 443 ssl; # managed by Certbot
     ssl_certificate /etc/letsencrypt/live/arpansahu.me/fullchain.pem; # managed by Certbot
@@ -821,221 +342,71 @@ server {
 
 ### Step 4: CI/CD using Jenkins
 
-Installing Jenkins
+For more information, see the [README of Jenkins Setup](https://github.com/arpansahu/common_readme/blob/main/AWS%20Deployment/Jenkins.md).
 
-Reference: https://www.jenkins.io/doc/book/installing/linux/
+## Services on AWS EC2/ Home Server Ubuntu 22.0 LTS 
 
-Jenkins requires Java in order to run, yet certain distributions don’t include this by default and some Java versions are incompatible with Jenkins.
+### Postgresql Server
 
-There are multiple Java implementations which you can use. OpenJDK is the most popular one at the moment, we will use it in this guide.
+  IT would be a nightmare to have your own vps to save cost and not hosting your own postgresql server.
 
-Update the Debian apt repositories, install OpenJDK 11, and check the installation with the commands:
+  For more information, see the [README of PostgreSql Server With Nginx Setup](https://github.com/arpansahu/common_readme/blob/main/AWS%20Deployment/Postgres.md).
 
-```
-sudo apt update
+  postgresql_server can be access accessed
+  
+  ```bash
+  psql "postgres://user:user_pass@arpansahu.me/database_name?sslmode=require"
+  ```
 
-sudo apt install openjdk-11-jre
+### PGAdmin4
 
-java -version
-openjdk version "11.0.12" 2021-07-20
-OpenJDK Runtime Environment (build 11.0.12+7-post-Debian-2)
-OpenJDK 64-Bit Server VM (build 11.0.12+7-post-Debian-2, mixed mode, sharing)
-```
+  pgAdmin 4 is a complete rewrite of pgAdmin, built using Python and Javascript/jQuery. A desktop runtime written in NWjs allows it to run standalone for individual users, or the web application code may be deployed directly on a web server for use by one or more users through their web browser. 
 
-Long Term Support release
+  For more information, see the [README of PGAdmin4 Server With Nginx Setup](https://github.com/arpansahu/common_readme/blob/main/AWS%20Deployment/PostgresUI.md).
 
-```
-curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo tee \
-  /usr/share/keyrings/jenkins-keyring.asc > /dev/null
-echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
-  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
-  /etc/apt/sources.list.d/jenkins.list > /dev/null
-sudo apt-get update
-sudo apt-get install jenkins
-```
+  My PGAdmin4 can be accessed here : https://pgadmin.arpansahu.me/
 
-Start Jenkins
+### Portainer
+   
+  Portainer is a web UI to manage your docker, and kubernetes. Portainer consists of two elements, the Portainer Server, and the Portainer Agent. Both elements run as lightweight Docker containers on a Docker engine.
 
-```
-sudo systemctl enable jenkins
-```
+  For more information, see the [README of Portainer Server With Nginx Setup](https://github.com/arpansahu/common_readme/blob/main/AWS%20Deployment/PostgresUI.md).
 
-You can start the Jenkins service with the command:
+  My Portainer can be accessed here : https://portainer.arpansahu.me/
 
-```
-sudo systemctl start jenkins
-```
+### Redis Server
 
-You can check the status of the Jenkins service using the command:
-```
-sudo systemctl status jenkins
-```
+  Redis is versatile and widely used for its speed and efficiency in various applications. Its ability to serve different roles, such as caching, real-time analytics, and pub/sub messaging, makes it a valuable tool in many technology stacks.
 
-Now for serving the Jenkins UI from Nginx add these following lines to the Nginx file located at 
-/etc/nginx/sites-available/arpansahu by running the following command
+  For more information, see the [README of Redis Server Setup](https://github.com/arpansahu/common_readme/blob/main/AWS%20Deployment/Redis.md).
 
-```
-sudo vi /etc/nginx/sites-available/arpansahu
-```
+  redis serve can be accessed
 
-* Add these lines to it.
+  ```bash
+  redis-cli -h arpansahu.me -p 6379 -a password_required
+  ```
 
-    ```
-    server {
-        listen         80;
-        server_name    jenkins.arpansahu.me;
-        # force https-redirects
-        if ($scheme = http) {
-            return 301 https://$server_name$request_uri;
-            }
-    
-        location / {
-             proxy_pass              http://{ip_of_home_server}:8080;
-             proxy_set_header        Host $host;
-             proxy_set_header    X-Forwarded-Proto $scheme;
-        }
-    
-        listen 443 ssl; # managed by Certbot
-        ssl_certificate /etc/letsencrypt/live/arpansahu.me/fullchain.pem; # managed by Certbot
-        ssl_certificate_key /etc/letsencrypt/live/arpansahu.me/privkey.pem; # managed by Certbot
-        include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-        ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
-    }
-    ```
+### Redis Commander
 
-You can add all the server blocks to the same nginx configuration file
-just make sure you place the server block for base domain at the last
+  Redis Commander is a web-based management tool for Redis databases. It provides a user-friendly interface to interact with Redis, making it easier to manage and monitor your Redis instances.
 
-* To copy .env from local server directory while buidling image
+  For more information, see the [README of Redis Server Setup](https://github.com/arpansahu/common_readme/blob/main/AWS%20Deployment/RedisComander.md).
 
-add Jenkins ALL=(ALL) NOPASSWD: ALL
-inside /etc/sudoers file
+  My Redis Commander can be accessed here : https://redis.arpansahu.me/
 
-and then put 
+### MiniIo (Self hosted S3 Storage)
 
-stage('Dependencies') {
-            steps {
-                script {
-                    sh "sudo cp /root/env/project_name/.env /var/lib/jenkins/workspace/project_name"
-                }
-            }
-        }
+  MinIO is a high-performance, distributed object storage system designed for large-scale data infrastructures. It is open-source and compatible with the Amazon S3 API, making it a popular choice for organizations looking for scalable, secure, and cost-effective storage solutions. 
 
-in jenkinsfile
+  For more information, see the [README of Redis Server Setup](https://github.com/arpansahu/common_readme/blob/main/AWS%20Deployment/Minio.md).
+  
+  You can connect to my MiniIo Server using terminal 
+  ```bash
+    mc alias set myminio https://arpansahu.me:9000 api_key api_secret --api S3v4
+    mc ls
+  ```
 
-* Now Create a file named Jenkinsfile at the root of Git Repo and add following lines to file
-
-```
-pipeline {
-    agent { label 'local' }
-    stages {
-        stage('Dependencies') {
-            steps {
-                script {
-                    sh "sudo cp /root/projectenvs/great_chat/.env /var/lib/jenkins/workspace/great_chat"
-                }
-            }
-        }
-        stage('Production') {
-            steps {
-                script {
-                    sh "docker compose up --build --detach"
-                }
-            }
-        }
-    }
-    post {
-        success {
-            sh """curl -s \
-            -X POST \
-            --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
-            https://api.mailjet.com/v3.1/send \
-            -H "Content-Type:application/json" \
-            -d '{
-                "Messages":[
-                        {
-                                "From": {
-                                        "Email": "$MAIL_JET_EMAIL_ADDRESS",
-                                        "Name": "ArpanSahuOne Jenkins Notification"
-                                },
-                                "To": [
-                                        {
-                                                "Email": "$MY_EMAIL_ADDRESS",
-                                                "Name": "Development Team"
-                                        }
-                                ],
-                                "Subject": "${currentBuild.fullDisplayName} deployed succcessfully",
-                                "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed",
-                                "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
-                        }
-                ]
-            }'"""
-        }
-        failure {
-            sh """curl -s \
-            -X POST \
-            --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
-            https://api.mailjet.com/v3.1/send \
-            -H "Content-Type:application/json" \
-            -d '{
-                "Messages":[
-                        {
-                                "From": {
-                                        "Email": "$MAIL_JET_EMAIL_ADDRESS",
-                                        "Name": "ArpanSahuOne Jenkins Notification"
-                                },
-                                "To": [
-                                        {
-                                                "Email": "$MY_EMAIL_ADDRESS",
-                                                "Name": "Developer Team"
-                                        }
-                                ],
-                                "Subject": "${currentBuild.fullDisplayName} deployment failed",
-                                "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} deployment failed",
-                                "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is not deployed, Build Failed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
-                        }
-                ]
-            }'"""
-        }
-    }
-}
-```
-
-Note: agent {label 'local'} is used to specify which node will execute the jenkins job deployment. Basically there are two nodes in this project 
-      One is my local Linux Server and Another is AWS EC2 machine where nginx is hosted there arpansahu.me my portfolio is also hosted is also hosted.
-      So local linux server is labelled with 'local' are the project with this label will be executed in local machine node.
-
-
-* Configure a Jenkins project from jenkins ui located at https://jenkins.arpansahu.me
-
-Make sure to use Pipline project and name it whatever you want I have named it as great_chat
-
-![Jenkins Project for borcelle CRM Configuration File](/great_chat-Config-Jenkins-.png)
-
-In this above picture you can see credentials right? you can add your github credentials
-from Manage Jenkins on home Page --> Manage Credentials
-
-and add your GitHub credentials from there
-
-* Add a .env file to you project using following command (This step is no more required stage('Dependencies'))
-
-    ```
-    sudo vi  /var/lib/jenkins/workspace/borcelle_crm_declarative_pipeline_project/.env
-    ```
-
-    Your workspace name may be different.
-
-    Add all the env variables as required and mentioned in the Readme File.
-
-* Add Global Jenkins Variables from Dashboard --> Manage --> Jenkins
-  Configure System
- 
-  * MAIL_JET_API_KEY
-  * MAIL_JET_API_SECRET
-  * MAIL_JET_EMAIL_ADDRESS
-  * MY_EMAIL_ADDRESS
-
-Now you are good to go.
+  Also there is a MiniIo UI Server which can be accessed here https://minioui.arpansahu.me/
 
 ## Documentation
 
