@@ -19,6 +19,7 @@ include_files = {
     "env.example": "https://raw.githubusercontent.com/arpansahu/great_chat/main/env.example",
     "docker-compose.yml": "https://raw.githubusercontent.com/arpansahu/great_chat/main/docker-compose.yml",
     "Dockerfile": "https://raw.githubusercontent.com/arpansahu/great_chat/main/Dockerfile",
+    "Jenkinsfile": "https://raw.githubusercontent.com/arpansahu/great_chat/main/Jenkinsfile",
 }
 
 # Read the base README file content
