@@ -65,7 +65,7 @@ Ajax is a set of web development techniques that uses various web technologies o
 
 ## Demo
 
-Available at: https://school-chale-hum.arpansahu.me
+Available at: https://great-chat.arpansahu.me
 
 admin login details:--
 username: admin@arpansahu.me
@@ -240,8 +240,9 @@ CACHES = {
 }
 ```
 
-(https://github.com/arpansahu/common_readme/blob/main/Docker%20Readme/intro.md)
+## Deployment on AWS EC2/ Home Server Ubuntu 22.0 LTS/ Hostinger VPS Server
 
+[README of Intro]
 
 ### Step 1: Dockerizing
 
@@ -318,69 +319,69 @@ server {
 
 [README of Jenkins Setup]
 
-## Services on AWS EC2/ Home Server Ubuntu 22.0 LTS 
+## Postgresql Server
 
-### Postgresql Server
+IT would be a nightmare to have your own vps to save cost and not hosting your own postgresql server.
 
-  IT would be a nightmare to have your own vps to save cost and not hosting your own postgresql server.
+For more information, see the [README of PostgreSql Server With Nginx Setup](https://github.com/arpansahu/common_readme/blob/main/AWS%20Deployment/Postgres.md).
 
-  For more information, see the [README of PostgreSql Server With Nginx Setup](https://github.com/arpansahu/common_readme/blob/main/AWS%20Deployment/Postgres.md).
+postgresql_server can be access accessed
 
-  postgresql_server can be access accessed
-  
-  ```bash
-  psql "postgres://user:user_pass@arpansahu.me/database_name?sslmode=require"
-  ```
+```bash
+psql "postgres://user:user_pass@arpansahu.me/database_name?sslmode=require"
+```
 
-### PGAdmin4
+# Services on AWS EC2/ Home Server Ubuntu 22.0 LTS s
 
-  pgAdmin 4 is a complete rewrite of pgAdmin, built using Python and Javascript/jQuery. A desktop runtime written in NWjs allows it to run standalone for individual users, or the web application code may be deployed directly on a web server for use by one or more users through their web browser. 
+## PGAdmin4
 
-  [README of PGAdmin4 Server With Nginx Setup]
+pgAdmin 4 is a complete rewrite of pgAdmin, built using Python and Javascript/jQuery. A desktop runtime written in NWjs allows it to run standalone for individual users, or the web application code may be deployed directly on a web server for use by one or more users through their web browser. 
 
-  My PGAdmin4 can be accessed here : https://pgadmin.arpansahu.me/
+[README of PGAdmin4 Server With Nginx Setup]
 
-### Portainer
+My PGAdmin4 can be accessed here : https://pgadmin.arpansahu.me/
+
+## Portainer
    
-  Portainer is a web UI to manage your docker, and kubernetes. Portainer consists of two elements, the Portainer Server, and the Portainer Agent. Both elements run as lightweight Docker containers on a Docker engine.
+Portainer is a web UI to manage your docker, and kubernetes. Portainer consists of two elements, the Portainer Server, and the Portainer Agent. Both elements run as lightweight Docker containers on a Docker engine.
 
-  [README of Portainer Server With Nginx Setup]
+[README of Portainer Server With Nginx Setup]
 
-  My Portainer can be accessed here : https://portainer.arpansahu.me/
+My Portainer can be accessed here : https://portainer.arpansahu.me/
 
-### Redis Server
+## Redis Server
 
-  Redis is versatile and widely used for its speed and efficiency in various applications. Its ability to serve different roles, such as caching, real-time analytics, and pub/sub messaging, makes it a valuable tool in many technology stacks.
+Redis is versatile and widely used for its speed and efficiency in various applications. Its ability to serve different roles, such as caching, real-time analytics, and pub/sub messaging, makes it a valuable tool in many technology stacks.
 
-  [README of Redis Server Setup]
+[README of Redis Server Setup]
 
-  redis serve can be accessed
+redis serve can be accessed
 
-  ```bash
-  redis-cli -h arpansahu.me -p 6379 -a password_required
-  ```
+```bash
+redis-cli -h arpansahu.me -p 6379 -a password_required
+```
 
-### Redis Commander
+## Redis Commander
 
-  Redis Commander is a web-based management tool for Redis databases. It provides a user-friendly interface to interact with Redis, making it easier to manage and monitor your Redis instances.
+Redis Commander is a web-based management tool for Redis databases. It provides a user-friendly interface to interact with Redis, making it easier to manage and monitor your Redis instances.
 
-  [README of Redis Server Setup]
+[README of Redis Server Setup]
 
-  My Redis Commander can be accessed here : https://redis.arpansahu.me/
+My Redis Commander can be accessed here : https://redis.arpansahu.me/
 
-### MiniIo (Self hosted S3 Storage)
+## MiniIo (Self hosted S3 Storage)
 
-  MinIO is a high-performance, distributed object storage system designed for large-scale data infrastructures. It is open-source and compatible with the Amazon S3 API, making it a popular choice for organizations looking for scalable, secure, and cost-effective storage solutions. 
+MinIO is a high-performance, distributed object storage system designed for large-scale data infrastructures. It is open-source and compatible with the Amazon S3 API, making it a popular choice for organizations looking for scalable, secure, and cost-effective storage solutions. 
 
-  [README of Redis Server Setup]
-  
-  You can connect to my MiniIo Server using terminal 
-  ```bash
-    mc alias set myminio https://arpansahu.me:9000 api_key api_secret --api S3v4
-    mc ls
-  ```
+[README of Redis Server Setup]
 
-  Also there is a MiniIo UI Server which can be accessed here https://minioui.arpansahu.me/
+You can connect to my MiniIo Server using terminal 
+```bash
+  mc alias set myminio https://arpansahu.me:9000 api_key api_secret --api S3v4
+  mc ls
+```
+
+Also there is a MiniIo UI Server which can be accessed here https://minioui.arpansahu.me/
 
 ## Documentation
 

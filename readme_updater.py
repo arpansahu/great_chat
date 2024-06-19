@@ -16,8 +16,8 @@ include_files = {
     "README of Minio Server Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Minio.md",
     "README of Intro": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Intro.md",
     "env.example": "https://raw.githubusercontent.com/arpansahu/great_chat/main/env.example",
-    "docker-compose.yml": "https://github.com/arpansahu/great_chat/blob/main/docker-compose.yml",
-    "Dockerfile": "https://github.com/arpansahu/great_chat/blob/main/Dockerfile",
+    "docker-compose.yml": "https://raw.githubusercontent.com/arpansahu/great_chat/main/docker-compose.yml",
+    "Dockerfile": "https://raw.githubusercontent.com/arpansahu/great_chat/main/Dockerfile",
 }
 
 # Read the main README file content
