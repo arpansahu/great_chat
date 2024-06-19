@@ -245,45 +245,19 @@ CACHES = {
 
 ### Step 1: Dockerizing
 
-For more information, see the [README of Docker Installation](https://github.com/arpansahu/common_readme/blob/main/Docker%20Readme/docker_installation.md).
+[README of Docker Installation]
 
 Now in your Git Repository
 
 Create a file named Dockerfile with no extension and add following lines in it
 ```
-FROM python:3.10.7
-
-WORKDIR /app
-
-COPY requirements.txt requirements.txt
-
-COPY . .
-
-RUN pip3 install -r requirements.txt
-
-EXPOSE 8002
-
-CMD python manage.py collectstatic
-CMD gunicorn --bind 0.0.0.0:8002 great_chat.wsgi
+[Dockerfile]
 ```
 
 Create a file named docker-compose.yml and add following lines in it
 
 ```
-version: '3'
-
-services:
-  web:
-    build: .
-    env_file: ./.env
-    command: bash -c "python manage.py makemigrations && python manage.py migrate && daphne --bind 0.0.0.0:8002 great_chat.asgi:application"
-    image: great_chat
-    container_name: great_chat
-    volumes:
-      - .:/great_chat
-    ports:
-      - "8002:8002"
-    restart: unless-stopped
+[docker-compose.yml]
 ```
 
 ### **What is Difference in Dockerfile and docker-compose.yml?**
@@ -304,7 +278,7 @@ if you remove this tag it will be attached to terminal, and you will be able to 
 
 ### Step2: Serving the requests from Nginx
 
-For more information, see the [README of Nginx Setup](https://github.com/arpansahu/common_readme/blob/main/AWS%20Deployment/nginx.md).
+[README of Nginx Setup]
 
 After all these steps your Nginx configuration file located at /etc/nginx/sites-available/arpansahu will be looking similar to this
 
@@ -342,7 +316,7 @@ server {
 
 ### Step 4: CI/CD using Jenkins
 
-For more information, see the [README of Jenkins Setup](https://github.com/arpansahu/common_readme/blob/main/AWS%20Deployment/Jenkins.md).
+[README of Jenkins Setup]
 
 ## Services on AWS EC2/ Home Server Ubuntu 22.0 LTS 
 
@@ -362,7 +336,7 @@ For more information, see the [README of Jenkins Setup](https://github.com/arpan
 
   pgAdmin 4 is a complete rewrite of pgAdmin, built using Python and Javascript/jQuery. A desktop runtime written in NWjs allows it to run standalone for individual users, or the web application code may be deployed directly on a web server for use by one or more users through their web browser. 
 
-  For more information, see the [README of PGAdmin4 Server With Nginx Setup](https://github.com/arpansahu/common_readme/blob/main/AWS%20Deployment/PostgresUI.md).
+  [README of PGAdmin4 Server With Nginx Setup]
 
   My PGAdmin4 can be accessed here : https://pgadmin.arpansahu.me/
 
@@ -370,7 +344,7 @@ For more information, see the [README of Jenkins Setup](https://github.com/arpan
    
   Portainer is a web UI to manage your docker, and kubernetes. Portainer consists of two elements, the Portainer Server, and the Portainer Agent. Both elements run as lightweight Docker containers on a Docker engine.
 
-  For more information, see the [README of Portainer Server With Nginx Setup](https://github.com/arpansahu/common_readme/blob/main/AWS%20Deployment/PostgresUI.md).
+  [README of Portainer Server With Nginx Setup]
 
   My Portainer can be accessed here : https://portainer.arpansahu.me/
 
@@ -378,7 +352,7 @@ For more information, see the [README of Jenkins Setup](https://github.com/arpan
 
   Redis is versatile and widely used for its speed and efficiency in various applications. Its ability to serve different roles, such as caching, real-time analytics, and pub/sub messaging, makes it a valuable tool in many technology stacks.
 
-  For more information, see the [README of Redis Server Setup](https://github.com/arpansahu/common_readme/blob/main/AWS%20Deployment/Redis.md).
+  [README of Redis Server Setup]
 
   redis serve can be accessed
 
@@ -390,7 +364,7 @@ For more information, see the [README of Jenkins Setup](https://github.com/arpan
 
   Redis Commander is a web-based management tool for Redis databases. It provides a user-friendly interface to interact with Redis, making it easier to manage and monitor your Redis instances.
 
-  For more information, see the [README of Redis Server Setup](https://github.com/arpansahu/common_readme/blob/main/AWS%20Deployment/RedisComander.md).
+  [README of Redis Server Setup]
 
   My Redis Commander can be accessed here : https://redis.arpansahu.me/
 
@@ -398,7 +372,7 @@ For more information, see the [README of Jenkins Setup](https://github.com/arpan
 
   MinIO is a high-performance, distributed object storage system designed for large-scale data infrastructures. It is open-source and compatible with the Amazon S3 API, making it a popular choice for organizations looking for scalable, secure, and cost-effective storage solutions. 
 
-  For more information, see the [README of Redis Server Setup](https://github.com/arpansahu/common_readme/blob/main/AWS%20Deployment/Minio.md).
+  [README of Redis Server Setup]
   
   You can connect to my MiniIo Server using terminal 
   ```bash
@@ -430,30 +404,6 @@ For more information, see the [README of Jenkins Setup](https://github.com/arpan
 
 To run this project, you will need to add the following environment variables to your .env file
 
-REDISCLOUD_URL=
-
-SECRET_KEY=
-
-DEBUG=
-
-ALLOWED_HOSTS=
-
-MAIL_JET_API_KEY=
-
-MAIL_JET_API_SECRET=
-
-MY_EMAIL_ADDRESS=
-
-AWS_ACCESS_KEY_ID=
-
-AWS_SECRET_ACCESS_KEY=
-
-AWS_STORAGE_BUCKET_NAME=
-
-DOMAIN=
-
-PROTOCOL=
-
-DATABASE_URL=
+[env.example]
 
 
