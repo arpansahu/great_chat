@@ -242,7 +242,6 @@ CACHES = {
 
 ## Deployment on AWS EC2/ Home Server Ubuntu 22.0 LTS/ Hostinger VPS Server
 
-## Deployment on AWS EC2/ Home Server Ubuntu 22.0 LTS/ Hostinger VPS Server
 Previously This project was hosted on Heroku, but so I started hosting this and all other projects in a 
 Single EC2 Machine, which costed me a lot, so now I have shifted all the projects into my own Home Server with 
 Ubuntu 22.0 LTS Server, except for portfolio project at https://www.arpansahu.me along with Nginx 
@@ -393,8 +392,6 @@ if you remove this tag it will be attached to terminal, and you will be able to 
 --build tag with docker compose up will force image to be rebuild everytime before starting the container
 
 ### Step2: Serving the requests from Nginx
-
-# Serving the requests from Nginx
 
 Installing Nginx server
 
@@ -896,8 +893,6 @@ server {
 
 ### Step 4: CI/CD using Jenkins
 
-# CI/CD with Jenkins
-
 Installing Jenkins
 
 Reference: https://www.jenkins.io/doc/book/installing/linux/
@@ -1118,9 +1113,7 @@ Now you are good to go.
 
 IT would be a nightmare to have your own vps to save cost and not hosting your own postgresql server.
 
-For more information, see the # PostgreSql
-
-## Installing PostgreSql
+For more information, see the ### Installing PostgreSql
 
 1. Update the package list to make sure you have the latest information
 
@@ -1358,9 +1351,7 @@ psql "postgres://user:user_pass@arpansahu.me/database_name?sslmode=require"
 
 pgAdmin 4 is a complete rewrite of pgAdmin, built using Python and Javascript/jQuery. A desktop runtime written in NWjs allows it to run standalone for individual users, or the web application code may be deployed directly on a web server for use by one or more users through their web browser. 
 
-# PGAdmin (PostgreSQl UI)
-
-## Installing PgAdmin
+### Installing PgAdmin
 
 1. **Create a Virtual Environment:**
 
@@ -1414,7 +1405,7 @@ vi /root/pgadmin_venv/lib/python3.10/site-packages/pgadmin4/config.py
 ```
 
 
-## Configuring Nginx as Reverse proxy
+### Configuring Nginx as Reverse proxy
 
 1. Edit Nginx Configuration
 
@@ -1462,9 +1453,7 @@ My PGAdmin4 can be accessed here : https://pgadmin.arpansahu.me/
    
 Portainer is a web UI to manage your docker, and kubernetes. Portainer consists of two elements, the Portainer Server, and the Portainer Agent. Both elements run as lightweight Docker containers on a Docker engine.
 
-# Portainer
-
-## Installation
+### Installation
 
 1. **Create a Docker Volume for Portainer Data (optional but recommended):**
    This step is optional but recommended as it allows you to persist Portainer's data across container restarts.
@@ -1497,7 +1486,7 @@ Once the setup is complete, you should have access to the Portainer dashboard, w
 Keep in mind that the instructions provided here assume a basic setup. For production environments, it's recommended to secure the Portainer instance, such as by using HTTPS and setting up authentication. Refer to the [Portainer documentation](https://documentation.portainer.io/) for more advanced configurations and security considerations.
 
 
-## Configuring Nginx as Reverse proxy
+### Configuring Nginx as Reverse proxy
 
 1. Edit Nginx Configuration
 
@@ -1545,9 +1534,7 @@ My Portainer can be accessed here : https://portainer.arpansahu.me/
 
 Redis is versatile and widely used for its speed and efficiency in various applications. Its ability to serve different roles, such as caching, real-time analytics, and pub/sub messaging, makes it a valuable tool in many technology stacks.
 
-# Redis 
-
-## Installation
+### Installation
 
 1. **Create a Docker Volume for Portainer Data (optional but recommended):**
    This step is optional but recommended as it allows you to persist Portainer's data across container restarts.
@@ -1608,9 +1595,7 @@ redis-cli -h arpansahu.me -p 6379 -a password_required
 
 Redis Commander is a web-based management tool for Redis databases. It provides a user-friendly interface to interact with Redis, making it easier to manage and monitor your Redis instances.
 
-# Redis 
-
-## Installation
+### Installation
 
 1. **Create a Docker Volume for Portainer Data (optional but recommended):**
    This step is optional but recommended as it allows you to persist Portainer's data across container restarts.
@@ -1667,9 +1652,7 @@ My Redis Commander can be accessed here : https://redis.arpansahu.me/
 
 MinIO is a high-performance, distributed object storage system designed for large-scale data infrastructures. It is open-source and compatible with the Amazon S3 API, making it a popular choice for organizations looking for scalable, secure, and cost-effective storage solutions. 
 
-# Redis 
-
-## Installation
+### Installation
 
 1. **Create a Docker Volume for Portainer Data (optional but recommended):**
    This step is optional but recommended as it allows you to persist Portainer's data across container restarts.
