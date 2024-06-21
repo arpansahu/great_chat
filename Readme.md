@@ -1,21 +1,32 @@
-# Django Starer
+# Great Chat
 
-- Implemented Student Manager
+- Implemented Whatsapp Clone
 
-1. This is dummy project for starting any django app
-2. It have Account functionality built in to gte started with
-3. S3 Aws is already integrated
-4. Redis is Integrated 
+1. This is whatsapp clone project for chat 
+2. It have Account functionality built in.
+3. S3 Aws is already integrated/ MiniIO too.
+4. Redis is Integrated as cache and message pub sub.
 5. AutoComplete JS Library are included already
 6. MailJet is used as email service provider
-7. This project is already dockerised
+7. This project is already dockerize and
 8. CI/Cd is also Included in this started project
 
--Deployed on Heroku
+- Whatsapp Clone Features
 
-1. Used Postgres 
-2. Used Daphene
-3. Used REDIS
+1. Send Text Messages, as well as files.
+2. Files will be allowed to download with download link.
+3. Meanwhile you can watch the media live in the chat such as images, and gif.
+4. Chat with You Contacts Privately.
+5. Chat with friends or people in Private Groups.
+6. Invite people to your private group.
+7. Chat in Global Chat across the globe.
+8. Leave if you don't like a group chat.
+9. Delete a chat group of your own, only admin can delete a group chat.
+10. Set profile photos to your own profile.
+11. Set group photos to your group chats.
+12. Remove Members from your own group.
+13. While chatting in the group or global chat you can see all the last 30 messages and their users if online or offline.
+14. For now only last 30 chats are being shown in the chat screen.
 
 -Deployed on AWS / Now in My Own Home Ubuntu Server LTS 22.0 / Hostinger VPS Server
 
@@ -28,6 +39,7 @@
 7. Used AWS Elastic Cache for redis which is not accessible outside AWS, Used Redis Server, hosted on Home Server itself as Redis on Home Server
 8. Used PostgresSql Schema based Database, all projects are using single Postgresql. 
 9. PostgresSQL is also hosted on Home Server Itself.
+10. Using MINIIO as self hosted S3 Storage Server.
 
 ## What is Python ?
 Python is a high-level, general-purpose programming language. Its design philosophy emphasizes code readability with the
@@ -40,10 +52,10 @@ Django is a Python-based free and open-source web framework that follows the mod
 ## What is Redis ?
     
 Redis is an in-memory data structure project implementing a distributed, in-memory key-value database with optional durability. 
-The most common Redis use cases are session cache, full-page cache, queues, leaderboards and counting, publish-subscribe, and much more. in this case, we will use Redis as a message broker.
+The most common Redis use cases are session cache, full-page cache, queues, leader boards and counting, publish-subscribe, and much more. in this case, we will use Redis as a message broker.
 
 ## What is Ajax?
-Ajax is a set of web development techniques that uses various web technologies on the client-side to create asynchronous web applications. With Ajax, web applications can send and retrieve data from a server asynchronously without interfering with the display and behaviour of the existing page.
+Ajax is a set of web development techniques that uses various web technologies on the client-side to create asynchronous web applications. With Ajax, web applications can send and retrieve data from a server asynchronously without interfering with the display and behavior of the existing page.
 
 ## Tech Stack
 
@@ -55,13 +67,13 @@ Ajax is a set of web development techniques that uses various web technologies o
 [![Javascript](https://img.shields.io/badge/JavaScript-323330?style=for-the-badge&logo=javascript&logoColor=F7DF1E)](https://www.javascript.com/)
 [![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/docs/)
 [![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/docs/)
-[![Amazon Web Services](https://img.shields.io/badge/Amazon_AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)](https://aws.amazon.com/)
 [![Heroku](https://img.shields.io/badge/-Heroku-430098?style=for-the-badge&logo=heroku&logoColor=white)](https://heroku.com/)
 [![Github](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://www.github.com/)
 [![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![Jenkins](https://img.shields.io/badge/Jenkins-D24939?style=for-the-badge&logo=Jenkins&logoColor=white)](https://www.jenkins.io/)
-[![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)]()
-[![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)]()
+[![AWS](https://img.shields.io/badge/Amazon_AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)](https://aws.amazon.com/)
+[![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)](https://nginx.org/en/)
+[![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://ubuntu.com/)
 
 ## Demo
 
@@ -70,6 +82,7 @@ Available at: https://great-chat.arpansahu.me
 admin login details:--
 username: admin@arpansahu.me
 password: showmecode
+
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
@@ -110,178 +123,234 @@ Installing Redis On Local (For ubuntu) for other Os Please refer to their websit
   sudo systemctl restart redis.service
 ```
 to check if its running or not
-```
+```bash
   sudo systemctl status redis
 ```
---------------------------
-
-Use these CACHE settings
-
-``` 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        # 'LOCATION': REDISCLOUD_URL,
-        'LOCATION':'redis://localhost:6379'
-    }
-}
-```
----
 
 Run Server
 ```bash
   python manage.py runserver
+
+  or 
+
+  daphne -p 8000 great_chat.asgi:application
 ```
 
-## Deployment on Heroku
-
-Installing Heroku Cli from : https://devcenter.heroku.com/articles/heroku-cli
-Create your account in Heroku.
-
-Inside your project directory
-
-Login Heroku CLI
-```bash
-  heroku login
-
-```
-
-Create Heroku App
+Use these CACHE settings
 
 ```bash
-  heroku create [app_name]
-
-```
-
-Push Heroku App
-```
-    git push heroku master
-```
-
-Configure Heroku App
-```bash
-  heroku config:set GITHUB_USERNAME=joesmith
-
-```
-Configuring Django App for Heroku
-
-Install whitenoise 
-```
-pip install whitenoise 
-```
-
-Include it in Middlewares.
-```
-MIDDLEWARE = [
-    # ...
-    "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
-    # ...
-]
-```
-
-Create Procfile and include this code snippet in it.
-```
-release: ./release-tasks.sh
-web: gunicorn great_chat.wsgi
-```
-Create a release-tasks.sh and include this code snippet in it.
-```
-python manage.py makemigrations
-python manage.py migrate
-python manage.py update_data                 (optional if you update this csv frequently)
-```
-Don't forget to make release-tasks.sh file executable using following command
-```
-chmod +x release-tasks.sh
-```
-Comment down Database setting and install dj-database-url
-
-``` 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': config('DB_NAME'),
-#         'USER': config('DB_USER'),
-#         'PASSWORD': config('DB_PASSWORD'),
-#         'HOST': config('DB_HOST'),
-#         'PORT': config('DB_PORT'),
-#     }
-# }
-```
-```
-pip install dj-database-url
-```
-
-and add these lines below the commented Database settings
-``` 
-import dj_database_url
-DATABASES = {'default': dj_database_url.config(default=config('DATABASE_URL'))}
-```
-
-Change CACHE from 
-``` 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        #'LOCATION': REDISCLOUD_URL,
-        'LOCATION':'redis://localhost:6379'
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': config('REDISCLOUD_URL'),
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
     }
 }
 ```
-to
-```
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': REDISCLOUD_URL,
-        #'LOCATION':'redis://localhost:6379'
+
+Use these Channels Settings
+
+```bash
+if not DEBUG:
+    CHANNEL_LAYERS = {
+        'default': {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        }
     }
-}
+else:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [(config('REDISCLOUD_URL'))],
+            },
+        },
+    }
+```
+
+
+Change settings.py static files and media files settings | Now I have added support for BlackBlaze Static Storage also which also based on AWS S3 protocols 
+
+``` 
+if not DEBUG:
+    BUCKET_TYPE = config('BUCKET_TYPE')
+
+    if BUCKET_TYPE == 'AWS':
+
+        AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+        AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+        AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+        AWS_DEFAULT_ACL = 'public-read'
+        AWS_S3_OBJECT_PARAMETERS = {
+            'CacheControl': 'max-age=86400'
+        }
+        AWS_LOCATION = 'static'
+        AWS_QUERYSTRING_AUTH = False
+        AWS_HEADERS = {
+            'Access-Control-Allow-Origin': '*',
+        }
+        # s3 static settings
+        AWS_STATIC_LOCATION = 'portfolio/great_chat/static'
+        STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_STATIC_LOCATION}/'
+        STATICFILES_STORAGE = 'great_chat.storage_backends.StaticStorage'
+        # s3 public media settings
+        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/great_chat/media'
+        MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_PUBLIC_MEDIA_LOCATION}/'
+        DEFAULT_FILE_STORAGE = 'great_chat.storage_backends.PublicMediaStorage'
+        # s3 private media settings
+        PRIVATE_MEDIA_LOCATION = 'portfolio/great_chat/private'
+        PRIVATE_FILE_STORAGE = 'great_chat.storage_backends.PrivateMediaStorage'
+
+    elif BUCKET_TYPE == 'BLACKBLAZE':
+
+        AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+        AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+        AWS_S3_REGION_NAME = 'us-east-005'
+
+        AWS_S3_ENDPOINT = f's3.{AWS_S3_REGION_NAME}.backblazeb2.com'
+        AWS_S3_ENDPOINT_URL = f'https://{AWS_S3_ENDPOINT}'
+        
+        AWS_DEFAULT_ACL = 'public-read'
+        AWS_S3_OBJECT_PARAMETERS = {
+            'CacheControl': 'max-age=86400',
+        }
+
+        AWS_LOCATION = 'static'
+        AWS_QUERYSTRING_AUTH = False
+        AWS_HEADERS = {
+            'Access-Control-Allow-Origin': '*',
+        }
+        # s3 static settings
+        AWS_STATIC_LOCATION = 'portfolio/great_chat/static'
+        STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.{AWS_STATIC_LOCATION}/'
+        STATICFILES_STORAGE = 'great_chat.storage_backends.StaticStorage'
+        # s3 public media settings
+        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/great_chat/media'
+        MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.{AWS_PUBLIC_MEDIA_LOCATION}/'
+        DEFAULT_FILE_STORAGE = 'great_chat.storage_backends.PublicMediaStorage'
+        # s3 private media settings
+        PRIVATE_MEDIA_LOCATION = 'portfolio/great_chat/private'
+        PRIVATE_FILE_STORAGE = 'great_chat.storage_backends.PrivateMediaStorage'
+
+    elif BUCKET_TYPE == 'MINIO':
+        AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+        AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+        AWS_S3_REGION_NAME = 'us-east-1'  # MinIO doesn't require this, but boto3 does
+        AWS_S3_ENDPOINT_URL = 'https://minio.arpansahu.me'
+        AWS_DEFAULT_ACL = 'public-read'
+        AWS_S3_OBJECT_PARAMETERS = {
+            'CacheControl': 'max-age=86400',
+        }
+        AWS_LOCATION = 'static'
+        AWS_QUERYSTRING_AUTH = False
+        AWS_HEADERS = {
+            'Access-Control-Allow-Origin': '*',
+        }
+
+        # s3 static settings
+        AWS_STATIC_LOCATION = 'portfolio/great_chat/static'
+        STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}/{AWS_STATIC_LOCATION}/'
+        STATICFILES_STORAGE = 'great_chat.storage_backends.StaticStorage'
+
+        # s3 public media settings
+        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/great_chat/media'
+        MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}/{AWS_PUBLIC_MEDIA_LOCATION}/'
+        DEFAULT_FILE_STORAGE = 'great_chat.storage_backends.PublicMediaStorage'
+
+        # s3 private media settings
+        PRIVATE_MEDIA_LOCATION = 'portfolio/great_chat/private'
+        PRIVATE_FILE_STORAGE = 'great_chat.storage_backends.PrivateMediaStorage'
+
+    
+
+else:
+    # Static files (CSS, JavaScript, Images)
+    # https://docs.djangoproject.com/en/3.2/howto/static-files/
+
+    STATIC_URL = '/static/'
+
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"), ]
+```
+
+run below command ```python manage.py collectstatic```  and you are good to go
+
+
+
+## Custom Django Management Commands
+
+1. Test DB
+  Django management command designed to test the basic functionality of the database. It performs a series of CRUD (Create, Read, Update, Delete) operations to ensure the database is working correctly.
+```bash
+python manage.py test_db
+```
+
+2. Test Cache
+   Django management command designed to test the basic functionality of the caching system. It performs a set and get operation to ensure the cache is working correctly and validates the expiration of cache entries.
+```bash
+python manage.py test_cache
+```
+
+3. Test Channels
+  Django management command designed to test the functionality of Django Channels, ensuring that it is properly configured and operational.
+```bash
+python manage.py test_channels
+```
+
+4. Sync Media to S3
+  In case if you are using production database and debug mode is on. all the media send in the chats will be stored to local media folder which might not get synced to s3 bucket and when you run in production those media will be missing.
+```bash
+python manage.py sync_media_to_s3
 ```
 
 ## Deployment on AWS EC2/ Home Server Ubuntu 22.0 LTS/ Hostinger VPS Server
 
 Previously This project was hosted on Heroku, but so I started hosting this and all other projects in a 
-Single EC2 Machine, which costed me a lot, so now I have shifted all the projects into my own Home Server with 
+Single EC2 Machine, which cost me a lot, so now I have shifted all the projects to my own Home Server with 
 Ubuntu 22.0 LTS Server, except for portfolio project at https://www.arpansahu.me along with Nginx 
 
 
-Now there is EC2 server running with a nginx server and arpansahu.me portfolio
-Nginx forward https://arpansahu.me/ to Home Server 
+Now there is an EC2 server running with an nginx server and arpansahu.me portfolio
+Nginx forwarded https://arpansahu.me/ to the Home Server 
 
 Multiple Projects are running inside dockers so all projects are dockerized.
-You can refer to all projects on https://www.arpansahu.me/projects
+You can refer to all projects at https://www.arpansahu.me/projects
 
-Every project have different port on which its running predefined inside Dockerfile and docker-compose.yml
+Every project has a different port on which it runs predefined inside Dockerfile and docker-compose.yml
 
 ![EC2 and Home Server along with Nginx, Docker and Jenkins Arrangement](https://github.com/arpansahu/common_readme/blob/main/Images/ec2_and_home_server.png)
 
-Note: Update as of Aug 2023, I have decided to make some changes to my lifestyle, and from now i will be constantly on the go
-      from my past experience with running free EC2 server for arpansahu.me and nginx in it and then using another home server
-      with all the other projects hosted, my experience was
+Note: Update as of Aug 2023, I have decided to make some changes to my lifestyle, and from now I will be constantly on the go
+ from my experience with running a free EC2 server for arpansahu. me and nginx in it and then using another home server
+ with all the other projects hosted, my experience was
       
-      1. Downtime due to Broadband Service Provider Issues
-      2. Downtime due to Weather Sometimes
-      3. Downtime due to Machine Breakdown
-      4. Downtime due to Power Cuts (even though i had a inverted with battery setup for my room)
-      5. Remotely it would be harder to fix these problems 
+ 1. Downtime due to Broadband Service Provider Issues
+ 2. Downtime due to Weather Sometimes
+ 3. Downtime due to Machine Breakdown
+ 4. Downtime due to Power Cuts (even though I had an inverted battery setup for my room)
+ 5. Remotely it would be harder to fix these problems 
 
-  and due to all these reasons i decided to shift all the projects to single EC2 Server, at first i was using t2.medium which costs more than 40$ a month 
-  then i switched to t2.small and it only costs you 15$ and if we take pre paid plans prices can be slashed much further. 
+ and due to all these reasons I decided to shift all the projects to a single EC2 Server, at first I was using t2.medium which costs more than 40$ a month 
+ then I switched to t2.small and it only costs you 15$ if we take pre-paid plans prices can be slashed much further. 
 
-  Then again i shifted to Hostinger VPS which was more cost friendly then EC2 Server. on Jan 2024
+ Then again I shifted to Hostinger VPS which was more cost-friendly than EC2 Server. On Jan 2024
 
-Now My project arrangements looks something similar to this
+Now My project arrangements look something similar to this
 
 ![EC2 Sever along with Nginx, Docker and Jenkins Arrangement](https://github.com/arpansahu/common_readme/blob/main/Images/One%20Server%20Configuration%20for%20arpanahuone.png)
 
 
-### Step 1: Dockerizing
+### Step 1: Dockerize
 
-# Dockerizing
-
-Installing Docker on Home Server
+#### Installing Redis Commander
 
 Reference: https://docs.docker.com/engine/install/ubuntu/
 
@@ -375,25 +444,11 @@ services:
     restart: unless-stopped
 ```
 
-### **What is Difference in Dockerfile and docker-compose.yml?**
-
-A Dockerfile is a simple text file that contains the commands a user could call to assemble an image whereas Docker Compose is a tool for defining and running multi-container Docker applications.
-
-Docker Compose define the services that make up your app in docker-compose.yml so they can be run together in an isolated environment. It gets an app running in one command by just running docker-compose up. Docker compose uses the Dockerfile if you add the build command to your project’s docker-compose.yml. Your Docker workflow should be to build a suitable Dockerfile for each image you wish to create, then use compose to assemble the images using the build command.
-
-Running Docker 
-```
-docker compose up --build --detach 
-```
-
---detach tag is for running the docker even if terminal is closed
-if you remove this tag it will be attached to terminal, and you will be able to see the logs too
-
---build tag with docker compose up will force image to be rebuild everytime before starting the container
+[DOCKER_END]
 
 ### Step2: Serving the requests from Nginx
 
-Installing Nginx server
+#### Installing the Nginx server
 
 ```
 sudo apt-get install nginx
@@ -410,13 +465,13 @@ sudo systemctl status nginx
 
 Add these two records to your DNS Configurations
 ```
-A Record	*	0.227.49.244 (public ip of ec2)	Automatic
-A Record	@	0.227.49.244 (public ip of ec2)	Automatic
+A Record	*	0.227.49.244 (public IP of ec2)	Automatic
+A Record	@	0.227.49.244 (public IP of ec2)	Automatic
 ```
 
-Note: now you will be able to see nginx running page if you open public ip of the machine
-
-Make Sure your EC2 security Group have this entry inbound rules 
+Note: now you will be able to see nginx running page if you open the public IP of the machine
+IP
+Make Sure your EC2 security Group have these entry inbound rules 
 
 ```
 random-hash-id	IPv4	HTTP	TCP	80	0.0.0.0/0	–
@@ -439,15 +494,15 @@ server {
   server_name               arpansahu.me;        
   listen                    80;
   location / {
-    proxy_pass              http://{ip_of_home_server}:8014;
+    proxy_pass              http://{ip_of_home_server/localhost}:8000;
     proxy_set_header        Host $host;
   }
 }
 ```
 
-Basically this single Nginx File will be hosting all the multiple projects which I have listed before also.
+This single Nginx File will be hosting all the multiple projects which I have listed before also.
 
-Checking if configurations fie is correct
+Checking if the configurations file is correct
 
 ```
 sudo service nginx configtest /etc/nginx/sites-available/arpansahu
@@ -465,15 +520,15 @@ Restarting Nginx Server
 sudo systemctl restart nginx
 ```
 
-Now It's time to enable HTTPS for this server
+Now it's time to enable HTTPS for this server
 
 ### Step 3: Enabling HTTPS 
 
-1. Base Domain:  Enabling https for base domain only or a single sub domain
+1. Base Domain:  Enabling HTTPS for base domain only or a single subdomain
 
-    To allow visitors to access your site over HTTPS, you’ll need an SSL/TLS certificate that sits on your web server. Certificates are issued by a Certificate Authority (CA).We’ll use a free CA called Let’s Encrypt. To actually install the certificate, you can use the Certbot client, which gives you an utterly painless step-by-step series of prompts.
-    Before starting with Certbot, you can tell Nginx up front to disable TLS version 1.0 and 1.1 in favor of versions 1.2 and 1.3. TLS 1.0 is end-of-life (EOL), while TLS 1.1 contained several vulnerabilities that were fixed by TLS 1.2. To do this, open the file /etc/nginx/nginx.conf. Find the following line:
-    
+    To allow visitors to access your site over HTTPS, you’ll need an SSL/TLS certificate that sits on your web server. Certificates are issued by a Certificate Authority (CA). We’ll use a free CA called Let’s Encrypt. To install the certificate, you can use the Certbot client, which gives you an utterly painless step-by-step series of prompts.
+    Before starting with Certbot, you can tell Nginx up front to disable TLS versions 1.0 and 1.1 in favour of versions 1.2 and 1.3. TLS 1.0 is end-of-life (EOL), while TLS 1.1 contained several vulnerabilities that were fixed by TLS 1.2. To do this, open the file /etc/nginx/nginx.conf. Find the following line:
+
     Open nginx.conf file end change ssl_protocols 
     
     ```
@@ -488,7 +543,7 @@ Now It's time to enable HTTPS for this server
     sudo nginx -t
     ```
     
-    Now you’re ready to install and use Certbot, you can use snap to install Certbot:
+    Now you’re ready to install and use Certbot, you can use Snap to install Certbot:
     
     ```
     sudo snap install --classic certbot
@@ -501,11 +556,11 @@ Now It's time to enable HTTPS for this server
     sudo certbot --nginx --rsa-key-size 4096 --no-redirect
     ```
     
-    It will be asking for domain name then you can enter your base domain 
-    I have generated ssl for arpansahu.me
+    It will ask for the domain name then you can enter your base domain 
+    I have generated SSL for arpansahu.me
     
-    Then a few questions will be asked by them answer them all and done your ssl certificate will be generated
-    
+    Then a few questions will be asked answer them all and your SSL certificate will be generated
+
     Now These lines will be added to your # Nginx configuration: /etc/nginx/sites-available/arpansahu
     
     ```
@@ -517,7 +572,7 @@ Now It's time to enable HTTPS for this server
     ```
     
     Redirecting HTTP to HTTPS
-    Open nginx configuration file  and make it like this
+    Open the nginx configuration file  and make it like this
 
     ```
     sudo vi /etc/nginx/sites-available/arpansahu
@@ -536,7 +591,7 @@ Now It's time to enable HTTPS for this server
     server {
     
       location / {
-        proxy_pass              http://{ip_of_home_server}:8014;
+        proxy_pass              http://{ip_of_home_server/ localhost}:8000;
         proxy_set_header        Host $host;
         
         listen 443 ssl; # managed by Certbot
@@ -547,20 +602,20 @@ Now It's time to enable HTTPS for this server
     }                          
     ``` 
     
-    You can dry run and check weather it's renewal is working or not
+    You can dry run and check whether it's renewal is working or not
     ```
     sudo certbot renew --dry-run
     ```
     
-    Note: this process was for borcelle-crm.arpansahu.me and not for all subdomains.
-        For all subdomains we will have to setup a wildcard ssl certificate
+    Note: this process was for arpansahu.me and not for all subdomains.
+    For all subdomains, we will have to set a wildcard SSL certificate
 
 
 2. Enabling a Wildcard certificate
 
-    Here we will enable ssl certificate for all subdomains at once
-    
-    Run following Command
+    Here we will enable an SSL certificate for all subdomains at once
+        
+    Run the following Command
     ```
     sudo certbot certonly --manual --preferred-challenges dns
     ```
@@ -568,11 +623,11 @@ Now It's time to enable HTTPS for this server
     Again you will be asked domain name and here you will use *.arpansahu.me. and second domain you will use is
     arpansahu.me.
     
-    Now, you should be having a question in your mind that why we are generating ssl for arpansahu.me separately.
-    It's because Let's Encrupt does not include base doamin with wildcard certificates for subdomains.
+    Now, you should have a question in your mind about why we are generating SSL for arpansahu.me separately.
+    It's because Let's Encrypt does not include a base domain with wildcard certificates for subdomains.
 
-    After running above command you will see a message similar to this
-    
+    After running the above command you will see a message similar to this
+      
     ```
     Saving debug log to /var/log/letsencrypt/letsencrypt.log
     Please enter the domain name(s) you would like on your certificate (comma and/or
@@ -590,48 +645,48 @@ Now It's time to enable HTTPS for this server
     
     Before continuing, verify the TXT record has been deployed. Depending on the DNS
     provider, this may take some time, from a few seconds to multiple minutes. You can
-    check if it has finished deploying with aid of online tools, such as the Google
+    check if it has finished deploying with the aid of online tools, such as Google
     Admin Toolbox: https://toolbox.googleapps.com/apps/dig/#TXT/_acme-challenge.arpansahu.me.
-    Look for one or more bolded line(s) below the line ';ANSWER'. It should show the
+    Look for one or more bolded line(s) below the line '; ANSWER'. It should show the
     value(s) you've just added.
    
     - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     Press Enter to Continue
     ```
    
-    You will be given a dns challenge called ACME challenger you have to create a dns TXT record in DNS.
-    Similar to below record.
-    
+    You will be given a DNS challenge called ACME challenger you have to create a DNS TXT record in DNS.
+    Similar to the below record.
+        
     ```
-    TXT Record	_acme-challenge	dpWCxvq3mARF5iGzSfaRNXwmdkUSs0wgsTPhSaX1gK4	5 Automatic
+    TXT Record  _acme-challenge dpWCxvq3mARF5iGzSfaRNXwmdkUSs0wgsTPhSaX1gK4 5 Automatic
     ```
     
-    Now, use this url to verify records are updated or not
+    Now, use this URL to verify whether records are updated or not
 
     https://toolbox.googleapps.com/apps/dig/#TXT/_acme-challenge.arpansahu.me (arpansahu.me is domain)
 
-    If its verified then press enter the terminal as mentioned above
-    
+    If it's verified then press enter the terminal as mentioned above
+        
     Then your certificate will be generated
     ```
-    Successfully received certificate.
-    Certificate is saved at: /etc/letsencrypt/live/arpansahu.me-0001/fullchain.pem            (use this in your nginx configuration file)
+    Successfully received a certificate.
+    The certificate is saved at: /etc/letsencrypt/live/arpansahu.me-0001/fullchain.pem            (use this in your nginx configuration file)
     Key is saved at:         /etc/letsencrypt/live/arpansahu.me-0001/privkey.pem
     This certificate expires on 2023-01-20.
-    These files will be updated when the certificate renews.
+    These files will be updated when the certificate is renewed.
     ```
-    
-    You can notice here, certificate generated is arpansahu.me-0001 and not arpansahu.me
+        
+    You can notice here, the certificate generated is arpansahu.me-0001 and not arpansahu.me
     because we already generated a certificate named arpansahu.me
-    
+        
     So remember to delete it before generating this wildcard certificate
     using command
 
     ```
     sudo certbot delete
     ```
-    
-    Note: This certificate will not be renewed automatically. Auto-renewal of --manual certificates requires the use of an authentication hook script (--manual-auth-hook) but one was not provided. To renew this certificate, repeat this same certbot command before the certificate's expiry date.
+        
+    Note: This certificate will not be renewed automatically. Auto-renewal of --manual certificates requires the use of an authentication hook script (--manual-auth-hook) but one was not provided. To renew this certificate, repeat this same Certbot command before the certificate's expiry date.
 
 3. Generating Wildcard SSL certificate and Automating its renewal
 
@@ -647,7 +702,7 @@ Now It's time to enable HTTPS for this server
     
    2. Install acme-dns Server
 
-      * Create folder for acme-dns and change directory
+      * Create a folder for acme-dns and change the directory
 
         ```
          sudo mkdir /opt/acme-dns
@@ -668,7 +723,7 @@ Now It's time to enable HTTPS for this server
         ```
         sudo rm acme-dns.tar.gz
         ```
-      * Create soft link
+      * Create a soft link
         ```
         sudo ln -s \
         /opt/acme-dns/acme-dns /usr/local/bin/acme-dns
@@ -683,9 +738,9 @@ Now It's time to enable HTTPS for this server
          --home /var/lib/acme-dns \
          acme-dns
         ```
-      * Update default acme-dns config compare with IP from the AWS console. CAn't bind to the public address need to use private one.
+      * Update default acme-dns config compared with IP from the AWS console. Can't bind to the public address need to use private one.
         ```
-        ip addr
+        IP addr
 	  
         sudo mkdir -p /etc/acme-dns
 	  
@@ -696,9 +751,9 @@ Now It's time to enable HTTPS for this server
       
       * Replace
         ```
-        listen = "127.0.0.1:53” to listen = “private ip of the ec2 instance” 172.31.93.180:53(port will be 53)
+        listen = "127.0.0.1:53” to listen = “private IP of the ec2 instance” 172.31.93.180:53(port will be 53)
  
-        Similarly Edit other details mentioned below  
+        Similarly, Edit other details mentioned below  
 
         # domain name to serve the requests off of
         domain = "auth.arpansahu.me"
@@ -710,17 +765,17 @@ Now It's time to enable HTTPS for this server
 
         records = [
           # domain pointing to the public IP of your acme-dns server
-           "auth.arpansahu.me. A 44.199.177.138. (public elastic ip)”,
+           "auth.arpansahu.me. A 44.199.177.138. (public elastic IP)”,
           # specify that auth.example.org will resolve any *.auth.example.org records
            "auth.arpansahu.me. NS auth.arpansahu.me.”,
         ]
 	
         [api]
-        # listen ip eg. 127.0.0.1
-        ip = "127.0.0.1”. (Changed)
+        # listen IP eg. 127.0.0.1
+        IP = "127.0.0.1”. (Changed)
 
         # listen port, eg. 443 for default HTTPS
-        port = "8080" (Changed).         ——— we will use port 8090 because we will also use Jenkins which will be running on 8080 port
+        port = "8080" (Changed).         ——— We will use port 8090 because we will also use Jenkins which will be running on 8080 port
         # possible values: "letsencrypt", "letsencryptstaging", "cert", "none"
         tls = "none"   (Changed)
 
@@ -739,7 +794,7 @@ Now It's time to enable HTTPS for this server
         sudo systemctl enable acme-dns.service
         sudo systemctl start acme-dns.service
         ```
-      * Check acme-dns for posible errors
+      * Check acme-dns for possible errors
         ```
         sudo systemctl status acme-dns.service
         ```
@@ -749,7 +804,7 @@ Now It's time to enable HTTPS for this server
          ```
       * Create A record for your domain
          ```
-         auth.arpansahu.me IN A <public-ip>
+         auth.arpansahu.me IN A <public-IP>
          ```
       * Create NS record for auth.arpansahu.me pointing to auth.arpansahu.me. This means, that auth.arpansahu.me is
         responsible for any *.auth.arpansahu.me records
@@ -765,7 +820,7 @@ Now It's time to enable HTTPS for this server
         ```
         journalctl -u acme-dns --no-pager --follow
         ```
-      * From local host try to resolve random DNS record
+      * From the local host try to resolve the random DNS record
         ```
         dig api.arpansahu.me
         dig api.auth.arpansahu.me
@@ -794,25 +849,41 @@ Now It's time to enable HTTPS for this server
      sudo snap install --classic certbot
      sudo ln -s /snap/bin/certbot /usr/bin/certbot
      ```
-    Note: you can skip step4 if Certbot is already installed
+    Note: you can skip this step if Certbot is already installed
 
     5. Get Letsencrypt Wildcard Certificate
        * Create a new acme-dns account for your domain and set it up
          ```
          sudo acme-dns-client register \
          -d arpansahu.me -s http://localhost:8090
+
+        The above command is old now we will use the new command 
+         sudo acme-dns-client register \
+          -d arpansahu.me \
+          -allow 0.0.0.0/0 \
+          -s http://localhost:8080
          ```
          Note: When we edited acme-dns config file there we mentioned the port 8090 and thats why we are using this port here also
        * Creating Another DNS Entry 
          ```
          CNAME Record	_acme-challenge	e6ac0f0a-0358-46d6-a9d3-8dd41f44c7ec.auth.arpansahu.me.	Automatic
          ```
-         Same as an entry is needed to be added to complete one time challenge as in previously we did.
-       * Check the entry is added successfully or not
+
+        Since the last update in  the last step now two more entries should be added 
+
+         ```
+         CAA Record @	0 issuewild "letsencrypt.org; validationmethods=dns-01; accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/1424899626"  Automatic
+
+         CAA Record @	0 issue "letsencrypt.org; validationmethods=dns-01; accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/1424899626"
+         Automatic
+         ```
+
+        Same as an entry that needs to be added to complete a time challenge as previously we did.
+       * Check whether the entry is added successfully or not
          ```
          dig _acme-challenge.arpansahu.me
          ```
-       * Get wildcard certificate
+       * Get a wildcard certificate
          ```
          sudo certbot certonly \
          --manual \
@@ -821,8 +892,8 @@ Now It's time to enable HTTPS for this server
          --manual-auth-hook 'acme-dns-client' \ 
          -d ‘*.arpansahu.me’ -d arpansahu.me
          ```
-         Note: Here we have to mention both the base and wildcard domain names with -d since let's encrypt don't provide base domain ssl by default in wildcard domain ssl
-       *Verifying the certificate
+        Note: Here we have to mention both the base and wildcard domain names with -d since let's encrypt don't provide base domain ssl by default in wildcard domain ssl
+       * Verifying the certificate
          ```
          sudo openssl x509 -text -noout \
          -in /etc/letsencrypt/live/arpansahu.me/fullchain.pem
@@ -852,14 +923,14 @@ Now It's time to enable HTTPS for this server
          ```
          sudo crontab -e
          ```
-       * Add following lines to the file
+       * Add the following lines to the file
          ```
          0 */12 * * * certbot renew --manual --test-cert --preferred-challenges dns --manual-auth-hook 'acme-dns-client'
          ```
 
 After all these steps your Nginx configuration file located at /etc/nginx/sites-available/arpansahu will be looking similar to this
 
-```
+```bash
 server_tokens               off;
 access_log                  /var/log/nginx/supersecure.access.log;
 error_log                   /var/log/nginx/supersecure.error.log;
@@ -893,11 +964,11 @@ server {
 
 ### Step 4: CI/CD using Jenkins
 
-Installing Jenkins
+### Installing Jenkins
 
 Reference: https://www.jenkins.io/doc/book/installing/linux/
 
-Jenkins requires Java in order to run, yet certain distributions don’t include this by default and some Java versions are incompatible with Jenkins.
+Jenkins requires Java to run, yet certain distributions don’t include this by default and some Java versions are incompatible with Jenkins.
 
 There are multiple Java implementations which you can use. OpenJDK is the most popular one at the moment, we will use it in this guide.
 
@@ -943,7 +1014,7 @@ You can check the status of the Jenkins service using the command:
 sudo systemctl status jenkins
 ```
 
-Now for serving the Jenkins UI from Nginx add these following lines to the Nginx file located at 
+Now for serving the Jenkins UI from Nginx add the following lines to the Nginx file located at 
 /etc/nginx/sites-available/arpansahu by running the following command
 
 ```
@@ -976,9 +1047,9 @@ sudo vi /etc/nginx/sites-available/arpansahu
     ```
 
 You can add all the server blocks to the same nginx configuration file
-just make sure you place the server block for base domain at the last
+just make sure you place the server block for the base domain at the last
 
-* To copy .env from local server directory while buidling image
+* To copy .env from the local server directory while building image
 
 add Jenkins ALL=(ALL) NOPASSWD: ALL
 inside /etc/sudoers file
@@ -988,23 +1059,26 @@ and then put
 stage('Dependencies') {
             steps {
                 script {
-                    sh "sudo cp /root/env/project_name/.env /var/lib/jenkins/workspace/project_name"
+                    sh "sudo cp /root/env/project_name/.env /var/lib/jenkins/workspace/pipeline_project_name"
                 }
             }
         }
 
-in jenkinsfile
+in Jenkinsfile
+
+
+
 
 * Now Create a file named Jenkinsfile at the root of Git Repo and add following lines to file
 
-```
+```bash
 pipeline {
     agent { label 'local' }
     stages {
         stage('Dependencies') {
             steps {
                 script {
-                    sh "sudo cp /root/projectenvs/{project_name}/.env /var/lib/jenkins/workspace/{project_name}"
+                    sh "sudo cp /root/projectenvs/great_chat/.env /var/lib/jenkins/workspace/great_chat"
                 }
             }
         }
@@ -1071,18 +1145,16 @@ pipeline {
         }
     }
 }
+
 ```
 
-Note: agent {label 'local'} is used to specify which node will execute the jenkins job deployment. Basically there are two nodes in this project 
-      One is my local Linux Server and Another is AWS EC2 machine where nginx is hosted there arpansahu.me my portfolio is also hosted is also hosted.
-      So local linux server is labelled with 'local' are the project with this label will be executed in local machine node.
-
+Note: agent {label 'local'} is used to specify which node will execute the jenkins job deployment. So local linux server is labelled with 'local' are the project with this label will be executed in local machine node.
 
 * Configure a Jenkins project from jenkins ui located at https://jenkins.arpansahu.me
 
-Make sure to use Pipline project and name it whatever you want I have named it as great_chat
+Make sure to use Pipeline project and name it whatever you want I have named it as great_chat
 
-![Jenkins Project for borcelle CRM Configuration File](/great_chat-Config-Jenkins-.png)
+![Jenkins Pipeline Configuration](/Jenkins.png)
 
 In this above picture you can see credentials right? you can add your github credentials
 from Manage Jenkins on home Page --> Manage Credentials
@@ -1092,7 +1164,7 @@ and add your GitHub credentials from there
 * Add a .env file to you project using following command (This step is no more required stage('Dependencies'))
 
     ```
-    sudo vi  /var/lib/jenkins/workspace/borcelle_crm_declarative_pipeline_project/.env
+    sudo vi  /var/lib/jenkins/workspace/great_chat/.env
     ```
 
     Your workspace name may be different.
@@ -1453,7 +1525,7 @@ My PGAdmin4 can be accessed here : https://pgadmin.arpansahu.me/
    
 Portainer is a web UI to manage your docker, and kubernetes. Portainer consists of two elements, the Portainer Server, and the Portainer Agent. Both elements run as lightweight Docker containers on a Docker engine.
 
-### Installation
+### Installing Portainer
 
 1. **Create a Docker Volume for Portainer Data (optional but recommended):**
    This step is optional but recommended as it allows you to persist Portainer's data across container restarts.
@@ -1534,7 +1606,7 @@ My Portainer can be accessed here : https://portainer.arpansahu.me/
 
 Redis is versatile and widely used for its speed and efficiency in various applications. Its ability to serve different roles, such as caching, real-time analytics, and pub/sub messaging, makes it a valuable tool in many technology stacks.
 
-### Installation
+### Installing Redis
 
 1. **Create a Docker Volume for Portainer Data (optional but recommended):**
    This step is optional but recommended as it allows you to persist Portainer's data across container restarts.
@@ -1595,7 +1667,7 @@ redis-cli -h arpansahu.me -p 6379 -a password_required
 
 Redis Commander is a web-based management tool for Redis databases. It provides a user-friendly interface to interact with Redis, making it easier to manage and monitor your Redis instances.
 
-### Installation
+### Installing Redis
 
 1. **Create a Docker Volume for Portainer Data (optional but recommended):**
    This step is optional but recommended as it allows you to persist Portainer's data across container restarts.
@@ -1652,7 +1724,7 @@ My Redis Commander can be accessed here : https://redis.arpansahu.me/
 
 MinIO is a high-performance, distributed object storage system designed for large-scale data infrastructures. It is open-source and compatible with the Amazon S3 API, making it a popular choice for organizations looking for scalable, secure, and cost-effective storage solutions. 
 
-### Installation
+### Installing Redis
 
 1. **Create a Docker Volume for Portainer Data (optional but recommended):**
    This step is optional but recommended as it allows you to persist Portainer's data across container restarts.
@@ -1705,7 +1777,7 @@ Also one more thing redis by default don't support ssl connections even if u use
 
 You can connect to my MiniIo Server using terminal 
 ```bash
-  mc alias set myminio https://arpansahu.me:9000 api_key api_secret --api S3v4
+  mc alias set myminio https://arpansahu.me api_key api_secret --api S3v4
   mc ls
 ```
 
@@ -1721,13 +1793,13 @@ Also there is a MiniIo UI Server which can be accessed here https://minioui.arpa
 [![Javascript](https://img.shields.io/badge/JavaScript-323330?style=for-the-badge&logo=javascript&logoColor=F7DF1E)](https://www.javascript.com/)
 [![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/docs/)
 [![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/docs/)
-[![Amazon Web Services](https://img.shields.io/badge/Amazon_AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)](https://aws.amazon.com/)
 [![Heroku](https://img.shields.io/badge/-Heroku-430098?style=for-the-badge&logo=heroku&logoColor=white)](https://heroku.com/)
 [![Github](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://www.github.com/)
 [![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 [![Jenkins](https://img.shields.io/badge/Jenkins-D24939?style=for-the-badge&logo=Jenkins&logoColor=white)](https://www.jenkins.io/)
-[![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)]()
-[![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)]()
+[![AWS](https://img.shields.io/badge/Amazon_AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)](https://aws.amazon.com/)
+[![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)](https://nginx.org/en/)
+[![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://ubuntu.com/)
 
 ## Environment Variables
 
@@ -1745,7 +1817,6 @@ MAIL_JET_API_SECRET=
 
 MY_EMAIL_ADDRESS=
 
-# bucket
 AWS_ACCESS_KEY_ID=
 
 AWS_SECRET_ACCESS_KEY=
