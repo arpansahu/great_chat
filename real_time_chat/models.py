@@ -20,7 +20,7 @@ class GroupMessage(AbstractBaseModel):
     group = models.ForeignKey(ChatGroup, related_name="chat_messages", on_delete=models.CASCADE)
     author = models.ForeignKey(Account, on_delete=models.CASCADE)
     body = models.CharField(max_length=300, blank=True, null=True)
-    file = models.FileField(upload_to='files/', blank=True, null=True)
+    file = models.FileField(upload_to='files/',max_length=500, blank=True, null=True)
 
     
     def __str__(self):

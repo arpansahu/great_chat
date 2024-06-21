@@ -8,7 +8,8 @@ new_readme_file = "Readme.md"
 include_files = {
     "README of Docker Installation": "https://raw.githubusercontent.com/arpansahu/common_readme/main/Docker%20Readme/docker_installation.md",
     "README of Nginx Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/nginx.md",
-    "README of Jenkins Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Jenkins.md",
+    "README of Jenkins Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Jenkins/Jenkins.md",
+    "JENKINS_END": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Jenkins/jenkins_end.md",
     "README of PostgreSql Server With Nginx Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Postgres.md",
     "README of PGAdmin4 Server With Nginx Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/PostgresUI.md",
     "README of Portainer Server With Nginx Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Portainer.md",
@@ -20,6 +21,16 @@ include_files = {
     "docker-compose.yml": "https://raw.githubusercontent.com/arpansahu/great_chat/main/docker-compose.yml",
     "Dockerfile": "https://raw.githubusercontent.com/arpansahu/great_chat/main/Dockerfile",
     "Jenkinsfile": "https://raw.githubusercontent.com/arpansahu/great_chat/main/Jenkinsfile",
+    "AWS DEPLOYMENT INTRODUCTION": "https://github.com/arpansahu/common_readme/blob/main/Introduction/aws_desployment_introduction.md",
+    "STATIC_FILES": "https://github.com/arpansahu/common_readme/blob/main/Introduction/static_files_settings.md",
+    "INTRODUCTION": "/readme_manager/partials/introduction.md",
+    "DOC_AND_STACK": "readme_manager/partials/documentation_and_stack.md",
+    "TECHNOLOGY QNA": "readme_manager/partials/technology_qna.md",
+    "DEMO": "readme_manager/partials/demo.md",
+    "INSTALLATION": "readme_manager/partials/installation.md",
+    "DJANGO_COMMANDS": "readme_manager/partials/django_commands.md",
+    "NGINX_SERVER": "readme_manager/partials/nginx_server.md",
+
 }
 
 # Read the base README file content
