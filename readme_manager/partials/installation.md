@@ -46,7 +46,7 @@ Run Server
 
 Use these CACHE settings
 
-```bash
+```python
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
@@ -60,7 +60,7 @@ CACHES = {
 
 Use these Channels Settings
 
-```bash
+```python
 if not DEBUG:
     CHANNEL_LAYERS = {
         'default': {
