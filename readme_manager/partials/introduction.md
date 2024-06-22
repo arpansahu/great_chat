@@ -1,4 +1,4 @@
-- Implemented Whatsapp Clone
+-Implemented Whatsapp Clone
 
 1. This is whatsapp clone project for chat 
 2. It have Account functionality built in.
@@ -9,7 +9,7 @@
 7. This project is already dockerize and
 8. CI/Cd is also Included in this started project
 
-- Whatsapp Clone Features
+-Whatsapp Clone Features
 
 1. Send Text Messages, as well as files.
 2. Files will be allowed to download with download link.
