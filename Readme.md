@@ -313,9 +313,6 @@ python manage.py sync_media_to_s3
 
 ## Readme Manager
 
-
-## Update README Script
-
 Each repository contains an `update_readme.sh` script located in the `readme_manager` directory. This script is responsible for updating the README file in the repository by pulling in content from various sources.
 
 ### What it Does
@@ -382,7 +379,7 @@ include_files = {
     "AWS DEPLOYMENT INTRODUCTION": "https://raw.githubusercontent.com/arpansahu/common_readme/main/Introduction/aws_desployment_introduction.md",
     "STATIC_FILES": "https://raw.githubusercontent.com/arpansahu/common_readme/main/Introduction/static_files_settings.md",
     "README of Readme Manager": "https://raw.githubusercontent.com/arpansahu/common_readme/main/Readme%20manager/readme_manager.md",
-    
+
     # Project-Specific Partial Files
     "INTRODUCTION": "../readme_manager/partials/introduction.md",
     "DOC_AND_STACK": "../readme_manager/partials/documentation_and_stack.md",
@@ -1544,6 +1541,12 @@ pgAdmin 4 is a complete rewrite of pgAdmin, built using Python and Javascript/jQ
    pgadmin4
    ```
 
+    To ensure pgAdmin runs in the background, use `nohup`:
+
+    ```bash
+    nohup pgadmin4 &>/dev/null &
+    ```
+    
 By using a virtual environment, you avoid potential conflicts with system packages, and you can manage dependencies for pgAdmin 4 more effectively.
 
 Remember to activate your virtual environment whenever you want to run pgAdmin 4:
@@ -1560,7 +1563,6 @@ deactivate
 ```
 
 
-This approach should help you manage the dependencies and resolve the version conflicts more effectively.
 
 4. Edit Host from 127.0.0.1 tto 0.0.0.0
 
@@ -1610,6 +1612,11 @@ server {
     ```bash
     sudo systemctl reload nginx
     ```
+
+### Conclusion
+
+This approach should help you manage the dependencies and resolve the version conflicts more effectively while ensuring pgAdmin runs in the background and is accessible via Nginx as a reverse proxy.
+
 
 My PGAdmin4 can be accessed here : https://pgadmin.arpansahu.me/
 
