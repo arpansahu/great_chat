@@ -173,7 +173,7 @@ else:
 
 Change settings.py static files and media files settings | Now I have added support for BlackBlaze Static Storage also which also based on AWS S3 protocols 
 
-``` 
+```python
 if not DEBUG:
     BUCKET_TYPE = config('BUCKET_TYPE')
 
@@ -281,7 +281,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"), ]
 ```
 
-run below command ```python manage.py collectstatic```  and you are good to go
+run below command 
+
+```bash
+python manage.py collectstatic
+```
+
+and you are good to go
 
 
 
@@ -329,7 +335,7 @@ The `update_readme.sh` script performs the following actions:
 
 To run the `update_readme.sh` script, navigate to the `readme_manager` directory and execute the script:
 
-```sh
+```bash
 cd readme_manager
 ./update_readme.sh
 ```
@@ -445,7 +451,8 @@ Reference: https://docs.docker.com/engine/install/ubuntu/
 
 1. Setting up the Repository
    1. Update the apt package index and install packages to allow apt to use a repository over HTTPS: 
-       ```
+
+       ```bash
        sudo apt-get update
     
        sudo apt-get install \
@@ -456,7 +463,7 @@ Reference: https://docs.docker.com/engine/install/ubuntu/
        ```
    2. Add Docker’s official GPG key:
 
-       ```
+       ```bash
        sudo mkdir -p /etc/apt/keyrings
     
        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
@@ -464,34 +471,38 @@ Reference: https://docs.docker.com/engine/install/ubuntu/
 
    3. Use the following command to set up the repository:
 
-       ```
+       ```bash
        echo \
          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
          $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
        ```
+
 2. Install Docker Engine
     
    1. Update the apt package index:
 
-      ```
+      ```bash
        sudo apt-get update
       ```
     
       1. Receiving a GPG error when running apt-get update?
 
          Your default umask may be incorrectly configured, preventing detection of the repository public key file. Try granting read permission for the Docker public key file before updating the package index:
-            ```
+
+            ```bash
             sudo chmod a+r /etc/apt/keyrings/docker.gpg
             sudo apt-get update
             ```
+            
    2. Install Docker Engine, containerd, and Docker Compose.
 
-        ```
+        ```bash
         sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
         ```
+        
    3. Verify that the Docker Engine installation is successful by running the hello-world image:
 
-        ```
+        ```bash
          sudo docker run hello-world
         ```
 
@@ -1063,7 +1074,7 @@ There are multiple Java implementations which you can use. OpenJDK is the most p
 
 Update the Debian apt repositories, install OpenJDK 11, and check the installation with the commands:
 
-```
+```bash
 sudo apt update
 
 sudo apt install openjdk-11-jre
@@ -1076,7 +1087,7 @@ OpenJDK 64-Bit Server VM (build 11.0.12+7-post-Debian-2, mixed mode, sharing)
 
 Long Term Support release
 
-```
+```bash
 curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo tee \
   /usr/share/keyrings/jenkins-keyring.asc > /dev/null
 echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
@@ -1088,31 +1099,32 @@ sudo apt-get install jenkins
 
 Start Jenkins
 
-```
+```bash
 sudo systemctl enable jenkins
 ```
 
 You can start the Jenkins service with the command:
 
-```
+```bash
 sudo systemctl start jenkins
 ```
 
 You can check the status of the Jenkins service using the command:
-```
+
+```bash
 sudo systemctl status jenkins
 ```
 
 Now for serving the Jenkins UI from Nginx add the following lines to the Nginx file located at 
 /etc/nginx/sites-available/arpansahu by running the following command
 
-```
+```bash
 sudo vi /etc/nginx/sites-available/arpansahu
 ```
 
 * Add these lines to it.
 
-    ```
+    ```bash
     server {
         listen         80;
         server_name    jenkins.arpansahu.me;
@@ -1145,6 +1157,7 @@ inside /etc/sudoers file
 
 and then put 
 
+```bash
 stage('Dependencies') {
             steps {
                 script {
@@ -1152,6 +1165,7 @@ stage('Dependencies') {
                 }
             }
         }
+```
 
 in Jenkinsfile
 
@@ -1252,7 +1266,7 @@ and add your GitHub credentials from there
 
 * Add a .env file to you project using following command (This step is no more required stage('Dependencies'))
 
-    ```
+    ```bash
     sudo vi  /var/lib/jenkins/workspace/great_chat/.env
     ```
 
@@ -1578,37 +1592,40 @@ vi /root/pgadmin_venv/lib/python3.10/site-packages/pgadmin4/config.py
     ```bash
     sudo vi /etc/nginx/sites-available/arpansahu
     ```
+
 2. Add this server configuration
 
-```bash
-server {
-    listen         80;
-    server_name    pgadmin.arpansahu.me;
-    # force https-redirects
-    if ($scheme = http) {
-        return 301 https://$server_name$request_uri;
+    ```bash
+    server {
+        listen         80;
+        server_name    pgadmin.arpansahu.me;
+        # force https-redirects
+        if ($scheme = http) {
+            return 301 https://$server_name$request_uri;
+            }
+
+        location / {
+            proxy_pass              http://0.0.0.0:9997;
+            proxy_set_header        Host $host;
+            proxy_set_header    X-Forwarded-Proto $scheme;
         }
 
-    location / {
-         proxy_pass              http://0.0.0.0:9997;
-         proxy_set_header        Host $host;
-         proxy_set_header    X-Forwarded-Proto $scheme;
+        listen 443 ssl; # managed by Certbot
+        ssl_certificate /etc/letsencrypt/live/arpansahu.me/fullchain.pem; # managed by Certbot
+        ssl_certificate_key /etc/letsencrypt/live/arpansahu.me/privkey.pem; # managed by Certbot
+        include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+        ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
     }
-
-    listen 443 ssl; # managed by Certbot
-    ssl_certificate /etc/letsencrypt/live/arpansahu.me/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/arpansahu.me/privkey.pem; # managed by Certbot
-    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
-}
-```
+    ```
 
 3. Test the Nginx Configuration
+
     ```bash
     sudo nginx -t
     ```
 
 4. Reload Nginx to apply the new configuration
+
     ```bash
     sudo systemctl reload nginx
     ```
