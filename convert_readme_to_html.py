@@ -35,14 +35,14 @@ def convert_github_image_urls(text):
             raw_url = url.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/")
             return f'![{alt_text}]({raw_url})'
         return match.group(0)
-    
+
     image_pattern = re.compile(r'!\[([^\]]*)\]\((https?://[^\)]+)\)')
     return image_pattern.sub(replace, text)
 
 # Function to convert Markdown image links to HTML <img> tags
 def convert_images_to_html(text):
     image_pattern = re.compile(r'!\[([^\]]*)\]\((https?://[^\)]+)\)')
-    return image_pattern.sub(r'<img class="d-block w-100" alt="\1" src="\2" />', text)
+    return image_pattern.sub(r'<img alt="\1" src="\2" />', text)
 
 # Function to process the markdown content and convert it to HTML
 def process_markdown_to_html(input_file, intermediate_file, output_file):
