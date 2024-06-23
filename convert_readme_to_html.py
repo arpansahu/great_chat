@@ -26,16 +26,6 @@ def adjust_code_blocks(input_file, output_file):
     with open(output_file, 'w') as file:
         file.writelines(adjusted_content)
 
-# Function to convert plain URLs to markdown links outside of code blocks and HTML tags
-def convert_urls_to_links(text):
-    def replace(match):
-        url = match.group(0)
-        return f'<a href="{url}">{url}</a>'
-    
-    # Pattern to identify URLs outside of code blocks and HTML tags
-    url_pattern = re.compile(r'(?<![`">])(https?://[^\s`"<]+)(?![<`])')
-    return url_pattern.sub(replace, text)
-
 # Function to process the markdown content and convert it to HTML
 def process_markdown_to_html(input_file, intermediate_file, output_file):
     # Adjust code blocks
@@ -56,13 +46,7 @@ def process_markdown_to_html(input_file, intermediate_file, output_file):
         if pre.code:
             code_block = pre.code
             code_block.string = '\n' + code_block.string.strip() + '\n'
-    
-    # Convert URLs to links outside of code blocks and HTML tags
-    for text_node in soup.find_all(string=True):
-        if text_node.parent.name not in ['code', 'pre']:
-            new_text = convert_urls_to_links(text_node)
-            text_node.replace_with(BeautifulSoup(new_text, 'html.parser'))
-    
+
     # Write the final HTML content to a new file
     with open(output_file, 'w') as file:
         file.write(soup.prettify())
