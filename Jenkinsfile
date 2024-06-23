@@ -31,10 +31,6 @@ pipeline {
                 }
             }
             steps {
-                // Add your production deployment steps here
-                echo 'Deploying changes to production...'
-            }
-            steps {
                 script {
                     sh "docker compose up --build --detach"
                 }
