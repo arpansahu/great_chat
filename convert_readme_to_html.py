@@ -1,5 +1,4 @@
 import markdown
-import re
 from markdown.extensions.fenced_code import FencedCodeExtension
 from markdown.extensions.nl2br import Nl2BrExtension
 from markdown.extensions.extra import ExtraExtension
@@ -48,7 +47,7 @@ def process_markdown_to_html(input_file, intermediate_file, output_file):
 
     # Write the final HTML content to a new file
     with open(output_file, 'w') as file:
-        file.write(soup.prettify())
+        file.write(soup.prettify(formatter=None))
 
     print(f"Conversion complete. The HTML content has been saved to {output_file}")
 
