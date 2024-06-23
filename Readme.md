@@ -464,8 +464,6 @@ Reference: https://docs.docker.com/engine/install/ubuntu/
    2. Add Docker’s official GPG key:
 
        ```bash
-       sudo mkdir -p /etc/apt/keyrings
-    
        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
        ```
 
@@ -566,13 +564,13 @@ if you remove this tag it will be attached to terminal, and you will be able to 
 
 #### Installing the Nginx server
 
-```
+```bash
 sudo apt-get install nginx
 ```
 
 Starting Nginx and checking its status 
 
-```
+```bash
 sudo systemctl start nginx
 sudo systemctl status nginx
 ```
@@ -580,7 +578,8 @@ sudo systemctl status nginx
 #### Modify DNS Configurations
 
 Add these two records to your DNS Configurations
-```
+
+```bash
 A Record	*	0.227.49.244 (public IP of ec2)	Automatic
 A Record	@	0.227.49.244 (public IP of ec2)	Automatic
 ```
@@ -589,19 +588,19 @@ Note: now you will be able to see nginx running page if you open the public IP o
 IP
 Make Sure your EC2 security Group have these entry inbound rules 
 
-```
+```bash
 random-hash-id	IPv4	HTTP	TCP	80	0.0.0.0/0	–
 ```
 
 Open a new Nginx Configuration file name can be anything i am choosing arpansahu since my domain is arpansahu.me. there is already a default configuration file but we will leave it like that only
 
-```
+```bash
 sudo vi /etc/nginx/sites-available/arpansahu
 ```
 
 paste this content in the above file
 
-```
+```bash
 server_tokens               off;
 access_log                  /var/log/nginx/supersecure.access.log;
 error_log                   /var/log/nginx/supersecure.error.log;
@@ -620,19 +619,20 @@ This single Nginx File will be hosting all the multiple projects which I have li
 
 Checking if the configurations file is correct
 
-```
+```bash
 sudo service nginx configtest /etc/nginx/sites-available/arpansahu
 ```
 
 Now you need to symlink this file to the sites-enabled directory:
 
-``` 
+```bash
 cd /etc/nginx/sites-enabled
 sudo ln -s ../sites-available/arpansahu
 ```
 
 Restarting Nginx Server 
-```
+
+```bash
 sudo systemctl restart nginx
 ```
 
@@ -647,7 +647,7 @@ Now it's time to enable HTTPS for this server
 
     Open nginx.conf file end change ssl_protocols 
     
-    ```
+    ```bash
     sudo vi /etc/nginx/nginx.conf
     
     From ssl_protocols TLSv1 TLSv1.1 TLSv1.2; to ssl_protocols TLSv1.2 TLSv1.3;
@@ -655,20 +655,20 @@ Now it's time to enable HTTPS for this server
     
     Use this command to verify if nginx.conf file is correct or not
     
-    ```
+    ```bash
     sudo nginx -t
     ```
     
     Now you’re ready to install and use Certbot, you can use Snap to install Certbot:
     
-    ```
+    ```bash
     sudo snap install --classic certbot
     sudo ln -s /snap/bin/certbot /usr/bin/certbot
     ```
     
     Now installing certificate
     
-    ```
+    ```bash
     sudo certbot --nginx --rsa-key-size 4096 --no-redirect
     ```
     
@@ -679,7 +679,7 @@ Now it's time to enable HTTPS for this server
 
     Now These lines will be added to your # Nginx configuration: /etc/nginx/sites-available/arpansahu
     
-    ```
+    ```bash
     listen 443 ssl;
     ssl_certificate /etc/letsencrypt/live/www.supersecure.codes/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/www.supersecure.codes/privkey.pem;
@@ -690,10 +690,11 @@ Now it's time to enable HTTPS for this server
     Redirecting HTTP to HTTPS
     Open the nginx configuration file  and make it like this
 
-    ```
+    ```bash
     sudo vi /etc/nginx/sites-available/arpansahu
     ```
-    ```
+
+    ```bash
     server_tokens               off;
     access_log                  /var/log/nginx/supersecure.access.log;
     error_log                   /var/log/nginx/supersecure.error.log;
@@ -719,7 +720,8 @@ Now it's time to enable HTTPS for this server
     ``` 
     
     You can dry run and check whether it's renewal is working or not
-    ```
+
+    ```bash
     sudo certbot renew --dry-run
     ```
     
@@ -732,7 +734,8 @@ Now it's time to enable HTTPS for this server
     Here we will enable an SSL certificate for all subdomains at once
         
     Run the following Command
-    ```
+
+    ```bash
     sudo certbot certonly --manual --preferred-challenges dns
     ```
     
@@ -744,7 +747,7 @@ Now it's time to enable HTTPS for this server
 
     After running the above command you will see a message similar to this
       
-    ```
+    ```bash
     Saving debug log to /var/log/letsencrypt/letsencrypt.log
     Please enter the domain name(s) you would like on your certificate (comma and/or
     space separated) (Enter 'c' to cancel): *.arpansahu.me
@@ -773,7 +776,7 @@ Now it's time to enable HTTPS for this server
     You will be given a DNS challenge called ACME challenger you have to create a DNS TXT record in DNS.
     Similar to the below record.
         
-    ```
+    ```bash
     TXT Record  _acme-challenge dpWCxvq3mARF5iGzSfaRNXwmdkUSs0wgsTPhSaX1gK4 5 Automatic
     ```
     
@@ -784,7 +787,8 @@ Now it's time to enable HTTPS for this server
     If it's verified then press enter the terminal as mentioned above
         
     Then your certificate will be generated
-    ```
+
+    ```bash
     Successfully received a certificate.
     The certificate is saved at: /etc/letsencrypt/live/arpansahu.me-0001/fullchain.pem            (use this in your nginx configuration file)
     Key is saved at:         /etc/letsencrypt/live/arpansahu.me-0001/privkey.pem
@@ -798,7 +802,7 @@ Now it's time to enable HTTPS for this server
     So remember to delete it before generating this wildcard certificate
     using command
 
-    ```
+    ```bash
     sudo certbot delete
     ```
         
@@ -808,7 +812,7 @@ Now it's time to enable HTTPS for this server
 
     1. Modify your ec2 inbound rules 
     
-      ```
+      ```bash
       –	sgr-0219f1387d28c96fb	IPv4	DNS (TCP)	TCP	53	0.0.0.0/0	–	
       –	sgr-01b2b32c3cee53aa9	IPv4	SSH	TCP	22	0.0.0.0/0	–
       –	sgr-0dfd03bbcdf60a4f7	IPv4	HTTP	TCP	80	0.0.0.0/0	–
@@ -820,32 +824,41 @@ Now it's time to enable HTTPS for this server
 
       * Create a folder for acme-dns and change the directory
 
-        ```
+        ```bash
          sudo mkdir /opt/acme-dns
          cd !$
         ```
+
       * Download and extract tar with acme-dns from GitHub
 
-        ```
+        ```bash
         sudo curl -L -o acme-dns.tar.gz \
         https://github.com/joohoi/acme-dns/releases/download/v0.8/acme-dns_0.8_linux_amd64.tar.gz
         sudo tar -zxf acme-dns.tar.gz
         ```
+
       * List files
-        ```
+
+        ```bash
         sudo ls
         ```
+
       * Clean Up
-        ```
+
+        ```bash
         sudo rm acme-dns.tar.gz
         ```
+
       * Create a soft link
-        ```
+
+        ```bash
         sudo ln -s \
         /opt/acme-dns/acme-dns /usr/local/bin/acme-dns
         ```
+
       * Create a minimal acme-dns user
-         ```
+
+         ```bash
          sudo adduser \
          --system \	
          --gecos "acme-dns Service" \
@@ -854,8 +867,10 @@ Now it's time to enable HTTPS for this server
          --home /var/lib/acme-dns \
          acme-dns
         ```
+
       * Update default acme-dns config compared with IP from the AWS console. Can't bind to the public address need to use private one.
-        ```
+
+        ```bash
         IP addr
 	  
         sudo mkdir -p /etc/acme-dns
@@ -866,7 +881,8 @@ Now it's time to enable HTTPS for this server
         ```
       
       * Replace
-        ```
+
+        ```bash
         listen = "127.0.0.1:53” to listen = “private IP of the ec2 instance” 172.31.93.180:53(port will be 53)
  
         Similarly, Edit other details mentioned below  
@@ -896,8 +912,10 @@ Now it's time to enable HTTPS for this server
         tls = "none"   (Changed)
 
         ```
+
       * Move the systemd service and reload
-        ```
+
+        ```bash
         cat acme-dns.service
      
         sudo mv \
@@ -905,46 +923,63 @@ Now it's time to enable HTTPS for this server
 	  
         sudo systemctl daemon-reload
         ```
+
       * Start and enable acme-dns server
-        ```
+
+        ```bash
         sudo systemctl enable acme-dns.service
         sudo systemctl start acme-dns.service
         ```
+
       * Check acme-dns for possible errors
-        ```
+
+        ```bash
         sudo systemctl status acme-dns.service
         ```
+
       * Use journalctl to debug in case of errors
-         ```
+
+         ```bash
          journalctl --unit acme-dns --no-pager --follow
          ```
+
       * Create A record for your domain
-         ```
+
+         ```bash
          auth.arpansahu.me IN A <public-IP>
          ```
+
       * Create NS record for auth.arpansahu.me pointing to auth.arpansahu.me. This means, that auth.arpansahu.me is
         responsible for any *.auth.arpansahu.me records
-        ```
+
+        ```bash
         auth.arpansahu.me IN NS auth.arpansahu.me
         ```
+
       * Your DNS record will be looking like this
-        ```
+
+        ```bash
         A Record	auth	44.199.177.138	Automatic	
         NS Record	auth	auth.arpansahu.me.	Automatic
         ```
+
       * Test acme-dns server (Split the screen)
-        ```
+
+        ```bash
         journalctl -u acme-dns --no-pager --follow
         ```
+
       * From the local host try to resolve the random DNS record
-        ```
+
+        ```bash
         dig api.arpansahu.me
         dig api.auth.arpansahu.me
         dig 7gvhsbvf.auth.arpansahu.me
         ``` 
         
    3. Install acme-dns-client 
-     ```
+
+     ```bash
      sudo mkdir /opt/acme-dns-client
      cd !$
     
@@ -958,36 +993,46 @@ Now it's time to enable HTTPS for this server
      sudo ln -s \
      /opt/acme-dns-client/acme-dns-client /usr/local/bin/acme-dns-client 
      ```
+
    4. Install Certbot
-     ```
+
+     ```bash
      cd
      sudo snap install core; sudo snap refresh core
      sudo snap install --classic certbot
      sudo ln -s /snap/bin/certbot /usr/bin/certbot
      ```
+
     Note: you can skip this step if Certbot is already installed
 
     5. Get Letsencrypt Wildcard Certificate
        * Create a new acme-dns account for your domain and set it up
-         ```
+
+         ```bash
          sudo acme-dns-client register \
          -d arpansahu.me -s http://localhost:8090
+         ```
 
         The above command is old now we will use the new command 
+
+         ```bash
          sudo acme-dns-client register \
           -d arpansahu.me \
           -allow 0.0.0.0/0 \
           -s http://localhost:8080
          ```
+
          Note: When we edited acme-dns config file there we mentioned the port 8090 and thats why we are using this port here also
+         
        * Creating Another DNS Entry 
-         ```
+
+         ```bash
          CNAME Record	_acme-challenge	e6ac0f0a-0358-46d6-a9d3-8dd41f44c7ec.auth.arpansahu.me.	Automatic
          ```
 
         Since the last update in  the last step now two more entries should be added 
 
-         ```
+         ```bash
          CAA Record @	0 issuewild "letsencrypt.org; validationmethods=dns-01; accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/1424899626"  Automatic
 
          CAA Record @	0 issue "letsencrypt.org; validationmethods=dns-01; accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/1424899626"
@@ -996,11 +1041,14 @@ Now it's time to enable HTTPS for this server
 
         Same as an entry that needs to be added to complete a time challenge as previously we did.
        * Check whether the entry is added successfully or not
-         ```
+
+         ```bash
          dig _acme-challenge.arpansahu.me
          ```
+
        * Get a wildcard certificate
-         ```
+
+         ```bash
          sudo certbot certonly \
          --manual \
          --test-cert \ 
@@ -1008,14 +1056,19 @@ Now it's time to enable HTTPS for this server
          --manual-auth-hook 'acme-dns-client' \ 
          -d ‘*.arpansahu.me’ -d arpansahu.me
          ```
+
         Note: Here we have to mention both the base and wildcard domain names with -d since let's encrypt don't provide base domain ssl by default in wildcard domain ssl
+       
        * Verifying the certificate
-         ```
+
+         ```bash
          sudo openssl x509 -text -noout \
          -in /etc/letsencrypt/live/arpansahu.me/fullchain.pem
          ```
+
        * Renew certificate (test)
-         ```
+
+         ```bash
          sudo certbot renew \
          --manual \ 
          --test-cert \ 
@@ -1023,24 +1076,32 @@ Now it's time to enable HTTPS for this server
          --preferred-challenges dns \
          --manual-auth-hook 'acme-dns-client'       
          ```
+         
        * Renew certificate (actually)
-         ```
+
+         ```bash
          sudo certbot renew \
          --manual \
          --preferred-challenges dns \
          --manual-auth-hook 'acme-dns-client'       
          ```
+
        * Check the entry is added successfully or not
-         ```
+
+         ```bash
          dig _acme-challenge.arpansahu.me
          ```
+
     6. Setup Auto-Renew for Letsencrypt WILDCARD Certificate
        * Setup cronjob
-         ```
+
+         ```bash
          sudo crontab -e
          ```
+
        * Add the following lines to the file
-         ```
+
+         ```bash
          0 */12 * * * certbot renew --manual --test-cert --preferred-challenges dns --manual-auth-hook 'acme-dns-client'
          ```
 
@@ -1358,6 +1419,7 @@ Remember to configure your PostgreSQL server according to your security needs, s
 ## Configuring Postgresql
 
 1. open postgresql.conf file
+
     ```bash
     sudo vi /etc/postgresql/14/main/postgresql.conf
     ```
@@ -1373,6 +1435,7 @@ Remember to configure your PostgreSQL server according to your security needs, s
     Now the thing is if u don't want to serve it using nginx u can also set it to * all so that database can be connected from any where
 
 3. 	Edit pg_hba.conf to allow connections:
+
     ```bash
     sudo nano /etc/postgresql/14/main/pg_hba.conf
     ```
@@ -1380,11 +1443,13 @@ Remember to configure your PostgreSQL server according to your security needs, s
     14 is the version which i have installed your version can be different
 
 4. 	Add the following line in the end:
+
     ```bash
     host    all             all             127.0.0.1/32            md5
     ```
 
     if u want to use without nginx
+
     ```bash
     host    all             all             0.0.0.0/0            md5
     ```
@@ -1392,6 +1457,7 @@ Remember to configure your PostgreSQL server according to your security needs, s
     I have added both 
 
 5. Restart PostgreSQL to apply changes:
+
     ```bash
     sudo systemctl restart postgresql
     ```
@@ -1449,9 +1515,11 @@ Note: In previous steps we have already seen how to setup the reverse proxy with
     Follow these steps: 
 
         0.	Remove the custom configuration file:
+
             ```bash
             sudo rm /etc/nginx/conf.d/postgresql.conf
             ```
+
         1.	Open the main Nginx configuration file: 
 
             ```bash
@@ -1512,6 +1580,7 @@ Note: In previous steps we have already seen how to setup the reverse proxy with
             ```
         
         3.	Test the Nginx Configuration
+        
             ```bash
             sudo nginx -t
             ```
@@ -1697,6 +1766,7 @@ Keep in mind that the instructions provided here assume a basic setup. For produ
     ```bash
     sudo vi /etc/nginx/sites-available/arpansahu
     ```
+
 2. Add this server configuration
 
     ```bash
@@ -1723,11 +1793,13 @@ Keep in mind that the instructions provided here assume a basic setup. For produ
     ```
 
 3. Test the Nginx Configuration
+
     ```bash
     sudo nginx -t
     ```
 
 4. Reload Nginx to apply the new configuration
+
     ```bash
     sudo systemctl reload nginx
     ```
@@ -1774,6 +1846,7 @@ Note: if u want to use ssl connection you can
 
 /etc/redis/redis.conf open this file and 
 
+```bash
 tls-port 6379
 port 0
 
@@ -1782,6 +1855,7 @@ tls-key-file /path/to/redis.key
 tls-dh-params-file /path/to/dhparam.pem
 
 tls-auth-clients no
+```
 
 Add this configuration 
 
@@ -1835,6 +1909,7 @@ Note: if u want to use ssl connection you can
 
 /etc/redis/redis.conf open this file and 
 
+```bash
 tls-port 6379
 port 0
 
@@ -1843,6 +1918,7 @@ tls-key-file /path/to/redis.key
 tls-dh-params-file /path/to/dhparam.pem
 
 tls-auth-clients no
+```
 
 Add this configuration 
 
@@ -1892,6 +1968,7 @@ Note: if u want to use ssl connection you can
 
 /etc/redis/redis.conf open this file and 
 
+```bash
 tls-port 6379
 port 0
 
@@ -1900,6 +1977,7 @@ tls-key-file /path/to/redis.key
 tls-dh-params-file /path/to/dhparam.pem
 
 tls-auth-clients no
+```
 
 Add this configuration 
 
