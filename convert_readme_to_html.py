@@ -3,6 +3,7 @@ from markdown.extensions.fenced_code import FencedCodeExtension
 from markdown.extensions.nl2br import Nl2BrExtension
 from markdown.extensions.extra import ExtraExtension
 from bs4 import BeautifulSoup
+import re
 
 # Function to adjust code blocks in the markdown file
 def adjust_code_blocks(input_file, output_file):
@@ -44,6 +45,24 @@ def extract_code_blocks(intermediate_file):
     
     return code_blocks
 
+# Function to convert GitHub image URLs to raw GitHub content URLs
+def convert_github_image_urls(text):
+    def replace(match):
+        alt_text = match.group(1)
+        url = match.group(2)
+        if "github.com" in url and "/blob/" in url:
+            raw_url = url.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/")
+            return f'![{alt_text}]({raw_url})'
+        return match.group(0)
+    
+    image_pattern = re.compile(r'!\[([^\]]*)\]\((https?://[^\)]+)\)')
+    return image_pattern.sub(replace, text)
+
+# Function to convert Markdown image links to HTML <img> tags
+def convert_images_to_html(text):
+    image_pattern = re.compile(r'!\[([^\]]*)\]\((https?://[^\)]+)\)')
+    return image_pattern.sub(r'<img class="d-block w-100" alt="\1" src="\2" />', text)
+
 # Function to process the markdown content and convert it to HTML
 def process_markdown_to_html(input_file, intermediate_file, output_file):
     # Adjust code blocks
@@ -53,8 +72,11 @@ def process_markdown_to_html(input_file, intermediate_file, output_file):
     with open(intermediate_file, 'r') as file:
         readme_text = file.read()
     
-    # Extract original code blocks
-    original_code_blocks = extract_code_blocks(intermediate_file)
+    # Convert GitHub image URLs to raw GitHub content URLs
+    readme_text = convert_github_image_urls(readme_text)
+    
+    # Convert Markdown image links to HTML <img> tags
+    readme_text = convert_images_to_html(readme_text)
     
     # Convert markdown to HTML with preserved code blocks, <br> tags for line breaks, and URL handling
     html_content = markdown.markdown(readme_text, extensions=[FencedCodeExtension(), Nl2BrExtension(), ExtraExtension()])
@@ -63,6 +85,7 @@ def process_markdown_to_html(input_file, intermediate_file, output_file):
     soup = BeautifulSoup(html_content, 'html.parser')
     
     # Replace code blocks with the original content, ensuring they start and end on new lines with proper indentation
+    original_code_blocks = extract_code_blocks(intermediate_file)
     code_block_index = 0
     for pre in soup.find_all('pre'):
         if pre.code:
