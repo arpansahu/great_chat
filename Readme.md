@@ -287,7 +287,7 @@ run below command
 python manage.py collectstatic
 ```
 
-and you are good to go test
+and you are good to go
 
 
 
@@ -1920,3 +1920,5 @@ Also there is a MiniIo UI Server which can be accessed here https://minioui.arpa
 To run this project, you will need to add the following environment variables to your .env file
 
 [env.example]
+
+
