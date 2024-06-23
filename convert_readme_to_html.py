@@ -6,7 +6,7 @@ from markdown.extensions.extra import ExtraExtension
 from bs4 import BeautifulSoup
 
 # Read the contents of the Readme.md file
-with open('docker.md', 'r') as file:
+with open('docker_converted.md', 'r') as file:
     readme_text = file.read()
 
 # Convert plain URLs to markdown links outside of code blocks and HTML tags
@@ -28,23 +28,16 @@ html_content = markdown.markdown(readme_text, extensions=[FencedCodeExtension(),
 # Parse the HTML content with BeautifulSoup to ensure no alteration to existing HTML tags and attributes
 soup = BeautifulSoup(html_content, 'html.parser')
 
-# Ensure all <pre><code> tags are correctly formatted
-for pre in soup.find_all('pre'):
-    if pre.code:
-        # Preserve class if already present
-        if 'class' in pre.code.attrs:
-            classes = pre.code.attrs['class']
-        else:
-            classes = []
-        classes.append('language-bash')  # or other language as needed
-        pre.code.attrs['class'] = classes
-
-        # Add a newline before the content within <pre><code> blocks
-        code_content = pre.code.string
-        pre.code.string = '\n' + code_content.strip() + '\n'
+# Fix code blocks not being rendered correctly
+for pre_block in soup.find_all('pre'):
+    if pre_block.code:
+        code_block = pre_block.code
+        # Ensure the first line starts from a new line and preserve internal indentation
+        original_text = code_block.get_text()
+        code_block.string = '\n' + original_text + '\n'
 
 # Write the HTML content to a new file
 with open('docker.html', 'w') as file:
     file.write(soup.prettify())
 
-print("Conversion complete. The HTML content has been saved to docker.html")
+print("Conversion complete. The HTML content has been saved to Readme.html")
