@@ -1,6 +1,11 @@
 pipeline {
     agent { label 'local' }
     stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
         stage('Dependencies') {
             steps {
                 script {
@@ -9,6 +14,18 @@ pipeline {
             }
         }
         stage('Production') {
+            when {
+                expression {
+                    // Collect all changed files
+                    def changes = currentBuild.changeSets.collect { it.items.collect { it.affectedFiles.collect { it.path } } }.flatten()
+                    
+                    // Define the file(s) to be excluded from triggering a deploy
+                    def excludedFiles = ['Readme.md']
+
+                    // Check if the only changed files are in the excluded list
+                    return changes.size() != changes.intersect(excludedFiles).size()
+                }
+            }
             steps {
                 script {
                     sh "docker compose up --build --detach"
