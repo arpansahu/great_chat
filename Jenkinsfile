@@ -70,6 +70,8 @@ pipeline {
                                 }
                         ]
                     }'"""
+                    // Trigger another Jenkins job
+                    build job: 'common_readme', wait: false
                 }
             }
         }
