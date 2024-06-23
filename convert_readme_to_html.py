@@ -2,10 +2,11 @@ import markdown
 import re
 from markdown.extensions.fenced_code import FencedCodeExtension
 from markdown.extensions.nl2br import Nl2BrExtension
+from markdown.extensions.codehilite import CodeHiliteExtension
 from markdown.extensions.extra import ExtraExtension
 from bs4 import BeautifulSoup
 
-# Adjust code blocks to remove leading spaces from code block markers
+# Function to adjust code blocks in the markdown file
 def adjust_code_blocks(input_file, output_file):
     with open(input_file, 'r') as file:
         content = file.readlines()
@@ -25,58 +26,51 @@ def adjust_code_blocks(input_file, output_file):
     with open(output_file, 'w') as file:
         file.writelines(adjusted_content)
 
-# Convert plain URLs to markdown links outside of code blocks and HTML tags
-def convert_urls_to_links(html_content):
+# Function to convert plain URLs to markdown links outside of code blocks and HTML tags
+def convert_urls_to_links(text):
     def replace(match):
         url = match.group(0)
-        return f'<{url}>'
+        return f'<a href="{url}">{url}</a>'
     
-    # Pattern to identify URLs outside of code blocks and HTML tags, but not within attributes
-    url_pattern = re.compile(r'(?<![`">])((?<!src=["\'])https?://[^\s`"<]+)(?![<`])')
-    return url_pattern.sub(replace, html_content)
+    # Pattern to identify URLs outside of code blocks and HTML tags
+    url_pattern = re.compile(r'(?<![`">])(https?://[^\s`"<]+)(?![<`])')
+    return url_pattern.sub(replace, text)
 
-# Main script for conversion
-def main():
-    input_file = 'Readme.md'
-    intermediate_file = 'Readme_converted.md'
-    output_file = 'Readme.html'
-
-    # Adjust code blocks in the input file
+# Function to process the markdown content and convert it to HTML
+def process_markdown_to_html(input_file, intermediate_file, output_file):
+    # Adjust code blocks
     adjust_code_blocks(input_file, intermediate_file)
-
-    # Read the adjusted contents of the intermediate file
+    
+    # Read the adjusted markdown file
     with open(intermediate_file, 'r') as file:
         readme_text = file.read()
-
+    
     # Convert markdown to HTML with preserved code blocks, <br> tags for line breaks, and URL handling
     html_content = markdown.markdown(readme_text, extensions=[FencedCodeExtension(), Nl2BrExtension(), ExtraExtension()])
-
+    
     # Parse the HTML content with BeautifulSoup to ensure no alteration to existing HTML tags and attributes
     soup = BeautifulSoup(html_content, 'html.parser')
-
-    # Fix code blocks not being rendered correctly
-    for pre_block in soup.find_all('pre'):
-        if pre_block.code:
-            code_block = pre_block.code
-            # Ensure the first line starts from a new line and preserve internal indentation
-            original_text = code_block.get_text()
-            code_block.string = '\n' + original_text + '\n'
-
-    # Convert the modified soup back to a string
-    html_content = str(soup)
-
-    # Convert plain URLs to markdown links outside of code blocks and HTML tags
-    html_content = convert_urls_to_links(html_content)
-
-    # Parse the modified HTML content with BeautifulSoup again to ensure proper formatting
-    soup = BeautifulSoup(html_content, 'html.parser')
-
+    
+    # Ensure all <pre><code> tags are correctly formatted
+    for pre in soup.find_all('pre'):
+        if pre.code:
+            code_block = pre.code
+            code_block.string = '\n' + code_block.string.strip() + '\n'
+    
+    # Convert URLs to links outside of code blocks and HTML tags
+    for text_node in soup.find_all(string=True):
+        if text_node.parent.name not in ['code', 'pre']:
+            new_text = convert_urls_to_links(text_node)
+            text_node.replace_with(BeautifulSoup(new_text, 'html.parser'))
+    
     # Write the final HTML content to a new file
     with open(output_file, 'w') as file:
         file.write(soup.prettify())
 
     print(f"Conversion complete. The HTML content has been saved to {output_file}")
 
-# Run the main script
-if __name__ == "__main__":
-    main()
+# Example usage
+input_file = 'Readme.md'
+intermediate_file = 'Readme_converted.md'
+output_file = 'Readme.html'
+process_markdown_to_html(input_file, intermediate_file, output_file)
