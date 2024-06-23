@@ -2,7 +2,6 @@ import markdown
 import re
 from markdown.extensions.fenced_code import FencedCodeExtension
 from markdown.extensions.nl2br import Nl2BrExtension
-from markdown.extensions.codehilite import CodeHiliteExtension
 from markdown.extensions.extra import ExtraExtension
 from bs4 import BeautifulSoup
 
