@@ -26,14 +26,14 @@ def adjust_code_blocks(input_file, output_file):
         file.writelines(adjusted_content)
 
 # Convert plain URLs to markdown links outside of code blocks and HTML tags
-def convert_urls_to_links(text):
+def convert_urls_to_links(html_content):
     def replace(match):
         url = match.group(0)
         return f'<{url}>'
     
-    # Pattern to identify URLs outside of code blocks and HTML tags
-    url_pattern = re.compile(r'(?<![`">])(https?://[^\s`"<]+)(?![<`])')
-    return url_pattern.sub(replace, text)
+    # Pattern to identify URLs outside of code blocks and HTML tags, but not within attributes
+    url_pattern = re.compile(r'(?<![`">])((?<!src=["\'])https?://[^\s`"<]+)(?![<`])')
+    return url_pattern.sub(replace, html_content)
 
 # Main script for conversion
 def main():
@@ -47,9 +47,6 @@ def main():
     # Read the adjusted contents of the intermediate file
     with open(intermediate_file, 'r') as file:
         readme_text = file.read()
-
-    # Preprocess the markdown content to convert URLs to links outside of code blocks and HTML tags
-    readme_text = convert_urls_to_links(readme_text)
 
     # Convert markdown to HTML with preserved code blocks, <br> tags for line breaks, and URL handling
     html_content = markdown.markdown(readme_text, extensions=[FencedCodeExtension(), Nl2BrExtension(), ExtraExtension()])
@@ -65,7 +62,16 @@ def main():
             original_text = code_block.get_text()
             code_block.string = '\n' + original_text + '\n'
 
-    # Write the HTML content to a new file
+    # Convert the modified soup back to a string
+    html_content = str(soup)
+
+    # Convert plain URLs to markdown links outside of code blocks and HTML tags
+    html_content = convert_urls_to_links(html_content)
+
+    # Parse the modified HTML content with BeautifulSoup again to ensure proper formatting
+    soup = BeautifulSoup(html_content, 'html.parser')
+
+    # Write the final HTML content to a new file
     with open(output_file, 'w') as file:
         file.write(soup.prettify())
 
