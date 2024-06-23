@@ -1,8 +1,5 @@
 pipeline {
     agent { label 'local' }
-    environment {
-        DEPLOYMENT_EXECUTED = false
-    }
     stages {
         stage('Checkout') {
             steps {
@@ -36,8 +33,8 @@ pipeline {
             steps {
                 script {
                     sh "docker compose up --build --detach"
-                    // Set the flag to true if the deployment stage is executed
-                    env.DEPLOYMENT_EXECUTED = true
+                    // Set a flag to true if the deployment stage is executed
+                    currentBuild.description = 'DEPLOYMENT_EXECUTED'
                 }
             }
         }
@@ -45,7 +42,7 @@ pipeline {
     post {
         success {
             script {
-                if (env.DEPLOYMENT_EXECUTED.toBoolean()) {
+                if (currentBuild.description == 'DEPLOYMENT_EXECUTED') {
                     sh """curl -s \
                     -X POST \
                     --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
@@ -77,7 +74,7 @@ pipeline {
         }
         failure {
             script {
-                if (env.DEPLOYMENT_EXECUTED.toBoolean()) {
+                if (currentBuild.description == 'DEPLOYMENT_EXECUTED') {
                     sh """curl -s \
                     -X POST \
                     --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
