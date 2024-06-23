@@ -5,9 +5,25 @@ from markdown.extensions.nl2br import Nl2BrExtension
 from markdown.extensions.extra import ExtraExtension
 from bs4 import BeautifulSoup
 
-# Read the contents of the Readme.md file
-with open('docker_converted.md', 'r') as file:
-    readme_text = file.read()
+# Adjust code blocks to remove leading spaces from code block markers
+def adjust_code_blocks(input_file, output_file):
+    with open(input_file, 'r') as file:
+        content = file.readlines()
+    
+    adjusted_content = []
+    inside_code_block = False
+    
+    for line in content:
+        if line.lstrip().startswith("```"):
+            inside_code_block = not inside_code_block
+            adjusted_content.append(line.lstrip())
+        elif inside_code_block:
+            adjusted_content.append(line)
+        else:
+            adjusted_content.append(line)
+    
+    with open(output_file, 'w') as file:
+        file.writelines(adjusted_content)
 
 # Convert plain URLs to markdown links outside of code blocks and HTML tags
 def convert_urls_to_links(text):
@@ -19,25 +35,42 @@ def convert_urls_to_links(text):
     url_pattern = re.compile(r'(?<![`">])(https?://[^\s`"<]+)(?![<`])')
     return url_pattern.sub(replace, text)
 
-# Preprocess the markdown content to convert URLs to links outside of code blocks and HTML tags
-readme_text = convert_urls_to_links(readme_text)
+# Main script for conversion
+def main():
+    input_file = 'Readme.md'
+    intermediate_file = 'Readme_converted.md'
+    output_file = 'Readme.html'
 
-# Convert markdown to HTML with preserved code blocks, <br> tags for line breaks, and URL handling
-html_content = markdown.markdown(readme_text, extensions=[FencedCodeExtension(), Nl2BrExtension(), ExtraExtension()])
+    # Adjust code blocks in the input file
+    adjust_code_blocks(input_file, intermediate_file)
 
-# Parse the HTML content with BeautifulSoup to ensure no alteration to existing HTML tags and attributes
-soup = BeautifulSoup(html_content, 'html.parser')
+    # Read the adjusted contents of the intermediate file
+    with open(intermediate_file, 'r') as file:
+        readme_text = file.read()
 
-# Fix code blocks not being rendered correctly
-for pre_block in soup.find_all('pre'):
-    if pre_block.code:
-        code_block = pre_block.code
-        # Ensure the first line starts from a new line and preserve internal indentation
-        original_text = code_block.get_text()
-        code_block.string = '\n' + original_text + '\n'
+    # Preprocess the markdown content to convert URLs to links outside of code blocks and HTML tags
+    readme_text = convert_urls_to_links(readme_text)
 
-# Write the HTML content to a new file
-with open('docker.html', 'w') as file:
-    file.write(soup.prettify())
+    # Convert markdown to HTML with preserved code blocks, <br> tags for line breaks, and URL handling
+    html_content = markdown.markdown(readme_text, extensions=[FencedCodeExtension(), Nl2BrExtension(), ExtraExtension()])
 
-print("Conversion complete. The HTML content has been saved to Readme.html")
+    # Parse the HTML content with BeautifulSoup to ensure no alteration to existing HTML tags and attributes
+    soup = BeautifulSoup(html_content, 'html.parser')
+
+    # Fix code blocks not being rendered correctly
+    for pre_block in soup.find_all('pre'):
+        if pre_block.code:
+            code_block = pre_block.code
+            # Ensure the first line starts from a new line and preserve internal indentation
+            original_text = code_block.get_text()
+            code_block.string = '\n' + original_text + '\n'
+
+    # Write the HTML content to a new file
+    with open(output_file, 'w') as file:
+        file.write(soup.prettify())
+
+    print(f"Conversion complete. The HTML content has been saved to {output_file}")
+
+# Run the main script
+if __name__ == "__main__":
+    main()
