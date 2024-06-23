@@ -233,39 +233,33 @@
 <p>
  Installing Pre requisites
 </p>
-<pre><code class="language-bash">
-  pip install -r requirements.txt
+<pre><code class="language-bash">  pip install -r requirements.txt
 </code></pre>
 <p>
  Create .env File and don't forget to add .env to gitignore
 </p>
-<pre><code class="language-bash">
-  add variables mentioned in .env.example
+<pre><code class="language-bash">  add variables mentioned in .env.example
 </code></pre>
 <p>
  Making Migrations and Migrating them.
 </p>
-<pre><code class="language-bash">
-  python manage.py makemigrations
+<pre><code class="language-bash">  python manage.py makemigrations
   python manage.py migrate
 </code></pre>
 <p>
  Run update_data Command
 </p>
-<pre><code>
-  python manage.py update_data
+<pre><code>  python manage.py update_data
 </code></pre>
 <p>
  Creating Super User
 </p>
-<pre><code class="language-bash">
-  python manage.py createsuperuser
+<pre><code class="language-bash">  python manage.py createsuperuser
 </code></pre>
 <p>
  Installing Redis On Local (For ubuntu) for other Os Please refer to their website https://redis.io/
 </p>
-<pre><code class="language-bash">
-  curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
+<pre><code class="language-bash">  curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
   echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
   sudo apt-get update
   sudo apt-get install redis
@@ -274,14 +268,12 @@
 <p>
  to check if its running or not
 </p>
-<pre><code class="language-bash">
-  sudo systemctl status redis
+<pre><code class="language-bash">  sudo systemctl status redis
 </code></pre>
 <p>
  Run Server
 </p>
-<pre><code class="language-bash">
-  python manage.py runserver
+<pre><code class="language-bash">  python manage.py runserver
 
   or 
 
@@ -290,8 +282,7 @@
 <p>
  Use these CACHE settings
 </p>
-<pre><code class="language-python">
-CACHES = {
+<pre><code class="language-python">CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
         'LOCATION': config('REDISCLOUD_URL'),
@@ -304,8 +295,7 @@ CACHES = {
 <p>
  Use these Channels Settings
 </p>
-<pre><code class="language-python">
-if not DEBUG:
+<pre><code class="language-python">if not DEBUG:
     CHANNEL_LAYERS = {
         'default': {
             "BACKEND": "channels.layers.InMemoryChannelLayer",
@@ -324,8 +314,7 @@ else:
 <p>
  Change settings.py static files and media files settings | Now I have added support for BlackBlaze Static Storage also which also based on AWS S3 protocols
 </p>
-<pre><code class="language-python">
-if not DEBUG:
+<pre><code class="language-python">if not DEBUG:
     BUCKET_TYPE = config('BUCKET_TYPE')
 
     if BUCKET_TYPE == 'AWS':
@@ -364,7 +353,7 @@ if not DEBUG:
 
         AWS_S3_ENDPOINT = f's3.{AWS_S3_REGION_NAME}.backblazeb2.com'
         AWS_S3_ENDPOINT_URL = f'https://{AWS_S3_ENDPOINT}'
-        
+
         AWS_DEFAULT_ACL = 'public-read'
         AWS_S3_OBJECT_PARAMETERS = {
             'CacheControl': 'max-age=86400',
@@ -417,7 +406,7 @@ if not DEBUG:
         PRIVATE_MEDIA_LOCATION = 'portfolio/great_chat/private'
         PRIVATE_FILE_STORAGE = 'great_chat.storage_backends.PrivateMediaStorage'
 
-    
+
 
 else:
     # Static files (CSS, JavaScript, Images)
@@ -434,8 +423,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"), ]
 <p>
  run below command
 </p>
-<pre><code class="language-bash">
-python manage.py collectstatic
+<pre><code class="language-bash">python manage.py collectstatic
 </code></pre>
 <p>
  and you are good to go
@@ -450,8 +438,7 @@ python manage.py collectstatic
   Django management command designed to test the basic functionality of the database. It performs a series of CRUD (Create, Read, Update, Delete) operations to ensure the database is working correctly.
  </li>
 </ol>
-<pre><code class="language-bash">
-python manage.py test_db
+<pre><code class="language-bash">python manage.py test_db
 </code></pre>
 <ol>
  <li>
@@ -460,8 +447,7 @@ python manage.py test_db
   Django management command designed to test the basic functionality of the caching system. It performs a set and get operation to ensure the cache is working correctly and validates the expiration of cache entries.
  </li>
 </ol>
-<pre><code class="language-bash">
-python manage.py test_cache
+<pre><code class="language-bash">python manage.py test_cache
 </code></pre>
 <ol>
  <li>
@@ -470,8 +456,7 @@ python manage.py test_cache
   Django management command designed to test the functionality of Django Channels, ensuring that it is properly configured and operational.
  </li>
 </ol>
-<pre><code class="language-bash">
-python manage.py test_channels
+<pre><code class="language-bash">python manage.py test_channels
 </code></pre>
 <ol>
  <li>
@@ -480,8 +465,7 @@ python manage.py test_channels
   In case if you are using production database and debug mode is on. all the media send in the chats will be stored to local media folder which might not get synced to s3 bucket and when you run in production those media will be missing.
  </li>
 </ol>
-<pre><code class="language-bash">
-python manage.py sync_media_to_s3
+<pre><code class="language-bash">python manage.py sync_media_to_s3
 </code></pre>
 <h2>
  Readme Manager
@@ -581,8 +565,7 @@ python manage.py sync_media_to_s3
  </code>
  directory and execute the script:
 </p>
-<pre><code class="language-bash">
-cd readme_manager && ./update_readme.sh
+<pre><code class="language-bash">cd readme_manager && ./update_readme.sh
 </code></pre>
 <p>
  This will update the
@@ -723,8 +706,7 @@ cd readme_manager && ./update_readme.sh
  </code>
  repository so that if changes are made, they will be updated in all the projects' README files.
 </p>
-<pre><code class="language-python">
-include_files = {
+<pre><code class="language-python">include_files = {
     # common readme files
     "README of Docker Installation": "https://raw.githubusercontent.com/arpansahu/common_readme/main/Docker%20Readme/docker_installation.md",
     "DOCKER_END": "https://raw.githubusercontent.com/arpansahu/common_readme/main/Docker%20Readme/docker_end.md",
@@ -854,9 +836,8 @@ include_files = {
   Update the apt package index and install packages to allow apt to use a repository over HTTPS:
  </li>
 </ol>
-<pre><code class="language-bash">
-       sudo apt-get update
-    
+<pre><code class="language-bash">       sudo apt-get update
+
        sudo apt-get install \
        ca-certificates \
        curl \
@@ -868,9 +849,8 @@ include_files = {
   Add Docker’s official GPG key:
  </li>
 </ol>
-<pre><code class="language-bash">
-       sudo mkdir -p /etc/apt/keyrings
-       
+<pre><code class="language-bash">       sudo mkdir -p /etc/apt/keyrings
+
        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 </code></pre>
 <ol>
@@ -878,8 +858,7 @@ include_files = {
   Use the following command to set up the repository:
  </li>
 </ol>
-<pre><code class="language-bash">
-       echo \
+<pre><code class="language-bash">       echo \
          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
          $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 </code></pre>
@@ -895,31 +874,36 @@ include_files = {
   </p>
  </li>
 </ol>
-<pre><code class="language-bash">
-       sudo apt-get update
+<pre><code class="language-bash">       sudo apt-get update
 </code></pre>
-<pre><code>
-            sudo chmod a+r /etc/apt/keyrings/docker.gpg
+<pre><code>  1. Receiving a GPG error when running apt-get update?
+
+     Your default umask may be incorrectly configured, preventing detection of the repository public key file. Try granting read permission for the Docker public key file before updating the package index:
+</code></pre>
+<pre><code class="language-bash">            sudo chmod a+r /etc/apt/keyrings/docker.gpg
             sudo apt-get update
-</code></pre>
-<pre><code class="language-bash">
-        sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 </code></pre>
 <ol>
  <li>
   Install Docker Engine, containerd, and Docker Compose.
  </li>
 </ol>
-<pre><code class="language-bash">
-         sudo docker run hello-world
+<pre><code class="language-bash">        sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 </code></pre>
 <ol>
  <li>
   Verify that the Docker Engine installation is successful by running the hello-world image:
  </li>
 </ol>
-<pre><code class="language-bash">
-FROM python:3.10.7
+<pre><code class="language-bash">         sudo docker run hello-world
+</code></pre>
+<p>
+ Now in your Git Repository
+</p>
+<p>
+ Create a file named Dockerfile with no extension and add following lines in it
+</p>
+<pre><code class="language-bash">FROM python:3.10.7
 
 WORKDIR /app
 
@@ -935,13 +919,9 @@ CMD python manage.py collectstatic
 CMD gunicorn --bind 0.0.0.0:8002 great_chat.wsgi
 </code></pre>
 <p>
- Now in your Git Repository
+ Create a file named docker-compose.yml and add following lines in it
 </p>
-<p>
- Create a file named Dockerfile with no extension and add following lines in it
-</p>
-<pre><code class="language-bash">
-version: '3'
+<pre><code class="language-bash">version: '3'
 
 services:
   web:
@@ -954,12 +934,6 @@ services:
     ports:
       - "8002:8002"
     restart: unless-stopped
-</code></pre>
-<p>
- Create a file named docker-compose.yml and add following lines in it
-</p>
-<pre><code class="language-bash">
-docker compose up --build --detach 
 </code></pre>
 <h3>
  <strong>
@@ -975,8 +949,7 @@ docker compose up --build --detach
 <p>
  Running Docker
 </p>
-<pre><code class="language-bash">
-sudo apt-get install nginx
+<pre><code class="language-bash">docker compose up --build --detach 
 </code></pre>
 <p>
  --detach tag is for running the docker even if terminal is closed
@@ -992,16 +965,13 @@ sudo apt-get install nginx
 <h4>
  Installing the Nginx server
 </h4>
-<pre><code class="language-bash">
-sudo systemctl start nginx
-sudo systemctl status nginx
+<pre><code class="language-bash">sudo apt-get install nginx
 </code></pre>
 <p>
  Starting Nginx and checking its status
 </p>
-<pre><code class="language-bash">
-A Record	*	0.227.49.244 (public IP of ec2)	Automatic
-A Record	@	0.227.49.244 (public IP of ec2)	Automatic
+<pre><code class="language-bash">sudo systemctl start nginx
+sudo systemctl status nginx
 </code></pre>
 <h4>
  Modify DNS Configurations
@@ -1009,8 +979,8 @@ A Record	@	0.227.49.244 (public IP of ec2)	Automatic
 <p>
  Add these two records to your DNS Configurations
 </p>
-<pre><code class="language-bash">
-random-hash-id	IPv4	HTTP	TCP	80	0.0.0.0/0	–
+<pre><code class="language-bash">A Record    *   0.227.49.244 (public IP of ec2) Automatic
+A Record    @   0.227.49.244 (public IP of ec2) Automatic
 </code></pre>
 <p>
  Note: now you will be able to see nginx running page if you open the public IP of the machine
@@ -1019,14 +989,17 @@ random-hash-id	IPv4	HTTP	TCP	80	0.0.0.0/0	–
  <br/>
  Make Sure your EC2 security Group have these entry inbound rules
 </p>
-<pre><code class="language-bash">
-sudo vi /etc/nginx/sites-available/arpansahu
+<pre><code class="language-bash">random-hash-id  IPv4    HTTP    TCP 80  0.0.0.0/0   –
 </code></pre>
 <p>
  Open a new Nginx Configuration file name can be anything i am choosing arpansahu since my domain is arpansahu.me. there is already a default configuration file but we will leave it like that only
 </p>
-<pre><code class="language-bash">
-server_tokens               off;
+<pre><code class="language-bash">sudo vi /etc/nginx/sites-available/arpansahu
+</code></pre>
+<p>
+ paste this content in the above file
+</p>
+<pre><code class="language-bash">server_tokens               off;
 access_log                  /var/log/nginx/supersecure.access.log;
 error_log                   /var/log/nginx/supersecure.error.log;
 
@@ -1040,34 +1013,23 @@ server {
 }
 </code></pre>
 <p>
- paste this content in the above file
-</p>
-<pre><code class="language-bash">
-sudo service nginx configtest /etc/nginx/sites-available/arpansahu
-</code></pre>
-<p>
  This single Nginx File will be hosting all the multiple projects which I have listed before also.
 </p>
 <p>
  Checking if the configurations file is correct
 </p>
-<pre><code class="language-bash">
-cd /etc/nginx/sites-enabled
-sudo ln -s ../sites-available/arpansahu
+<pre><code class="language-bash">sudo service nginx configtest /etc/nginx/sites-available/arpansahu
 </code></pre>
 <p>
  Now you need to symlink this file to the sites-enabled directory:
 </p>
-<pre><code class="language-bash">
-sudo systemctl restart nginx
+<pre><code class="language-bash">cd /etc/nginx/sites-enabled
+sudo ln -s ../sites-available/arpansahu
 </code></pre>
 <p>
  Restarting Nginx Server
 </p>
-<pre><code class="language-bash">
-    sudo vi /etc/nginx/nginx.conf
-    
-    From ssl_protocols TLSv1 TLSv1.1 TLSv1.2; to ssl_protocols TLSv1.2 TLSv1.3;
+<pre><code class="language-bash">sudo systemctl restart nginx
 </code></pre>
 <p>
  Now it's time to enable HTTPS for this server
@@ -1090,43 +1052,57 @@ sudo systemctl restart nginx
   </p>
  </li>
 </ol>
-<pre><code class="language-bash">
-    sudo nginx -t
+<pre><code class="language-bash">    sudo vi /etc/nginx/nginx.conf
+
+    From ssl_protocols TLSv1 TLSv1.1 TLSv1.2; to ssl_protocols TLSv1.2 TLSv1.3;
 </code></pre>
-<pre><code>
-    sudo snap install --classic certbot
+<pre><code>Use this command to verify if nginx.conf file is correct or not
+</code></pre>
+<pre><code class="language-bash">    sudo nginx -t
+</code></pre>
+<pre><code>Now you’re ready to install and use Certbot, you can use Snap to install Certbot:
+</code></pre>
+<pre><code class="language-bash">    sudo snap install --classic certbot
     sudo ln -s /snap/bin/certbot /usr/bin/certbot
 </code></pre>
-<pre><code class="language-bash">
-    sudo certbot --nginx --rsa-key-size 4096 --no-redirect
+<pre><code>Now installing certificate
 </code></pre>
-<pre><code>
-    listen 443 ssl;
+<pre><code class="language-bash">    sudo certbot --nginx --rsa-key-size 4096 --no-redirect
+</code></pre>
+<pre><code>It will ask for the domain name then you can enter your base domain 
+I have generated SSL for arpansahu.me
+
+Then a few questions will be asked answer them all and your SSL certificate will be generated
+
+Now These lines will be added to your # Nginx configuration: /etc/nginx/sites-available/arpansahu
+</code></pre>
+<pre><code class="language-bash">    listen 443 ssl;
     ssl_certificate /etc/letsencrypt/live/www.supersecure.codes/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/www.supersecure.codes/privkey.pem;
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 </code></pre>
-<pre><code class="language-bash">
-    sudo vi /etc/nginx/sites-available/arpansahu
+<pre><code>Redirecting HTTP to HTTPS
+Open the nginx configuration file  and make it like this
 </code></pre>
-<pre><code>
-    server_tokens               off;
+<pre><code class="language-bash">    sudo vi /etc/nginx/sites-available/arpansahu
+</code></pre>
+<pre><code class="language-bash">    server_tokens               off;
     access_log                  /var/log/nginx/supersecure.access.log;
     error_log                   /var/log/nginx/supersecure.error.log;
-     
+
     server {
       server_name               arpansahu.me;
       listen                    80;
       return                    307 https://$host$request_uri;
     }
-    
+
     server {
-    
+
       location / {
         proxy_pass              http://{ip_of_home_server/ localhost}:8000;
         proxy_set_header        Host $host;
-        
+
         listen 443 ssl; # managed by Certbot
         ssl_certificate /etc/letsencrypt/live/arpansahu.me/fullchain.pem; # managed by Certbot
         ssl_certificate_key /etc/letsencrypt/live/arpansahu.me/privkey.pem; # managed by Certbot
@@ -1134,65 +1110,12 @@ sudo systemctl restart nginx
         ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
     }                          
 </code></pre>
-<pre><code class="language-bash">
-    sudo certbot renew --dry-run
+<pre><code>You can dry run and check whether it's renewal is working or not
 </code></pre>
-<pre><code>
-    sudo certbot certonly --manual --preferred-challenges dns
+<pre><code class="language-bash">    sudo certbot renew --dry-run
 </code></pre>
-<pre><code class="language-bash">
-    Saving debug log to /var/log/letsencrypt/letsencrypt.log
-    Please enter the domain name(s) you would like on your certificate (comma and/or
-    space separated) (Enter 'c' to cancel): *.arpansahu.me
-    Requesting a certificate for *.arpansahu.me
-    
-    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    Please deploy a DNS TXT record under the name:
-    
-    _acme-challenge.arpansahu.me.
-    
-    with the following value:
-    
-    dpWCxvq3mARF5iGzSfaRNXwmdkUSs0wgsTPhSaX1gK4
-    
-    Before continuing, verify the TXT record has been deployed. Depending on the DNS
-    provider, this may take some time, from a few seconds to multiple minutes. You can
-    check if it has finished deploying with the aid of online tools, such as Google
-    Admin Toolbox: https://toolbox.googleapps.com/apps/dig/#TXT/_acme-challenge.arpansahu.me.
-    Look for one or more bolded line(s) below the line '; ANSWER'. It should show the
-    value(s) you've just added.
-   
-    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    Press Enter to Continue
-</code></pre>
-<pre><code>
-    TXT Record  _acme-challenge dpWCxvq3mARF5iGzSfaRNXwmdkUSs0wgsTPhSaX1gK4 5 Automatic
-</code></pre>
-<pre><code class="language-bash">
-    Successfully received a certificate.
-    The certificate is saved at: /etc/letsencrypt/live/arpansahu.me-0001/fullchain.pem            (use this in your nginx configuration file)
-    Key is saved at:         /etc/letsencrypt/live/arpansahu.me-0001/privkey.pem
-    This certificate expires on 2023-01-20.
-    These files will be updated when the certificate is renewed.
-</code></pre>
-<pre><code class="language-bash">
-    sudo certbot delete
-</code></pre>
-<pre><code>
-      –	sgr-0219f1387d28c96fb	IPv4	DNS (TCP)	TCP	53	0.0.0.0/0	–	
-      –	sgr-01b2b32c3cee53aa9	IPv4	SSH	TCP	22	0.0.0.0/0	–
-      –	sgr-0dfd03bbcdf60a4f7	IPv4	HTTP	TCP	80	0.0.0.0/0	–
-      –	sgr-02668dff944b9b87f	IPv4	HTTPS	TCP	443	0.0.0.0/0	–
-      –	sgr-013f089a3f960913c	IPv4	DNS (UDP)	UDP	53	0.0.0.0/0	–
-</code></pre>
-<pre><code class="language-bash">
-         sudo mkdir /opt/acme-dns
-         cd !$
-</code></pre>
-<pre><code>
-        sudo curl -L -o acme-dns.tar.gz \
-        https://github.com/joohoi/acme-dns/releases/download/v0.8/acme-dns_0.8_linux_amd64.tar.gz
-        sudo tar -zxf acme-dns.tar.gz
+<pre><code>Note: this process was for arpansahu.me and not for all subdomains.
+For all subdomains, we will have to set a wildcard SSL certificate
 </code></pre>
 <ol>
  <li>
@@ -1207,37 +1130,145 @@ sudo systemctl restart nginx
   </p>
  </li>
 </ol>
-<pre><code class="language-bash">
-        sudo ls
+<pre><code class="language-bash">    sudo certbot certonly --manual --preferred-challenges dns
 </code></pre>
-<pre><code>
-        sudo rm acme-dns.tar.gz
+<pre><code>Again you will be asked domain name and here you will use *.arpansahu.me. and second domain you will use is
+arpansahu.me.
+
+Now, you should have a question in your mind about why we are generating SSL for arpansahu.me separately.
+It's because Let's Encrypt does not include a base domain with wildcard certificates for subdomains.
+
+After running the above command you will see a message similar to this
 </code></pre>
-<pre><code class="language-bash">
-        sudo ln -s \
+<pre><code class="language-bash">    Saving debug log to /var/log/letsencrypt/letsencrypt.log
+    Please enter the domain name(s) you would like on your certificate (comma and/or
+    space separated) (Enter 'c' to cancel): *.arpansahu.me
+    Requesting a certificate for *.arpansahu.me
+
+    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    Please deploy a DNS TXT record under the name:
+
+    _acme-challenge.arpansahu.me.
+
+    with the following value:
+
+    dpWCxvq3mARF5iGzSfaRNXwmdkUSs0wgsTPhSaX1gK4
+
+    Before continuing, verify the TXT record has been deployed. Depending on the DNS
+    provider, this may take some time, from a few seconds to multiple minutes. You can
+    check if it has finished deploying with the aid of online tools, such as Google
+    Admin Toolbox: https://toolbox.googleapps.com/apps/dig/#TXT/_acme-challenge.arpansahu.me.
+    Look for one or more bolded line(s) below the line '; ANSWER'. It should show the
+    value(s) you've just added.
+
+    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    Press Enter to Continue
+</code></pre>
+<pre><code>You will be given a DNS challenge called ACME challenger you have to create a DNS TXT record in DNS.
+Similar to the below record.
+</code></pre>
+<pre><code class="language-bash">    TXT Record  _acme-challenge dpWCxvq3mARF5iGzSfaRNXwmdkUSs0wgsTPhSaX1gK4 5 Automatic
+</code></pre>
+<pre><code>Now, use this URL to verify whether records are updated or not
+
+https://toolbox.googleapps.com/apps/dig/#TXT/_acme-challenge.arpansahu.me (arpansahu.me is domain)
+
+If it's verified then press enter the terminal as mentioned above
+
+Then your certificate will be generated
+</code></pre>
+<pre><code class="language-bash">    Successfully received a certificate.
+    The certificate is saved at: /etc/letsencrypt/live/arpansahu.me-0001/fullchain.pem            (use this in your nginx configuration file)
+    Key is saved at:         /etc/letsencrypt/live/arpansahu.me-0001/privkey.pem
+    This certificate expires on 2023-01-20.
+    These files will be updated when the certificate is renewed.
+</code></pre>
+<pre><code>You can notice here, the certificate generated is arpansahu.me-0001 and not arpansahu.me
+because we already generated a certificate named arpansahu.me
+
+So remember to delete it before generating this wildcard certificate
+using command
+</code></pre>
+<pre><code class="language-bash">    sudo certbot delete
+</code></pre>
+<pre><code>Note: This certificate will not be renewed automatically. Auto-renewal of --manual certificates requires the use of an authentication hook script (--manual-auth-hook) but one was not provided. To renew this certificate, repeat this same Certbot command before the certificate's expiry date.
+</code></pre>
+<ol>
+ <li>
+  <p>
+   Generating Wildcard SSL certificate and Automating its renewal
+  </p>
+  <ol>
+   <li>
+    Modify your ec2 inbound rules
+   </li>
+  </ol>
+ </li>
+</ol>
+<pre><code class="language-bash">      – sgr-0219f1387d28c96fb   IPv4    DNS (TCP)   TCP 53  0.0.0.0/0   –   
+      – sgr-01b2b32c3cee53aa9   IPv4    SSH TCP 22  0.0.0.0/0   –
+      – sgr-0dfd03bbcdf60a4f7   IPv4    HTTP    TCP 80  0.0.0.0/0   –
+      – sgr-02668dff944b9b87f   IPv4    HTTPS   TCP 443 0.0.0.0/0   –
+      – sgr-013f089a3f960913c   IPv4    DNS (UDP)   UDP 53  0.0.0.0/0   –
+</code></pre>
+<ol>
+ <li>
+  <p>
+   Install acme-dns Server
+  </p>
+  <ul>
+   <li>
+    Create a folder for acme-dns and change the directory
+   </li>
+  </ul>
+ </li>
+</ol>
+<pre><code class="language-bash">         sudo mkdir /opt/acme-dns
+         cd !$
+</code></pre>
+<pre><code>  * Download and extract tar with acme-dns from GitHub
+</code></pre>
+<pre><code class="language-bash">        sudo curl -L -o acme-dns.tar.gz \
+        https://github.com/joohoi/acme-dns/releases/download/v0.8/acme-dns_0.8_linux_amd64.tar.gz
+        sudo tar -zxf acme-dns.tar.gz
+</code></pre>
+<pre><code>  * List files
+</code></pre>
+<pre><code class="language-bash">        sudo ls
+</code></pre>
+<pre><code>  * Clean Up
+</code></pre>
+<pre><code class="language-bash">        sudo rm acme-dns.tar.gz
+</code></pre>
+<pre><code>  * Create a soft link
+</code></pre>
+<pre><code class="language-bash">        sudo ln -s \
         /opt/acme-dns/acme-dns /usr/local/bin/acme-dns
 </code></pre>
-<pre><code>
-         sudo adduser \
-         --system \	
+<pre><code>  * Create a minimal acme-dns user
+</code></pre>
+<pre><code class="language-bash">         sudo adduser \
+         --system \ 
          --gecos "acme-dns Service" \
          --disabled-password \
          --group \
          --home /var/lib/acme-dns \
          acme-dns
 </code></pre>
-<pre><code class="language-bash">
-        IP addr
-	  
+<pre><code>  * Update default acme-dns config compared with IP from the AWS console. Can't bind to the public address need to use private one.
+</code></pre>
+<pre><code class="language-bash">        IP addr
+
         sudo mkdir -p /etc/acme-dns
-	  
+
         sudo mv /opt/acme-dns/config.cfg /etc/acme-dns/
-	  
+
         sudo vim /etc/acme-dns/config.cfg
 </code></pre>
-<pre><code>
-        listen = "127.0.0.1:53” to listen = “private IP of the ec2 instance” 172.31.93.180:53(port will be 53)
- 
+<pre><code>  * Replace
+</code></pre>
+<pre><code class="language-bash">        listen = "127.0.0.1:53” to listen = “private IP of the ec2 instance” 172.31.93.180:53(port will be 53)
+
         Similarly, Edit other details mentioned below  
 
         # domain name to serve the requests off of
@@ -1254,7 +1285,7 @@ sudo systemctl restart nginx
           # specify that auth.example.org will resolve any *.auth.example.org records
            "auth.arpansahu.me. NS auth.arpansahu.me.”,
         ]
-	
+
         [api]
         # listen IP eg. 127.0.0.1
         IP = "127.0.0.1”. (Changed)
@@ -1265,145 +1296,162 @@ sudo systemctl restart nginx
         tls = "none"   (Changed)
 
 </code></pre>
-<pre><code class="language-bash">
-        cat acme-dns.service
-     
+<pre><code>  * Move the systemd service and reload
+</code></pre>
+<pre><code class="language-bash">        cat acme-dns.service
+
         sudo mv \
         acme-dns.service /etc/systemd/system/acme-dns.service
-	  
+
         sudo systemctl daemon-reload
 </code></pre>
-<pre><code>
-        sudo systemctl enable acme-dns.service
+<pre><code>  * Start and enable acme-dns server
+</code></pre>
+<pre><code class="language-bash">        sudo systemctl enable acme-dns.service
         sudo systemctl start acme-dns.service
 </code></pre>
-<pre><code class="language-bash">
-        sudo systemctl status acme-dns.service
+<pre><code>  * Check acme-dns for possible errors
 </code></pre>
-<pre><code>
-         journalctl --unit acme-dns --no-pager --follow
+<pre><code class="language-bash">        sudo systemctl status acme-dns.service
 </code></pre>
-<ol>
- <li>
-  <p>
-   Generating Wildcard SSL certificate and Automating its renewal
-  </p>
-  <ol>
-   <li>
-    Modify your ec2 inbound rules
-   </li>
-  </ol>
- </li>
-</ol>
-<pre><code class="language-bash">
-         auth.arpansahu.me IN A <public-IP>
+<pre><code>  * Use journalctl to debug in case of errors
 </code></pre>
-<ol>
- <li>
-  <p>
-   Install acme-dns Server
-  </p>
-  <ul>
-   <li>
-    Create a folder for acme-dns and change the directory
-   </li>
-  </ul>
- </li>
-</ol>
-<pre><code class="language-bash">
-        auth.arpansahu.me IN NS auth.arpansahu.me
+<pre><code class="language-bash">         journalctl --unit acme-dns --no-pager --follow
 </code></pre>
-<pre><code>
-        A Record	auth	44.199.177.138	Automatic	
-        NS Record	auth	auth.arpansahu.me.	Automatic
+<pre><code>  * Create A record for your domain
 </code></pre>
-<pre><code class="language-bash">
-        journalctl -u acme-dns --no-pager --follow
+<pre><code class="language-bash">         auth.arpansahu.me IN A <public-IP>
 </code></pre>
-<pre><code>
-        dig api.arpansahu.me
+<pre><code>  * Create NS record for auth.arpansahu.me pointing to auth.arpansahu.me. This means, that auth.arpansahu.me is
+    responsible for any *.auth.arpansahu.me records
+</code></pre>
+<pre><code class="language-bash">        auth.arpansahu.me IN NS auth.arpansahu.me
+</code></pre>
+<pre><code>  * Your DNS record will be looking like this
+</code></pre>
+<pre><code class="language-bash">        A Record    auth    44.199.177.138  Automatic   
+        NS Record   auth    auth.arpansahu.me.  Automatic
+</code></pre>
+<pre><code>  * Test acme-dns server (Split the screen)
+</code></pre>
+<pre><code class="language-bash">        journalctl -u acme-dns --no-pager --follow
+</code></pre>
+<pre><code>  * From the local host try to resolve the random DNS record
+</code></pre>
+<pre><code class="language-bash">        dig api.arpansahu.me
         dig api.auth.arpansahu.me
         dig 7gvhsbvf.auth.arpansahu.me
 </code></pre>
-<pre><code class="language-bash">
-     sudo mkdir /opt/acme-dns-client
+<ol>
+ <li>
+  Install acme-dns-client
+ </li>
+</ol>
+<pre><code class="language-bash">     sudo mkdir /opt/acme-dns-client
      cd !$
-    
+
      sudo curl -L \
      -o acme-dns-client.tar.gz \
      https://github.com/acme-dns/acme-dns-client/releases/download/v0.2/acme-dns-client_0.2_linux_amd64.tar.gz
-    
+
      sudo tar -zxf acme-dns-client.tar.gz
      ls
      sudo rm acme-dns-client.tar.gz
      sudo ln -s \
      /opt/acme-dns-client/acme-dns-client /usr/local/bin/acme-dns-client 
 </code></pre>
-<pre><code>
-     cd
+<ol>
+ <li>
+  Install Certbot
+ </li>
+</ol>
+<pre><code class="language-bash">     cd
      sudo snap install core; sudo snap refresh core
      sudo snap install --classic certbot
      sudo ln -s /snap/bin/certbot /usr/bin/certbot
 </code></pre>
-<pre><code class="language-bash">
-         sudo acme-dns-client register \
+<pre><code>Note: you can skip this step if Certbot is already installed
+
+5. Get Letsencrypt Wildcard Certificate
+   * Create a new acme-dns account for your domain and set it up
+</code></pre>
+<pre><code class="language-bash">         sudo acme-dns-client register \
          -d arpansahu.me -s http://localhost:8090
 </code></pre>
-<pre><code>
-         sudo acme-dns-client register \
+<pre><code>    The above command is old now we will use the new command
+</code></pre>
+<pre><code class="language-bash">         sudo acme-dns-client register \
           -d arpansahu.me \
           -allow 0.0.0.0/0 \
           -s http://localhost:8080
 </code></pre>
-<pre><code class="language-bash">
-         CNAME Record	_acme-challenge	e6ac0f0a-0358-46d6-a9d3-8dd41f44c7ec.auth.arpansahu.me.	Automatic
-</code></pre>
-<pre><code>
-         CAA Record @	0 issuewild "letsencrypt.org; validationmethods=dns-01; accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/1424899626"  Automatic
+<pre><code>     Note: When we edited acme-dns config file there we mentioned the port 8090 and thats why we are using this port here also
 
-         CAA Record @	0 issue "letsencrypt.org; validationmethods=dns-01; accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/1424899626"
+   * Creating Another DNS Entry
+</code></pre>
+<pre><code class="language-bash">         CNAME Record   _acme-challenge e6ac0f0a-0358-46d6-a9d3-8dd41f44c7ec.auth.arpansahu.me. Automatic
+</code></pre>
+<pre><code>    Since the last update in  the last step now two more entries should be added
+</code></pre>
+<pre><code class="language-bash">         CAA Record @   0 issuewild "letsencrypt.org; validationmethods=dns-01; accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/1424899626"  Automatic
+
+         CAA Record @   0 issue "letsencrypt.org; validationmethods=dns-01; accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/1424899626"
          Automatic
 </code></pre>
-<pre><code class="language-bash">
-         dig _acme-challenge.arpansahu.me
+<pre><code>    Same as an entry that needs to be added to complete a time challenge as previously we did.
+   * Check whether the entry is added successfully or not
 </code></pre>
-<pre><code>
-         sudo certbot certonly \
+<pre><code class="language-bash">         dig _acme-challenge.arpansahu.me
+</code></pre>
+<pre><code>   * Get a wildcard certificate
+</code></pre>
+<pre><code class="language-bash">         sudo certbot certonly \
          --manual \
          --test-cert \ 
          --preferred-challenges dns \ 
          --manual-auth-hook 'acme-dns-client' \ 
          -d ‘*.arpansahu.me’ -d arpansahu.me
 </code></pre>
-<pre><code class="language-bash">
-         sudo openssl x509 -text -noout \
+<pre><code>    Note: Here we have to mention both the base and wildcard domain names with -d since let's encrypt don't provide base domain ssl by default in wildcard domain ssl
+
+   * Verifying the certificate
+</code></pre>
+<pre><code class="language-bash">         sudo openssl x509 -text -noout \
          -in /etc/letsencrypt/live/arpansahu.me/fullchain.pem
 </code></pre>
-<pre><code>
-         sudo certbot renew \
+<pre><code>   * Renew certificate (test)
+</code></pre>
+<pre><code class="language-bash">         sudo certbot renew \
          --manual \ 
          --test-cert \ 
          --dry-run \ 
          --preferred-challenges dns \
          --manual-auth-hook 'acme-dns-client'       
 </code></pre>
-<pre><code class="language-bash">
-         sudo certbot renew \
+<pre><code>   * Renew certificate (actually)
+</code></pre>
+<pre><code class="language-bash">         sudo certbot renew \
          --manual \
          --preferred-challenges dns \
          --manual-auth-hook 'acme-dns-client'       
 </code></pre>
-<pre><code>
-         dig _acme-challenge.arpansahu.me
+<pre><code>   * Check the entry is added successfully or not
 </code></pre>
-<pre><code class="language-bash">
-         sudo crontab -e
+<pre><code class="language-bash">         dig _acme-challenge.arpansahu.me
 </code></pre>
-<pre><code>
-         0 */12 * * * certbot renew --manual --test-cert --preferred-challenges dns --manual-auth-hook 'acme-dns-client'
+<pre><code>6. Setup Auto-Renew for Letsencrypt WILDCARD Certificate
+   * Setup cronjob
 </code></pre>
-<pre><code class="language-bash">
-server_tokens               off;
+<pre><code class="language-bash">         sudo crontab -e
+</code></pre>
+<pre><code>   * Add the following lines to the file
+</code></pre>
+<pre><code class="language-bash">         0 */12 * * * certbot renew --manual --test-cert --preferred-challenges dns --manual-auth-hook 'acme-dns-client'
+</code></pre>
+<p>
+ After all these steps your Nginx configuration file located at /etc/nginx/sites-available/arpansahu will be looking similar to this
+</p>
+<pre><code class="language-bash">server_tokens               off;
 access_log                  /var/log/nginx/supersecure.access.log;
 error_log                   /var/log/nginx/supersecure.error.log;
 
@@ -1420,7 +1468,7 @@ server {
          proxy_set_header        Host $host;
          proxy_set_header        X-Forwarded-Proto $scheme;
 
-	 # WebSocket support
+     # WebSocket support
          proxy_http_version 1.1;
          proxy_set_header Upgrade $http_upgrade;
          proxy_set_header Connection "upgrade";
@@ -1433,8 +1481,25 @@ server {
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 }
 </code></pre>
-<pre><code>
-sudo apt update
+<h3>
+ Step 4: CI/CD using Jenkins
+</h3>
+<h3>
+ Installing Jenkins
+</h3>
+<p>
+ Reference: https://www.jenkins.io/doc/book/installing/linux/
+</p>
+<p>
+ Jenkins requires Java to run, yet certain distributions don’t include this by default and some Java versions are incompatible with Jenkins.
+</p>
+<p>
+ There are multiple Java implementations which you can use. OpenJDK is the most popular one at the moment, we will use it in this guide.
+</p>
+<p>
+ Update the Debian apt repositories, install OpenJDK 11, and check the installation with the commands:
+</p>
+<pre><code class="language-bash">sudo apt update
 
 sudo apt install openjdk-11-jre
 
@@ -1443,8 +1508,10 @@ openjdk version "11.0.12" 2021-07-20
 OpenJDK Runtime Environment (build 11.0.12+7-post-Debian-2)
 OpenJDK 64-Bit Server VM (build 11.0.12+7-post-Debian-2, mixed mode, sharing)
 </code></pre>
-<pre><code class="language-bash">
-curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo tee \
+<p>
+ Long Term Support release
+</p>
+<pre><code class="language-bash">curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo tee \
   /usr/share/keyrings/jenkins-keyring.asc > /dev/null
 echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
   https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
@@ -1452,33 +1519,47 @@ echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
 sudo apt-get update
 sudo apt-get install jenkins
 </code></pre>
-<pre><code>
-sudo systemctl enable jenkins
+<p>
+ Start Jenkins
+</p>
+<pre><code class="language-bash">sudo systemctl enable jenkins
 </code></pre>
-<pre><code class="language-bash">
-sudo systemctl start jenkins
+<p>
+ You can start the Jenkins service with the command:
+</p>
+<pre><code class="language-bash">sudo systemctl start jenkins
 </code></pre>
-<pre><code>
-sudo systemctl status jenkins
+<p>
+ You can check the status of the Jenkins service using the command:
+</p>
+<pre><code class="language-bash">sudo systemctl status jenkins
 </code></pre>
-<pre><code class="language-bash">
-sudo vi /etc/nginx/sites-available/arpansahu
+<p>
+ Now for serving the Jenkins UI from Nginx add the following lines to the Nginx file located at
+ <br/>
+ /etc/nginx/sites-available/arpansahu by running the following command
+</p>
+<pre><code class="language-bash">sudo vi /etc/nginx/sites-available/arpansahu
 </code></pre>
-<pre><code>
-    server {
+<ul>
+ <li>
+  Add these lines to it.
+ </li>
+</ul>
+<pre><code class="language-bash">    server {
         listen         80;
         server_name    jenkins.arpansahu.me;
         # force https-redirects
         if ($scheme = http) {
             return 301 https://$server_name$request_uri;
             }
-    
+
         location / {
              proxy_pass              http://{ip_of_home_server}:8080;
              proxy_set_header        Host $host;
              proxy_set_header    X-Forwarded-Proto $scheme;
         }
-    
+
         listen 443 ssl; # managed by Certbot
         ssl_certificate /etc/letsencrypt/live/arpansahu.me/fullchain.pem; # managed by Certbot
         ssl_certificate_key /etc/letsencrypt/live/arpansahu.me/privkey.pem; # managed by Certbot
@@ -1486,8 +1567,25 @@ sudo vi /etc/nginx/sites-available/arpansahu
         ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
     }
 </code></pre>
-<pre><code class="language-bash">
-stage('Dependencies') {
+<p>
+ You can add all the server blocks to the same nginx configuration file
+ <br/>
+ just make sure you place the server block for the base domain at the last
+</p>
+<ul>
+ <li>
+  To copy .env from the local server directory while building image
+ </li>
+</ul>
+<p>
+ add Jenkins ALL=(ALL) NOPASSWD: ALL
+ <br/>
+ inside /etc/sudoers file
+</p>
+<p>
+ and then put
+</p>
+<pre><code class="language-bash">stage('Dependencies') {
             steps {
                 script {
                     sh "sudo cp /root/env/project_name/.env /var/lib/jenkins/workspace/pipeline_project_name"
@@ -1495,8 +1593,15 @@ stage('Dependencies') {
             }
         }
 </code></pre>
-<pre><code>
-pipeline {
+<p>
+ in Jenkinsfile
+</p>
+<ul>
+ <li>
+  Now Create a file named Jenkinsfile at the root of Git Repo and add following lines to file
+ </li>
+</ul>
+<pre><code class="language-bash">pipeline {
     agent { label 'local' }
     stages {
         stage('Checkout') {
@@ -1603,312 +1708,6 @@ pipeline {
     }
 }
 </code></pre>
-<pre><code class="language-bash">
-    sudo vi  /var/lib/jenkins/workspace/great_chat/.env
-</code></pre>
-<pre><code>
-    sudo apt update
-</code></pre>
-<pre><code class="language-bash">
-    sudo apt install postgresql postgresql-contrib
-</code></pre>
-<pre><code>
-    sudo -i -u postgres
-</code></pre>
-<pre><code class="language-bash">
-    psql
-</code></pre>
-<ol>
- <li>
-  Install acme-dns-client
- </li>
-</ol>
-<pre><code class="language-bash">
-    ALTER USER postgres WITH PASSWORD 'your_password';
-</code></pre>
-<ol>
- <li>
-  Install Certbot
- </li>
-</ol>
-<pre><code class="language-bash">
-    \q
-</code></pre>
-<pre><code>
-    exit
-</code></pre>
-<pre><code class="language-bash">
-    sudo vi /etc/postgresql/14/main/postgresql.conf
-</code></pre>
-<pre><code>
-    listen_addresses = 'localhost'
-</code></pre>
-<pre><code class="language-bash">
-    sudo nano /etc/postgresql/14/main/pg_hba.conf
-</code></pre>
-<pre><code>
-    host    all             all             127.0.0.1/32            md5
-</code></pre>
-<pre><code class="language-bash">
-    host    all             all             0.0.0.0/0            md5
-</code></pre>
-<pre><code>
-    sudo systemctl restart postgresql
-</code></pre>
-<pre><code class="language-bash">
-    sudo apt install nginx-extras
-</code></pre>
-<pre><code>
-    sudo vi /etc/nginx/nginx.conf
-</code></pre>
-<pre><code class="language-bash">
-    stream {
-        upstream postgresql_upstream {
-            server 127.0.0.1:5432;  # PostgreSQL server
-        }
-
-        server {
-            listen 9550 ssl;  # Use SSL on port 443
-            proxy_pass postgresql_upstream;
-
-            ssl_certificate /etc/letsencrypt/live/arpansahu.me/fullchain.pem;  # SSL certificate
-            ssl_certificate_key /etc/letsencrypt/live/arpansahu.me/privkey.pem;  # SSL certificate key
-            ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;  # SSL DH parameters
-            include /etc/letsencrypt/options-ssl-nginx.conf;  # SSL options
-
-            proxy_timeout 600s;
-            proxy_connect_timeout 600s;
-        }
-    }
-</code></pre>
-<pre><code>
-    sudo nginx -t
-</code></pre>
-<pre><code class="language-bash">
-            sudo rm /etc/nginx/conf.d/postgresql.conf
-</code></pre>
-<pre><code>
-            sudo nano /etc/nginx/nginx.conf
-</code></pre>
-<pre><code class="language-bash">
-            user www-data;
-            worker_processes auto;
-            pid /run/nginx.pid;
-            include /etc/nginx/modules-enabled/*.conf;
-
-            events {
-                worker_connections 768;
-            }
-
-            http {
-                sendfile on;
-                tcp_nopush on;
-                tcp_nodelay on;
-                keepalive_timeout 65;
-                types_hash_max_size 2048;
-
-                include /etc/nginx/mime.types;
-                default_type application/octet-stream;
-
-                access_log /var/log/nginx/access.log;
-                error_log /var/log/nginx/error.log;
-
-                gzip on;
-                gzip_disable "msie6";
-
-                include /etc/nginx/conf.d/*.conf;
-                include /etc/nginx/sites-enabled/*;
-            }
-
-            stream {
-                upstream postgresql_upstream {
-                    server 127.0.0.1:5432;  # PostgreSQL server
-                }
-
-                server {
-                    listen 9550 ssl;  # Use SSL on port different 443
-                    proxy_pass postgresql_upstream;
-
-                    ssl_certificate /etc/letsencrypt/live/arpansahu.me/fullchain.pem;  # SSL certificate
-                    ssl_certificate_key /etc/letsencrypt/live/arpansahu.me/privkey.pem;  # SSL certificate key
-                    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;  # SSL DH parameters
-                    include /etc/letsencrypt/options-ssl-nginx.conf;  # SSL options
-
-                    proxy_timeout 600s;
-                    proxy_connect_timeout 600s;
-                }
-            }
-</code></pre>
-<pre><code>
-            sudo nginx -t
-</code></pre>
-<pre><code class="language-bash">
-    sudo systemctl reload nginx
-</code></pre>
-<pre><code>
-    psql "postgres://username:password@domain/database_name?sslmode=require"
-</code></pre>
-<pre><code class="language-bash">
-psql "postgres://user:user_pass@arpansahu.me/database_name?sslmode=require"
-</code></pre>
-<pre><code>
-   python3 -m venv pgadmin_venv
-   source pgadmin_venv/bin/activate
-</code></pre>
-<pre><code class="language-bash">
-   pip install pgadmin4
-</code></pre>
-<pre><code>
-   pgadmin4
-</code></pre>
-<pre><code class="language-bash">
-    nohup pgadmin4 &>/dev/null &
-</code></pre>
-<pre><code>
-source pgadmin_venv/bin/activate
-pgadmin4
-</code></pre>
-<pre><code class="language-bash">
-deactivate
-</code></pre>
-<p>
- After all these steps your Nginx configuration file located at /etc/nginx/sites-available/arpansahu will be looking similar to this
-</p>
-<pre><code class="language-bash">
-vi /root/pgadmin_venv/lib/python3.10/site-packages/pgadmin4/config.py
-</code></pre>
-<h3>
- Step 4: CI/CD using Jenkins
-</h3>
-<h3>
- Installing Jenkins
-</h3>
-<p>
- Reference: https://www.jenkins.io/doc/book/installing/linux/
-</p>
-<p>
- Jenkins requires Java to run, yet certain distributions don’t include this by default and some Java versions are incompatible with Jenkins.
-</p>
-<p>
- There are multiple Java implementations which you can use. OpenJDK is the most popular one at the moment, we will use it in this guide.
-</p>
-<p>
- Update the Debian apt repositories, install OpenJDK 11, and check the installation with the commands:
-</p>
-<pre><code class="language-bash">
-    sudo vi /etc/nginx/sites-available/arpansahu
-</code></pre>
-<p>
- Long Term Support release
-</p>
-<pre><code class="language-bash">
-    server {
-        listen         80;
-        server_name    pgadmin.arpansahu.me;
-        # force https-redirects
-        if ($scheme = http) {
-            return 301 https://$server_name$request_uri;
-            }
-
-        location / {
-            proxy_pass              http://0.0.0.0:9997;
-            proxy_set_header        Host $host;
-            proxy_set_header    X-Forwarded-Proto $scheme;
-        }
-
-        listen 443 ssl; # managed by Certbot
-        ssl_certificate /etc/letsencrypt/live/arpansahu.me/fullchain.pem; # managed by Certbot
-        ssl_certificate_key /etc/letsencrypt/live/arpansahu.me/privkey.pem; # managed by Certbot
-        include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-        ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
-    }
-</code></pre>
-<p>
- Start Jenkins
-</p>
-<pre><code class="language-bash">
-    sudo nginx -t
-</code></pre>
-<p>
- You can start the Jenkins service with the command:
-</p>
-<pre><code class="language-bash">
-    sudo systemctl reload nginx
-</code></pre>
-<p>
- You can check the status of the Jenkins service using the command:
-</p>
-<pre><code class="language-bash">
-    docker volume create portainer_data
-</code></pre>
-<p>
- Now for serving the Jenkins UI from Nginx add the following lines to the Nginx file located at
- <br/>
- /etc/nginx/sites-available/arpansahu by running the following command
-</p>
-<pre><code class="language-bash">
-    docker run -d -p 0.0.0.0:9998:9000 -p 9444:8000 -p 9443:9443 --name=portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce
-    to use it in nginx server configuration
-</code></pre>
-<ul>
- <li>
-  Add these lines to it.
- </li>
-</ul>
-<pre><code class="language-bash">
-    sudo vi /etc/nginx/sites-available/arpansahu
-</code></pre>
-<p>
- You can add all the server blocks to the same nginx configuration file
- <br/>
- just make sure you place the server block for the base domain at the last
-</p>
-<ul>
- <li>
-  To copy .env from the local server directory while building image
- </li>
-</ul>
-<p>
- add Jenkins ALL=(ALL) NOPASSWD: ALL
- <br/>
- inside /etc/sudoers file
-</p>
-<p>
- and then put
-</p>
-<pre><code class="language-bash">
-    server {
-        listen         80;
-        server_name    portainer.arpansahu.me;
-        # force https-redirects
-        if ($scheme = http) {
-            return 301 https://$server_name$request_uri;
-            }
-
-        location / {
-            proxy_pass              http://0.0.0.0:9998;
-            proxy_set_header        Host $host;
-            proxy_set_header    X-Forwarded-Proto $scheme;
-        }
-
-        listen 443 ssl; # managed by Certbot
-        ssl_certificate /etc/letsencrypt/live/arpansahu.me/fullchain.pem; # managed by Certbot
-        ssl_certificate_key /etc/letsencrypt/live/arpansahu.me/privkey.pem; # managed by Certbot
-        include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-        ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
-    }
-</code></pre>
-<p>
- in Jenkinsfile
-</p>
-<ul>
- <li>
-  Now Create a file named Jenkinsfile at the root of Git Repo and add following lines to file
- </li>
-</ul>
-<pre><code class="language-bash">
-    sudo nginx -t
-</code></pre>
 <p>
  Note: agent {label 'local'} is used to specify which node will execute the jenkins job deployment. So local linux server is labelled with 'local' are the project with this label will be executed in local machine node.
 </p>
@@ -1936,11 +1735,11 @@ vi /root/pgadmin_venv/lib/python3.10/site-packages/pgadmin4/config.py
   Add a .env file to you project using following command (This step is no more required stage('Dependencies'))
  </li>
 </ul>
-<pre><code class="language-bash">
-    sudo systemctl reload nginx
+<pre><code class="language-bash">    sudo vi  /var/lib/jenkins/workspace/great_chat/.env
 </code></pre>
-<pre><code>
-    docker volume create portainer_data
+<pre><code>Your workspace name may be different.
+
+Add all the env variables as required and mentioned in the Readme File.
 </code></pre>
 <ul>
  <li>
@@ -1982,24 +1781,14 @@ vi /root/pgadmin_venv/lib/python3.10/site-packages/pgadmin4/config.py
   Update the package list to make sure you have the latest information
  </li>
 </ol>
-<pre><code class="language-bash">
-    docker run -d -p 0.0.0.0:9998:9000 -p 9444:8000 -p 9443:9443 --name=portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce
-    to use it in nginx server configuration
+<pre><code class="language-bash">    sudo apt update
 </code></pre>
 <ol>
  <li>
   Install the PostgreSQL package
  </li>
 </ol>
-<pre><code class="language-bash">
-tls-port 6379
-port 0
-
-tls-cert-file /path/to/redis.crt
-tls-key-file /path/to/redis.key
-tls-dh-params-file /path/to/dhparam.pem
-
-tls-auth-clients no
+<pre><code class="language-bash">    sudo apt install postgresql postgresql-contrib
 </code></pre>
 <ol>
  <li>
@@ -2010,16 +1799,14 @@ tls-auth-clients no
   with administrative privileges. You can switch to this user to perform administrative tasks:
  </li>
 </ol>
-<pre><code class="language-bash">
-redis-cli -h arpansahu.me -p 6379 -a password_required
+<pre><code class="language-bash">    sudo -i -u postgres
 </code></pre>
 <ol>
  <li>
   Access the PostgreSQL interactive terminal by running:
  </li>
 </ol>
-<pre><code class="language-bash">
-    docker volume create portainer_data
+<pre><code class="language-bash">    psql
 </code></pre>
 <ol>
  <li>
@@ -2030,9 +1817,7 @@ redis-cli -h arpansahu.me -p 6379 -a password_required
   user:
  </li>
 </ol>
-<pre><code class="language-sql">
-    docker run -d -p 0.0.0.0:9998:9000 -p 9444:8000 -p 9443:9443 --name=portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce
-    to use it in nginx server configuration
+<pre><code class="language-sql">    ALTER USER postgres WITH PASSWORD 'your_password';
 </code></pre>
 <p>
  Replace
@@ -2046,15 +1831,7 @@ redis-cli -h arpansahu.me -p 6379 -a password_required
   Exit the PostgreSQL shell:
  </li>
 </ol>
-<pre><code class="language-sql">
-tls-port 6379
-port 0
-
-tls-cert-file /path/to/redis.crt
-tls-key-file /path/to/redis.key
-tls-dh-params-file /path/to/dhparam.pem
-
-tls-auth-clients no
+<pre><code class="language-sql">    \q
 </code></pre>
 <ol>
  <li>
@@ -2065,8 +1842,7 @@ tls-auth-clients no
   user session:
  </li>
 </ol>
-<pre><code class="language-bash">
-    docker volume create portainer_data
+<pre><code class="language-bash">    exit
 </code></pre>
 <p>
  Now, PostgreSQL is installed on your Ubuntu server. You can access the PostgreSQL database by logging in with the
@@ -2090,28 +1866,16 @@ tls-auth-clients no
   open postgresql.conf file
  </li>
 </ol>
-<pre><code class="language-bash">
-    docker run -d -p 0.0.0.0:9998:9000 -p 9444:8000 -p 9443:9443 --name=portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce
-    to use it in nginx server configuration
+<pre><code class="language-bash">    sudo vi /etc/postgresql/14/main/postgresql.conf
 </code></pre>
-<pre><code>
-tls-port 6379
-port 0
-
-tls-cert-file /path/to/redis.crt
-tls-key-file /path/to/redis.key
-tls-dh-params-file /path/to/dhparam.pem
-
-tls-auth-clients no
+<pre><code>14 is the version which i have installed your version can be different
 </code></pre>
 <ol>
  <li>
   Find the listen_addresses line and set it to:
  </li>
 </ol>
-<pre><code class="language-bash">
-  mc alias set myminio https://arpansahu.me api_key api_secret --api S3v4
-  mc ls
+<pre><code class="language-bash">    listen_addresses = 'localhost'
 </code></pre>
 <pre><code>Now the thing is if u don't want to serve it using nginx u can also set it to * all so that database can be connected from any where
 </code></pre>
