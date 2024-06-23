@@ -18,13 +18,21 @@ pipeline {
                 expression {
                     // Collect all changed files
                     def changes = currentBuild.changeSets.collect { it.items.collect { it.affectedFiles.collect { it.path } } }.flatten()
-                    
+
                     // Define the file(s) to be excluded from triggering a deploy
                     def excludedFiles = ['Readme.md']
 
                     // Check if the only changed files are in the excluded list
-                    return changes.size() != changes.intersect(excludedFiles).size()
+                    def onlyExcludedFilesChanged = changes.every { changedFile -> 
+                        excludedFiles.contains(changedFile)
+                    }
+
+                    return !onlyExcludedFilesChanged
                 }
+            }
+            steps {
+                // Add your production deployment steps here
+                echo 'Deploying changes to production...'
             }
             steps {
                 script {
