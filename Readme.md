@@ -404,7 +404,6 @@ include_files = {
 ```
 
 Also, remember if you want to include new files, you need to change the `baseREADME` file and the `include_files` array in the `common_readme` repository itself.
-test
 
 ## Deployment on AWS EC2/ Home Server Ubuntu 22.0 LTS/ Hostinger VPS Server
 
