@@ -260,7 +260,7 @@
  Installing Redis On Local (For ubuntu) for other Os Please refer to their website https://redis.io/
 </p>
 <pre><code class="language-bash">  curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
-  echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
+  echo &quot;deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main&quot; | sudo tee /etc/apt/sources.list.d/redis.list
   sudo apt-get update
   sudo apt-get install redis
   sudo systemctl restart redis.service
@@ -283,11 +283,11 @@
  Use these CACHE settings
 </p>
 <pre><code class="language-python">CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': config('REDISCLOUD_URL'),
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+    &#x27;default&#x27;: {
+        &#x27;BACKEND&#x27;: &#x27;django_redis.cache.RedisCache&#x27;,
+        &#x27;LOCATION&#x27;: config(&#x27;REDISCLOUD_URL&#x27;),
+        &#x27;OPTIONS&#x27;: {
+            &#x27;CLIENT_CLASS&#x27;: &#x27;django_redis.client.DefaultClient&#x27;,
         }
     }
 }
@@ -297,16 +297,16 @@
 </p>
 <pre><code class="language-python">if not DEBUG:
     CHANNEL_LAYERS = {
-        'default': {
-            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        &#x27;default&#x27;: {
+            &quot;BACKEND&quot;: &quot;channels.layers.InMemoryChannelLayer&quot;,
         }
     }
 else:
     CHANNEL_LAYERS = {
-        "default": {
-            "BACKEND": "channels_redis.core.RedisChannelLayer",
-            "CONFIG": {
-                "hosts": [(config('REDISCLOUD_URL'))],
+        &quot;default&quot;: {
+            &quot;BACKEND&quot;: &quot;channels_redis.core.RedisChannelLayer&quot;,
+            &quot;CONFIG&quot;: {
+                &quot;hosts&quot;: [(config(&#x27;REDISCLOUD_URL&#x27;))],
             },
         },
     }
@@ -315,96 +315,96 @@ else:
  Change settings.py static files and media files settings | Now I have added support for BlackBlaze Static Storage also which also based on AWS S3 protocols
 </p>
 <pre><code class="language-python">if not DEBUG:
-    BUCKET_TYPE = config('BUCKET_TYPE')
+    BUCKET_TYPE = config(&#x27;BUCKET_TYPE&#x27;)
 
-    if BUCKET_TYPE == 'AWS':
+    if BUCKET_TYPE == &#x27;AWS&#x27;:
 
-        AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
-        AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
-        AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
-        AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-        AWS_DEFAULT_ACL = 'public-read'
+        AWS_ACCESS_KEY_ID = config(&#x27;AWS_ACCESS_KEY_ID&#x27;)
+        AWS_SECRET_ACCESS_KEY = config(&#x27;AWS_SECRET_ACCESS_KEY&#x27;)
+        AWS_STORAGE_BUCKET_NAME = config(&#x27;AWS_STORAGE_BUCKET_NAME&#x27;)
+        AWS_S3_CUSTOM_DOMAIN = f&#x27;{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com&#x27;
+        AWS_DEFAULT_ACL = &#x27;public-read&#x27;
         AWS_S3_OBJECT_PARAMETERS = {
-            'CacheControl': 'max-age=86400'
+            &#x27;CacheControl&#x27;: &#x27;max-age=86400&#x27;
         }
-        AWS_LOCATION = 'static'
+        AWS_LOCATION = &#x27;static&#x27;
         AWS_QUERYSTRING_AUTH = False
         AWS_HEADERS = {
-            'Access-Control-Allow-Origin': '*',
+            &#x27;Access-Control-Allow-Origin&#x27;: &#x27;*&#x27;,
         }
         # s3 static settings
-        AWS_STATIC_LOCATION = 'portfolio/great_chat/static'
-        STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_STATIC_LOCATION}/'
-        STATICFILES_STORAGE = 'great_chat.storage_backends.StaticStorage'
+        AWS_STATIC_LOCATION = &#x27;portfolio/great_chat/static&#x27;
+        STATIC_URL = f&#x27;https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_STATIC_LOCATION}/&#x27;
+        STATICFILES_STORAGE = &#x27;great_chat.storage_backends.StaticStorage&#x27;
         # s3 public media settings
-        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/great_chat/media'
-        MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_PUBLIC_MEDIA_LOCATION}/'
-        DEFAULT_FILE_STORAGE = 'great_chat.storage_backends.PublicMediaStorage'
+        AWS_PUBLIC_MEDIA_LOCATION = &#x27;portfolio/great_chat/media&#x27;
+        MEDIA_URL = f&#x27;https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_PUBLIC_MEDIA_LOCATION}/&#x27;
+        DEFAULT_FILE_STORAGE = &#x27;great_chat.storage_backends.PublicMediaStorage&#x27;
         # s3 private media settings
-        PRIVATE_MEDIA_LOCATION = 'portfolio/great_chat/private'
-        PRIVATE_FILE_STORAGE = 'great_chat.storage_backends.PrivateMediaStorage'
+        PRIVATE_MEDIA_LOCATION = &#x27;portfolio/great_chat/private&#x27;
+        PRIVATE_FILE_STORAGE = &#x27;great_chat.storage_backends.PrivateMediaStorage&#x27;
 
-    elif BUCKET_TYPE == 'BLACKBLAZE':
+    elif BUCKET_TYPE == &#x27;BLACKBLAZE&#x27;:
 
-        AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
-        AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
-        AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
-        AWS_S3_REGION_NAME = 'us-east-005'
+        AWS_ACCESS_KEY_ID = config(&#x27;AWS_ACCESS_KEY_ID&#x27;)
+        AWS_SECRET_ACCESS_KEY = config(&#x27;AWS_SECRET_ACCESS_KEY&#x27;)
+        AWS_STORAGE_BUCKET_NAME = config(&#x27;AWS_STORAGE_BUCKET_NAME&#x27;)
+        AWS_S3_REGION_NAME = &#x27;us-east-005&#x27;
 
-        AWS_S3_ENDPOINT = f's3.{AWS_S3_REGION_NAME}.backblazeb2.com'
-        AWS_S3_ENDPOINT_URL = f'https://{AWS_S3_ENDPOINT}'
+        AWS_S3_ENDPOINT = f&#x27;s3.{AWS_S3_REGION_NAME}.backblazeb2.com&#x27;
+        AWS_S3_ENDPOINT_URL = f&#x27;https://{AWS_S3_ENDPOINT}&#x27;
 
-        AWS_DEFAULT_ACL = 'public-read'
+        AWS_DEFAULT_ACL = &#x27;public-read&#x27;
         AWS_S3_OBJECT_PARAMETERS = {
-            'CacheControl': 'max-age=86400',
+            &#x27;CacheControl&#x27;: &#x27;max-age=86400&#x27;,
         }
 
-        AWS_LOCATION = 'static'
+        AWS_LOCATION = &#x27;static&#x27;
         AWS_QUERYSTRING_AUTH = False
         AWS_HEADERS = {
-            'Access-Control-Allow-Origin': '*',
+            &#x27;Access-Control-Allow-Origin&#x27;: &#x27;*&#x27;,
         }
         # s3 static settings
-        AWS_STATIC_LOCATION = 'portfolio/great_chat/static'
-        STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.{AWS_STATIC_LOCATION}/'
-        STATICFILES_STORAGE = 'great_chat.storage_backends.StaticStorage'
+        AWS_STATIC_LOCATION = &#x27;portfolio/great_chat/static&#x27;
+        STATIC_URL = f&#x27;https://{AWS_STORAGE_BUCKET_NAME}.{AWS_STATIC_LOCATION}/&#x27;
+        STATICFILES_STORAGE = &#x27;great_chat.storage_backends.StaticStorage&#x27;
         # s3 public media settings
-        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/great_chat/media'
-        MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.{AWS_PUBLIC_MEDIA_LOCATION}/'
-        DEFAULT_FILE_STORAGE = 'great_chat.storage_backends.PublicMediaStorage'
+        AWS_PUBLIC_MEDIA_LOCATION = &#x27;portfolio/great_chat/media&#x27;
+        MEDIA_URL = f&#x27;https://{AWS_STORAGE_BUCKET_NAME}.{AWS_PUBLIC_MEDIA_LOCATION}/&#x27;
+        DEFAULT_FILE_STORAGE = &#x27;great_chat.storage_backends.PublicMediaStorage&#x27;
         # s3 private media settings
-        PRIVATE_MEDIA_LOCATION = 'portfolio/great_chat/private'
-        PRIVATE_FILE_STORAGE = 'great_chat.storage_backends.PrivateMediaStorage'
+        PRIVATE_MEDIA_LOCATION = &#x27;portfolio/great_chat/private&#x27;
+        PRIVATE_FILE_STORAGE = &#x27;great_chat.storage_backends.PrivateMediaStorage&#x27;
 
-    elif BUCKET_TYPE == 'MINIO':
-        AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
-        AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
-        AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
-        AWS_S3_REGION_NAME = 'us-east-1'  # MinIO doesn't require this, but boto3 does
-        AWS_S3_ENDPOINT_URL = 'https://minio.arpansahu.me'
-        AWS_DEFAULT_ACL = 'public-read'
+    elif BUCKET_TYPE == &#x27;MINIO&#x27;:
+        AWS_ACCESS_KEY_ID = config(&#x27;AWS_ACCESS_KEY_ID&#x27;)
+        AWS_SECRET_ACCESS_KEY = config(&#x27;AWS_SECRET_ACCESS_KEY&#x27;)
+        AWS_STORAGE_BUCKET_NAME = config(&#x27;AWS_STORAGE_BUCKET_NAME&#x27;)
+        AWS_S3_REGION_NAME = &#x27;us-east-1&#x27;  # MinIO doesn&#x27;t require this, but boto3 does
+        AWS_S3_ENDPOINT_URL = &#x27;https://minio.arpansahu.me&#x27;
+        AWS_DEFAULT_ACL = &#x27;public-read&#x27;
         AWS_S3_OBJECT_PARAMETERS = {
-            'CacheControl': 'max-age=86400',
+            &#x27;CacheControl&#x27;: &#x27;max-age=86400&#x27;,
         }
-        AWS_LOCATION = 'static'
+        AWS_LOCATION = &#x27;static&#x27;
         AWS_QUERYSTRING_AUTH = False
         AWS_HEADERS = {
-            'Access-Control-Allow-Origin': '*',
+            &#x27;Access-Control-Allow-Origin&#x27;: &#x27;*&#x27;,
         }
 
         # s3 static settings
-        AWS_STATIC_LOCATION = 'portfolio/great_chat/static'
-        STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}/{AWS_STATIC_LOCATION}/'
-        STATICFILES_STORAGE = 'great_chat.storage_backends.StaticStorage'
+        AWS_STATIC_LOCATION = &#x27;portfolio/great_chat/static&#x27;
+        STATIC_URL = f&#x27;https://{AWS_STORAGE_BUCKET_NAME}/{AWS_STATIC_LOCATION}/&#x27;
+        STATICFILES_STORAGE = &#x27;great_chat.storage_backends.StaticStorage&#x27;
 
         # s3 public media settings
-        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/great_chat/media'
-        MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}/{AWS_PUBLIC_MEDIA_LOCATION}/'
-        DEFAULT_FILE_STORAGE = 'great_chat.storage_backends.PublicMediaStorage'
+        AWS_PUBLIC_MEDIA_LOCATION = &#x27;portfolio/great_chat/media&#x27;
+        MEDIA_URL = f&#x27;https://{AWS_STORAGE_BUCKET_NAME}/{AWS_PUBLIC_MEDIA_LOCATION}/&#x27;
+        DEFAULT_FILE_STORAGE = &#x27;great_chat.storage_backends.PublicMediaStorage&#x27;
 
         # s3 private media settings
-        PRIVATE_MEDIA_LOCATION = 'portfolio/great_chat/private'
-        PRIVATE_FILE_STORAGE = 'great_chat.storage_backends.PrivateMediaStorage'
+        PRIVATE_MEDIA_LOCATION = &#x27;portfolio/great_chat/private&#x27;
+        PRIVATE_FILE_STORAGE = &#x27;great_chat.storage_backends.PrivateMediaStorage&#x27;
 
 
 
@@ -412,13 +412,13 @@ else:
     # Static files (CSS, JavaScript, Images)
     # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-    STATIC_URL = '/static/'
+    STATIC_URL = &#x27;/static/&#x27;
 
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-    MEDIA_URL = '/media/'
+    STATIC_ROOT = os.path.join(BASE_DIR, &#x27;staticfiles&#x27;)
+    MEDIA_URL = &#x27;/media/&#x27;
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"), ]
+MEDIA_ROOT = os.path.join(BASE_DIR, &#x27;media&#x27;)
+STATICFILES_DIRS = [os.path.join(BASE_DIR, &quot;static&quot;), ]
 </code></pre>
 <p>
  run below command
@@ -565,7 +565,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"), ]
  </code>
  directory and execute the script:
 </p>
-<pre><code class="language-bash">cd readme_manager && ./update_readme.sh
+<pre><code class="language-bash">cd readme_manager &amp;&amp; ./update_readme.sh
 </code></pre>
 <p>
  This will update the
@@ -708,36 +708,36 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"), ]
 </p>
 <pre><code class="language-python">include_files = {
     # common readme files
-    "README of Docker Installation": "https://raw.githubusercontent.com/arpansahu/common_readme/main/Docker%20Readme/docker_installation.md",
-    "DOCKER_END": "https://raw.githubusercontent.com/arpansahu/common_readme/main/Docker%20Readme/docker_end.md",
-    "README of Nginx Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/nginx.md",
-    "README of Jenkins Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Jenkins/Jenkins.md",
-    "JENKINS_END": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Jenkins/jenkins_end.md",
-    "README of PostgreSql Server With Nginx Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Postgres.md",
-    "README of PGAdmin4 Server With Nginx Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/PostgresUI.md",
-    "README of Portainer Server With Nginx Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Portainer.md",
-    "README of Redis Server Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Redis.md",
-    "README of Redis Commander Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/RedisComander.md",
-    "README of Minio Server Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Minio.md",
-    "README of Intro": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Intro.md",
-    "AWS DEPLOYMENT INTRODUCTION": "https://raw.githubusercontent.com/arpansahu/common_readme/main/Introduction/aws_desployment_introduction.md",
-    "STATIC_FILES": "https://raw.githubusercontent.com/arpansahu/common_readme/main/Introduction/static_files_settings.md",
-    "README of Readme Manager": "https://raw.githubusercontent.com/arpansahu/common_readme/main/Readme%20manager/readme_manager.md",
+    &quot;README of Docker Installation&quot;: &quot;https://raw.githubusercontent.com/arpansahu/common_readme/main/Docker%20Readme/docker_installation.md&quot;,
+    &quot;DOCKER_END&quot;: &quot;https://raw.githubusercontent.com/arpansahu/common_readme/main/Docker%20Readme/docker_end.md&quot;,
+    &quot;README of Nginx Setup&quot;: &quot;https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/nginx.md&quot;,
+    &quot;README of Jenkins Setup&quot;: &quot;https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Jenkins/Jenkins.md&quot;,
+    &quot;JENKINS_END&quot;: &quot;https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Jenkins/jenkins_end.md&quot;,
+    &quot;README of PostgreSql Server With Nginx Setup&quot;: &quot;https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Postgres.md&quot;,
+    &quot;README of PGAdmin4 Server With Nginx Setup&quot;: &quot;https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/PostgresUI.md&quot;,
+    &quot;README of Portainer Server With Nginx Setup&quot;: &quot;https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Portainer.md&quot;,
+    &quot;README of Redis Server Setup&quot;: &quot;https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Redis.md&quot;,
+    &quot;README of Redis Commander Setup&quot;: &quot;https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/RedisComander.md&quot;,
+    &quot;README of Minio Server Setup&quot;: &quot;https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Minio.md&quot;,
+    &quot;README of Intro&quot;: &quot;https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Intro.md&quot;,
+    &quot;AWS DEPLOYMENT INTRODUCTION&quot;: &quot;https://raw.githubusercontent.com/arpansahu/common_readme/main/Introduction/aws_desployment_introduction.md&quot;,
+    &quot;STATIC_FILES&quot;: &quot;https://raw.githubusercontent.com/arpansahu/common_readme/main/Introduction/static_files_settings.md&quot;,
+    &quot;README of Readme Manager&quot;: &quot;https://raw.githubusercontent.com/arpansahu/common_readme/main/Readme%20manager/readme_manager.md&quot;,
 
     # Project-Specific Partial Files
-    "INTRODUCTION": "../readme_manager/partials/introduction.md",
-    "DOC_AND_STACK": "../readme_manager/partials/documentation_and_stack.md",
-    "TECHNOLOGY QNA": "../readme_manager/partials/technology_qna.md",
-    "DEMO": "../readme_manager/partials/demo.md",
-    "INSTALLATION": "../readme_manager/partials/installation.md",
-    "DJANGO_COMMANDS": "../readme_manager/partials/django_commands.md",
-    "NGINX_SERVER": "../readme_manager/partials/nginx_server.md",
+    &quot;INTRODUCTION&quot;: &quot;../readme_manager/partials/introduction.md&quot;,
+    &quot;DOC_AND_STACK&quot;: &quot;../readme_manager/partials/documentation_and_stack.md&quot;,
+    &quot;TECHNOLOGY QNA&quot;: &quot;../readme_manager/partials/technology_qna.md&quot;,
+    &quot;DEMO&quot;: &quot;../readme_manager/partials/demo.md&quot;,
+    &quot;INSTALLATION&quot;: &quot;../readme_manager/partials/installation.md&quot;,
+    &quot;DJANGO_COMMANDS&quot;: &quot;../readme_manager/partials/django_commands.md&quot;,
+    &quot;NGINX_SERVER&quot;: &quot;../readme_manager/partials/nginx_server.md&quot;,
 
     # Project-Specific Core Files
-    "env.example": "../env.example",
-    "docker-compose.yml": "../docker-compose.yml",
-    "Dockerfile": "../Dockerfile",
-    "Jenkinsfile": "../Jenkinsfile",
+    &quot;env.example&quot;: &quot;../env.example&quot;,
+    &quot;docker-compose.yml&quot;: &quot;../docker-compose.yml&quot;,
+    &quot;Dockerfile&quot;: &quot;../Dockerfile&quot;,
+    &quot;Jenkinsfile&quot;: &quot;../Jenkinsfile&quot;,
 }
 </code></pre>
 <p>
@@ -859,8 +859,8 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"), ]
  </li>
 </ol>
 <pre><code class="language-bash">       echo \
-         "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-         $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+         &quot;deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+         $(lsb_release -cs) stable&quot; | sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null
 </code></pre>
 <ol>
  <li>
@@ -921,18 +921,18 @@ CMD gunicorn --bind 0.0.0.0:8002 great_chat.wsgi
 <p>
  Create a file named docker-compose.yml and add following lines in it
 </p>
-<pre><code class="language-bash">version: '3'
+<pre><code class="language-bash">version: &#x27;3&#x27;
 
 services:
   web:
     build: .
     env_file: ./.env
-    command: bash -c "python manage.py makemigrations && python manage.py migrate && daphne -b 0.0.0.0 -p 8002 great_chat.asgi:application"
+    command: bash -c &quot;python manage.py makemigrations &amp;&amp; python manage.py migrate &amp;&amp; daphne -b 0.0.0.0 -p 8002 great_chat.asgi:application&quot;
     container_name: great_chat
     volumes:
       - .:/great_chat
     ports:
-      - "8002:8002"
+      - &quot;8002:8002&quot;
     restart: unless-stopped
 </code></pre>
 <h3>
@@ -1110,7 +1110,7 @@ Open the nginx configuration file  and make it like this
         ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
     }                          
 </code></pre>
-<pre><code>You can dry run and check whether it's renewal is working or not
+<pre><code>You can dry run and check whether it&#x27;s renewal is working or not
 </code></pre>
 <pre><code class="language-bash">    sudo certbot renew --dry-run
 </code></pre>
@@ -1136,13 +1136,13 @@ For all subdomains, we will have to set a wildcard SSL certificate
 arpansahu.me.
 
 Now, you should have a question in your mind about why we are generating SSL for arpansahu.me separately.
-It's because Let's Encrypt does not include a base domain with wildcard certificates for subdomains.
+It&#x27;s because Let&#x27;s Encrypt does not include a base domain with wildcard certificates for subdomains.
 
 After running the above command you will see a message similar to this
 </code></pre>
 <pre><code class="language-bash">    Saving debug log to /var/log/letsencrypt/letsencrypt.log
     Please enter the domain name(s) you would like on your certificate (comma and/or
-    space separated) (Enter 'c' to cancel): *.arpansahu.me
+    space separated) (Enter &#x27;c&#x27; to cancel): *.arpansahu.me
     Requesting a certificate for *.arpansahu.me
 
     - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1158,8 +1158,8 @@ After running the above command you will see a message similar to this
     provider, this may take some time, from a few seconds to multiple minutes. You can
     check if it has finished deploying with the aid of online tools, such as Google
     Admin Toolbox: https://toolbox.googleapps.com/apps/dig/#TXT/_acme-challenge.arpansahu.me.
-    Look for one or more bolded line(s) below the line '; ANSWER'. It should show the
-    value(s) you've just added.
+    Look for one or more bolded line(s) below the line &#x27;; ANSWER&#x27;. It should show the
+    value(s) you&#x27;ve just added.
 
     - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     Press Enter to Continue
@@ -1173,7 +1173,7 @@ Similar to the below record.
 
 https://toolbox.googleapps.com/apps/dig/#TXT/_acme-challenge.arpansahu.me (arpansahu.me is domain)
 
-If it's verified then press enter the terminal as mentioned above
+If it&#x27;s verified then press enter the terminal as mentioned above
 
 Then your certificate will be generated
 </code></pre>
@@ -1191,7 +1191,7 @@ using command
 </code></pre>
 <pre><code class="language-bash">    sudo certbot delete
 </code></pre>
-<pre><code>Note: This certificate will not be renewed automatically. Auto-renewal of --manual certificates requires the use of an authentication hook script (--manual-auth-hook) but one was not provided. To renew this certificate, repeat this same Certbot command before the certificate's expiry date.
+<pre><code>Note: This certificate will not be renewed automatically. Auto-renewal of --manual certificates requires the use of an authentication hook script (--manual-auth-hook) but one was not provided. To renew this certificate, repeat this same Certbot command before the certificate&#x27;s expiry date.
 </code></pre>
 <ol>
  <li>
@@ -1249,13 +1249,13 @@ using command
 </code></pre>
 <pre><code class="language-bash">         sudo adduser \
          --system \ 
-         --gecos "acme-dns Service" \
+         --gecos &quot;acme-dns Service&quot; \
          --disabled-password \
          --group \
          --home /var/lib/acme-dns \
          acme-dns
 </code></pre>
-<pre><code>  * Update default acme-dns config compared with IP from the AWS console. Can't bind to the public address need to use private one.
+<pre><code>  * Update default acme-dns config compared with IP from the AWS console. Can&#x27;t bind to the public address need to use private one.
 </code></pre>
 <pre><code class="language-bash">        IP addr
 
@@ -1267,33 +1267,33 @@ using command
 </code></pre>
 <pre><code>  * Replace
 </code></pre>
-<pre><code class="language-bash">        listen = "127.0.0.1:53” to listen = “private IP of the ec2 instance” 172.31.93.180:53(port will be 53)
+<pre><code class="language-bash">        listen = &quot;127.0.0.1:53” to listen = “private IP of the ec2 instance” 172.31.93.180:53(port will be 53)
 
         Similarly, Edit other details mentioned below  
 
         # domain name to serve the requests off of
-        domain = "auth.arpansahu.me"
+        domain = &quot;auth.arpansahu.me&quot;
         # zone name server
-        nsname = "auth.arpansahu.me"
+        nsname = &quot;auth.arpansahu.me&quot;
         # admin email address, where @ is substituted with .
-        nsadmin = "admin@arpansahu.me"
+        nsadmin = &quot;admin@arpansahu.me&quot;
 
 
         records = [
           # domain pointing to the public IP of your acme-dns server
-           "auth.arpansahu.me. A 44.199.177.138. (public elastic IP)”,
+           &quot;auth.arpansahu.me. A 44.199.177.138. (public elastic IP)”,
           # specify that auth.example.org will resolve any *.auth.example.org records
-           "auth.arpansahu.me. NS auth.arpansahu.me.”,
+           &quot;auth.arpansahu.me. NS auth.arpansahu.me.”,
         ]
 
         [api]
         # listen IP eg. 127.0.0.1
-        IP = "127.0.0.1”. (Changed)
+        IP = &quot;127.0.0.1”. (Changed)
 
         # listen port, eg. 443 for default HTTPS
-        port = "8080" (Changed).         ——— We will use port 8090 because we will also use Jenkins which will be running on 8080 port
-        # possible values: "letsencrypt", "letsencryptstaging", "cert", "none"
-        tls = "none"   (Changed)
+        port = &quot;8080&quot; (Changed).         ——— We will use port 8090 because we will also use Jenkins which will be running on 8080 port
+        # possible values: &quot;letsencrypt&quot;, &quot;letsencryptstaging&quot;, &quot;cert&quot;, &quot;none&quot;
+        tls = &quot;none&quot;   (Changed)
 
 </code></pre>
 <pre><code>  * Move the systemd service and reload
@@ -1320,7 +1320,7 @@ using command
 </code></pre>
 <pre><code>  * Create A record for your domain
 </code></pre>
-<pre><code class="language-bash">         auth.arpansahu.me IN A <public-IP>
+<pre><code class="language-bash">         auth.arpansahu.me IN A &lt;public-IP&gt;
 </code></pre>
 <pre><code>  * Create NS record for auth.arpansahu.me pointing to auth.arpansahu.me. This means, that auth.arpansahu.me is
     responsible for any *.auth.arpansahu.me records
@@ -1393,9 +1393,9 @@ using command
 </code></pre>
 <pre><code>    Since the last update in  the last step now two more entries should be added
 </code></pre>
-<pre><code class="language-bash">         CAA Record @   0 issuewild "letsencrypt.org; validationmethods=dns-01; accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/1424899626"  Automatic
+<pre><code class="language-bash">         CAA Record @   0 issuewild &quot;letsencrypt.org; validationmethods=dns-01; accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/1424899626&quot;  Automatic
 
-         CAA Record @   0 issue "letsencrypt.org; validationmethods=dns-01; accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/1424899626"
+         CAA Record @   0 issue &quot;letsencrypt.org; validationmethods=dns-01; accounturi=https://acme-v02.api.letsencrypt.org/acme/acct/1424899626&quot;
          Automatic
 </code></pre>
 <pre><code>    Same as an entry that needs to be added to complete a time challenge as previously we did.
@@ -1409,10 +1409,10 @@ using command
          --manual \
          --test-cert \ 
          --preferred-challenges dns \ 
-         --manual-auth-hook 'acme-dns-client' \ 
+         --manual-auth-hook &#x27;acme-dns-client&#x27; \ 
          -d ‘*.arpansahu.me’ -d arpansahu.me
 </code></pre>
-<pre><code>    Note: Here we have to mention both the base and wildcard domain names with -d since let's encrypt don't provide base domain ssl by default in wildcard domain ssl
+<pre><code>    Note: Here we have to mention both the base and wildcard domain names with -d since let&#x27;s encrypt don&#x27;t provide base domain ssl by default in wildcard domain ssl
 
    * Verifying the certificate
 </code></pre>
@@ -1426,14 +1426,14 @@ using command
          --test-cert \ 
          --dry-run \ 
          --preferred-challenges dns \
-         --manual-auth-hook 'acme-dns-client'       
+         --manual-auth-hook &#x27;acme-dns-client&#x27;       
 </code></pre>
 <pre><code>   * Renew certificate (actually)
 </code></pre>
 <pre><code class="language-bash">         sudo certbot renew \
          --manual \
          --preferred-challenges dns \
-         --manual-auth-hook 'acme-dns-client'       
+         --manual-auth-hook &#x27;acme-dns-client&#x27;       
 </code></pre>
 <pre><code>   * Check the entry is added successfully or not
 </code></pre>
@@ -1446,7 +1446,7 @@ using command
 </code></pre>
 <pre><code>   * Add the following lines to the file
 </code></pre>
-<pre><code class="language-bash">         0 */12 * * * certbot renew --manual --test-cert --preferred-challenges dns --manual-auth-hook 'acme-dns-client'
+<pre><code class="language-bash">         0 */12 * * * certbot renew --manual --test-cert --preferred-challenges dns --manual-auth-hook &#x27;acme-dns-client&#x27;
 </code></pre>
 <p>
  After all these steps your Nginx configuration file located at /etc/nginx/sites-available/arpansahu will be looking similar to this
@@ -1471,7 +1471,7 @@ server {
      # WebSocket support
          proxy_http_version 1.1;
          proxy_set_header Upgrade $http_upgrade;
-         proxy_set_header Connection "upgrade";
+         proxy_set_header Connection &quot;upgrade&quot;;
     }
 
     listen 443 ssl; # managed by Certbot
@@ -1504,7 +1504,7 @@ server {
 sudo apt install openjdk-11-jre
 
 java -version
-openjdk version "11.0.12" 2021-07-20
+openjdk version &quot;11.0.12&quot; 2021-07-20
 OpenJDK Runtime Environment (build 11.0.12+7-post-Debian-2)
 OpenJDK 64-Bit Server VM (build 11.0.12+7-post-Debian-2, mixed mode, sharing)
 </code></pre>
@@ -1512,10 +1512,10 @@ OpenJDK 64-Bit Server VM (build 11.0.12+7-post-Debian-2, mixed mode, sharing)
  Long Term Support release
 </p>
 <pre><code class="language-bash">curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo tee \
-  /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+  /usr/share/keyrings/jenkins-keyring.asc &gt; /dev/null
 echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
   https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
-  /etc/apt/sources.list.d/jenkins.list > /dev/null
+  /etc/apt/sources.list.d/jenkins.list &gt; /dev/null
 sudo apt-get update
 sudo apt-get install jenkins
 </code></pre>
@@ -1585,10 +1585,10 @@ sudo apt-get install jenkins
 <p>
  and then put
 </p>
-<pre><code class="language-bash">stage('Dependencies') {
+<pre><code class="language-bash">stage(&#x27;Dependencies&#x27;) {
             steps {
                 script {
-                    sh "sudo cp /root/env/project_name/.env /var/lib/jenkins/workspace/pipeline_project_name"
+                    sh &quot;sudo cp /root/env/project_name/.env /var/lib/jenkins/workspace/pipeline_project_name&quot;
                 }
             }
         }
@@ -1602,31 +1602,31 @@ sudo apt-get install jenkins
  </li>
 </ul>
 <pre><code class="language-bash">pipeline {
-    agent { label 'local' }
+    agent { label &#x27;local&#x27; }
     stages {
-        stage('Checkout') {
+        stage(&#x27;Checkout&#x27;) {
             steps {
                 checkout scm
             }
         }
-        stage('Dependencies') {
+        stage(&#x27;Dependencies&#x27;) {
             steps {
                 script {
-                    sh "sudo cp /root/projectenvs/great_chat/.env /var/lib/jenkins/workspace/great_chat"
+                    sh &quot;sudo cp /root/projectenvs/great_chat/.env /var/lib/jenkins/workspace/great_chat&quot;
                 }
             }
         }
-        stage('Production') {
+        stage(&#x27;Production&#x27;) {
             when {
                 expression {
                     // Collect all changed files
                     def changes = currentBuild.changeSets.collect { it.items.collect { it.affectedFiles.collect { it.path } } }.flatten()
 
                     // Define the file(s) to be excluded from triggering a deploy
-                    def excludedFiles = ['Readme.md']
+                    def excludedFiles = [&#x27;Readme.md&#x27;]
 
                     // Check if the only changed files are in the excluded list
-                    def onlyExcludedFilesChanged = changes.every { changedFile -> 
+                    def onlyExcludedFilesChanged = changes.every { changedFile -&gt; 
                         excludedFiles.contains(changedFile)
                     }
 
@@ -1635,9 +1635,9 @@ sudo apt-get install jenkins
             }
             steps {
                 script {
-                    sh "docker compose up --build --detach"
+                    sh &quot;docker compose up --build --detach&quot;
                     // Set a flag to true if the deployment stage is executed
-                    currentBuild.description = 'DEPLOYMENT_EXECUTED'
+                    currentBuild.description = &#x27;DEPLOYMENT_EXECUTED&#x27;
                 }
             }
         }
@@ -1645,63 +1645,63 @@ sudo apt-get install jenkins
     post {
         success {
             script {
-                if (currentBuild.description == 'DEPLOYMENT_EXECUTED') {
-                    sh """curl -s \
+                if (currentBuild.description == &#x27;DEPLOYMENT_EXECUTED&#x27;) {
+                    sh &quot;&quot;&quot;curl -s \
                     -X POST \
                     --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
                     https://api.mailjet.com/v3.1/send \
-                    -H "Content-Type:application/json" \
-                    -d '{
-                        "Messages":[
+                    -H &quot;Content-Type:application/json&quot; \
+                    -d &#x27;{
+                        &quot;Messages&quot;:[
                                 {
-                                        "From": {
-                                                "Email": "$MAIL_JET_EMAIL_ADDRESS",
-                                                "Name": "ArpanSahuOne Jenkins Notification"
+                                        &quot;From&quot;: {
+                                                &quot;Email&quot;: &quot;$MAIL_JET_EMAIL_ADDRESS&quot;,
+                                                &quot;Name&quot;: &quot;ArpanSahuOne Jenkins Notification&quot;
                                         },
-                                        "To": [
+                                        &quot;To&quot;: [
                                                 {
-                                                        "Email": "$MY_EMAIL_ADDRESS",
-                                                        "Name": "Development Team"
+                                                        &quot;Email&quot;: &quot;$MY_EMAIL_ADDRESS&quot;,
+                                                        &quot;Name&quot;: &quot;Development Team&quot;
                                                 }
                                         ],
-                                        "Subject": "${currentBuild.fullDisplayName} deployed successfully",
-                                        "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed",
-                                        "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
+                                        &quot;Subject&quot;: &quot;${currentBuild.fullDisplayName} deployed successfully&quot;,
+                                        &quot;TextPart&quot;: &quot;Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed&quot;,
+                                        &quot;HTMLPart&quot;: &quot;&lt;h3&gt;Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed &lt;/h3&gt; &lt;br&gt; &lt;p&gt; Build Url: ${env.BUILD_URL}  &lt;/p&gt;&quot;
                                 }
                         ]
-                    }'"""
+                    }&#x27;&quot;&quot;&quot;
                     // Trigger another Jenkins job
-                    build job: 'common_readme', parameters: [string(name: 'project_git_url', value: 'https://github.com/arpansahu/great_chat'), string(name: 'environment', value: 'prod')], wait: false
+                    build job: &#x27;common_readme&#x27;, parameters: [string(name: &#x27;project_git_url&#x27;, value: &#x27;https://github.com/arpansahu/great_chat&#x27;), string(name: &#x27;environment&#x27;, value: &#x27;prod&#x27;)], wait: false
                 }
             }
         }
         failure {
             script {
-                if (currentBuild.description == 'DEPLOYMENT_EXECUTED') {
-                    sh """curl -s \
+                if (currentBuild.description == &#x27;DEPLOYMENT_EXECUTED&#x27;) {
+                    sh &quot;&quot;&quot;curl -s \
                     -X POST \
                     --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
                     https://api.mailjet.com/v3.1/send \
-                    -H "Content-Type:application/json" \
-                    -d '{
-                        "Messages":[
+                    -H &quot;Content-Type:application/json&quot; \
+                    -d &#x27;{
+                        &quot;Messages&quot;:[
                                 {
-                                        "From": {
-                                                "Email": "$MAIL_JET_EMAIL_ADDRESS",
-                                                "Name": "ArpanSahuOne Jenkins Notification"
+                                        &quot;From&quot;: {
+                                                &quot;Email&quot;: &quot;$MAIL_JET_EMAIL_ADDRESS&quot;,
+                                                &quot;Name&quot;: &quot;ArpanSahuOne Jenkins Notification&quot;
                                         },
-                                        "To": [
+                                        &quot;To&quot;: [
                                                 {
-                                                        "Email": "$MY_EMAIL_ADDRESS",
-                                                        "Name": "Developer Team"
+                                                        &quot;Email&quot;: &quot;$MY_EMAIL_ADDRESS&quot;,
+                                                        &quot;Name&quot;: &quot;Developer Team&quot;
                                                 }
                                         ],
-                                        "Subject": "${currentBuild.fullDisplayName} deployment failed",
-                                        "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} deployment failed",
-                                        "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is not deployed, Build Failed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
+                                        &quot;Subject&quot;: &quot;${currentBuild.fullDisplayName} deployment failed&quot;,
+                                        &quot;TextPart&quot;: &quot;Hola Development Team, your project ${currentBuild.fullDisplayName} deployment failed&quot;,
+                                        &quot;HTMLPart&quot;: &quot;&lt;h3&gt;Hola Development Team, your project ${currentBuild.fullDisplayName} is not deployed, Build Failed &lt;/h3&gt; &lt;br&gt; &lt;p&gt; Build Url: ${env.BUILD_URL}  &lt;/p&gt;&quot;
                                 }
                         ]
-                    }'"""
+                    }&#x27;&quot;&quot;&quot;
                 }
             }
         }
@@ -1817,12 +1817,12 @@ Add all the env variables as required and mentioned in the Readme File.
   user:
  </li>
 </ol>
-<pre><code class="language-sql">    ALTER USER postgres WITH PASSWORD 'your_password';
+<pre><code class="language-sql">    ALTER USER postgres WITH PASSWORD &#x27;your_password&#x27;;
 </code></pre>
 <p>
  Replace
  <code>
-  'your_password'
+  &#x27;your_password&#x27;
  </code>
  with the desired password.
 </p>
@@ -1875,9 +1875,9 @@ Add all the env variables as required and mentioned in the Readme File.
   Find the listen_addresses line and set it to:
  </li>
 </ol>
-<pre><code class="language-bash">    listen_addresses = 'localhost'
+<pre><code class="language-bash">    listen_addresses = &#x27;localhost&#x27;
 </code></pre>
-<pre><code>Now the thing is if u don't want to serve it using nginx u can also set it to * all so that database can be connected from any where
+<pre><code>Now the thing is if u don&#x27;t want to serve it using nginx u can also set it to * all so that database can be connected from any where
 </code></pre>
 <ol>
  <li>
@@ -1954,7 +1954,7 @@ Add all the env variables as required and mentioned in the Readme File.
 </code></pre>
 <pre><code class="language-bash">    sudo nginx -t
 </code></pre>
-<pre><code>If error comes nginx: [emerg] "stream" directive is not allowed here in /etc/nginx/conf.d/postgresql.conf:1
+<pre><code>If error comes nginx: [emerg] &quot;stream&quot; directive is not allowed here in /etc/nginx/conf.d/postgresql.conf:1
 nginx: configuration file /etc/nginx/nginx.conf test failed
 
 Follow these steps:
@@ -1993,7 +1993,7 @@ Follow these steps:
                 error_log /var/log/nginx/error.log;
 
                 gzip on;
-                gzip_disable "msie6";
+                gzip_disable &quot;msie6&quot;;
 
                 include /etc/nginx/conf.d/*.conf;
                 include /etc/nginx/sites-enabled/*;
@@ -2031,14 +2031,14 @@ Follow these steps:
   Testing connecting with postgres without ip and using domain
  </li>
 </ol>
-<pre><code class="language-bash">    psql "postgres://username:password@domain/database_name?sslmode=require"
+<pre><code class="language-bash">    psql &quot;postgres://username:password@domain/database_name?sslmode=require&quot;
 </code></pre>
 <pre><code>(https://github.com/arpansahu/common_readme/blob/main/AWS%20Deployment/Postgres.md).
 </code></pre>
 <p>
  postgresql_server can be access accessed
 </p>
-<pre><code class="language-bash">psql "postgres://user:user_pass@arpansahu.me/database_name?sslmode=require"
+<pre><code class="language-bash">psql &quot;postgres://user:user_pass@arpansahu.me/database_name?sslmode=require&quot;
 </code></pre>
 <h1>
  Services on AWS EC2/ Home Server Ubuntu 22.0 LTS s
@@ -2094,7 +2094,7 @@ Follow these steps:
 </code></pre>
 <pre><code>To ensure pgAdmin runs in the background, use `nohup`:
 </code></pre>
-<pre><code class="language-bash">    nohup pgadmin4 &>/dev/null &
+<pre><code class="language-bash">    nohup pgadmin4 &amp;&gt;/dev/null &amp;
 </code></pre>
 <p>
  By using a virtual environment, you avoid potential conflicts with system packages, and you can manage dependencies for pgAdmin 4 more effectively.

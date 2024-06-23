@@ -1,4 +1,5 @@
 import markdown
+import html
 from markdown.extensions.fenced_code import FencedCodeExtension
 from markdown.extensions.nl2br import Nl2BrExtension
 from markdown.extensions.extra import ExtraExtension
@@ -63,6 +64,12 @@ def process_markdown_to_html(input_file, intermediate_file, output_file):
     
     # Parse the HTML content with BeautifulSoup to ensure no alteration to existing HTML tags and attributes
     soup = BeautifulSoup(html_content, 'html.parser')
+    
+    # Escape HTML entities in code blocks to ensure they are displayed correctly
+    for code_block in soup.find_all('code'):
+        if code_block.string:
+            escaped_code = html.escape(code_block.string)
+            code_block.string.replace_with(escaped_code)
     
     # Write the final HTML content to a new file
     with open(output_file, 'w') as file:
