@@ -509,7 +509,8 @@ Reference: https://docs.docker.com/engine/install/ubuntu/
 Now in your Git Repository
 
 Create a file named Dockerfile with no extension and add following lines in it
-```
+
+```bash
 FROM python:3.10.7
 
 WORKDIR /app
@@ -528,7 +529,7 @@ CMD gunicorn --bind 0.0.0.0:8002 great_chat.wsgi
 
 Create a file named docker-compose.yml and add following lines in it
 
-```
+```bash
 version: '3'
 
 services:
