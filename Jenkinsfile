@@ -68,7 +68,7 @@ pipeline {
                         ]
                     }'"""
                     // Trigger another Jenkins job
-                    build job: 'common_readme', parameters: [string(name: 'project_git_url', value: 'https://github.com/arpansahu/great_chat'), string(name: 'environment', value: 'prod')], wait: false
+                   
                 }
                 
             }
