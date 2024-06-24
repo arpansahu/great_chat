@@ -1,6 +1,14 @@
 pipeline {
     agent { label 'local' }
     stages {
+        stage('Initialize') {
+            steps {
+                script {
+                    // Log the current workspace path
+                    echo "Current workspace path is: ${env.WORKSPACE}"
+                }
+            }
+        }
         stage('Checkout') {
             steps {
                 // Checkout code from SCM
@@ -11,7 +19,7 @@ pipeline {
             steps {
                 script {
                     // Copy .env file to the workspace
-                    sh "sudo cp /root/projectenvs/great_chat/.env /var/lib/jenkins/workspace/great_chat"
+                    sh "sudo cp /root/projectenvs/great_chat/.env ${env.WORKSPACE}/great_chat"
                 }
             }
         }
@@ -74,14 +82,19 @@ pipeline {
                         ]
                     }'"""
 
+                    // List files in the workspace and in specific directories for debugging
+                    sh "ls -l ${env.WORKSPACE}"
+                    sh "ls -l ${env.WORKSPACE}/readme_manager"
+                    sh "ls -l ${env.WORKSPACE}/readme_manager_html_detailed"
+
                     // Trigger readme_manager.sh and readme_manager_html_detailed.sh
-                    if (fileExists('readme_manager/readme_manager.sh')) {
-                        sh "bash readme_manager/readme_manager.sh"
+                    if (fileExists("${env.WORKSPACE}/readme_manager/readme_manager.sh")) {
+                        sh "bash ${env.WORKSPACE}/readme_manager/readme_manager.sh"
                     } else {
                         echo "readme_manager.sh not found"
                     }
-                    if (fileExists('readme_manager_html_detailed/readme_manager_html_detailed.sh')) {
-                        sh "bash readme_manager_html_detailed/readme_manager_html_detailed.sh"
+                    if (fileExists("${env.WORKSPACE}/readme_manager_html_detailed/readme_manager_html_detailed.sh")) {
+                        sh "bash ${env.WORKSPACE}/readme_manager_html_detailed/readme_manager_html_detailed.sh"
                     } else {
                         echo "readme_manager_html_detailed.sh not found"
                     }
@@ -117,14 +130,19 @@ pipeline {
                         ]
                     }'"""
 
+                    // List files in the workspace and in specific directories for debugging
+                    sh "ls -l ${env.WORKSPACE}"
+                    sh "ls -l ${env.WORKSPACE}/readme_manager"
+                    sh "ls -l ${env.WORKSPACE}/readme_manager_html_detailed"
+
                     // Trigger readme_manager.sh and readme_manager_html_detailed.sh
-                    if (fileExists('readme_manager/readme_manager.sh')) {
-                        sh "bash readme_manager/readme_manager.sh"
+                    if (fileExists("${env.WORKSPACE}/readme_manager/readme_manager.sh")) {
+                        sh "bash ${env.WORKSPACE}/readme_manager/readme_manager.sh"
                     } else {
                         echo "readme_manager.sh not found"
                     }
-                    if (fileExists('readme_manager_html_detailed/readme_manager_html_detailed.sh')) {
-                        sh "bash readme_manager_html_detailed/readme_manager_html_detailed.sh"
+                    if (fileExists("${env.WORKSPACE}/readme_manager_html_detailed/readme_manager_html_detailed.sh")) {
+                        sh "bash ${env.WORKSPACE}/readme_manager_html_detailed/readme_manager_html_detailed.sh"
                     } else {
                         echo "readme_manager_html_detailed.sh not found"
                     }
