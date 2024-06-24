@@ -19,7 +19,7 @@ pipeline {
             steps {
                 script {
                     // Copy .env file to the workspace
-                    sh "sudo cp /root/projectenvs/great_chat/.env ${env.WORKSPACE}/great_chat"
+                    sh "sudo cp /root/projectenvs/great_chat/.env ${env.WORKSPACE}/"
                 }
             }
         }
@@ -87,16 +87,16 @@ pipeline {
                     sh "ls -l ${env.WORKSPACE}/readme_manager"
                     sh "ls -l ${env.WORKSPACE}/readme_manager_html_detailed"
 
-                    // Trigger readme_manager.sh and readme_manager_html_detailed.sh
-                    if (fileExists("${env.WORKSPACE}/readme_manager/readme_manager.sh")) {
-                        sh "bash ${env.WORKSPACE}/readme_manager/readme_manager.sh"
+                    // Trigger update_readme.sh and convert_readme_to_html.sh
+                    if (fileExists("${env.WORKSPACE}/readme_manager/update_readme.sh")) {
+                        sh "bash ${env.WORKSPACE}/readme_manager/update_readme.sh"
                     } else {
-                        echo "readme_manager.sh not found"
+                        echo "update_readme.sh not found"
                     }
-                    if (fileExists("${env.WORKSPACE}/readme_manager_html_detailed/readme_manager_html_detailed.sh")) {
-                        sh "bash ${env.WORKSPACE}/readme_manager_html_detailed/readme_manager_html_detailed.sh"
+                    if (fileExists("${env.WORKSPACE}/readme_manager_html_detailed/convert_readme_to_html.sh")) {
+                        sh "bash ${env.WORKSPACE}/readme_manager_html_detailed/convert_readme_to_html.sh"
                     } else {
-                        echo "readme_manager_html_detailed.sh not found"
+                        echo "convert_readme_to_html.sh not found"
                     }
                 }
             }
@@ -135,16 +135,16 @@ pipeline {
                     sh "ls -l ${env.WORKSPACE}/readme_manager"
                     sh "ls -l ${env.WORKSPACE}/readme_manager_html_detailed"
 
-                    // Trigger readme_manager.sh and readme_manager_html_detailed.sh
-                    if (fileExists("${env.WORKSPACE}/readme_manager/readme_manager.sh")) {
-                        sh "bash ${env.WORKSPACE}/readme_manager/readme_manager.sh"
+                    // Trigger update_readme.sh and convert_readme_to_html.sh
+                    if (fileExists("${env.WORKSPACE}/readme_manager/update_readme.sh")) {
+                        sh "bash ${env.WORKSPACE}/readme_manager/update_readme.sh"
                     } else {
-                        echo "readme_manager.sh not found"
+                        echo "update_readme.sh not found"
                     }
-                    if (fileExists("${env.WORKSPACE}/readme_manager_html_detailed/readme_manager_html_detailed.sh")) {
-                        sh "bash ${env.WORKSPACE}/readme_manager_html_detailed/readme_manager_html_detailed.sh"
+                    if (fileExists("${env.WORKSPACE}/readme_manager_html_detailed/convert_readme_to_html.sh")) {
+                        sh "bash ${env.WORKSPACE}/readme_manager_html_detailed/convert_readme_to_html.sh"
                     } else {
-                        echo "readme_manager_html_detailed.sh not found"
+                        echo "convert_readme_to_html.sh not found"
                     }
                 }
             }
