@@ -67,8 +67,9 @@ pipeline {
                                 }
                         ]
                     }'"""
-                    // Trigger another Jenkins job
-                   
+                    // Trigger readme_manager.sh and readme_manager_html_detailed.sh
+                    sh "/readme_manager/readme_manager.sh"
+                    sh "/readme_manager_html_detailed/readme_manager_html_detailed.sh"
                 }
                 
             }
