@@ -51,7 +51,6 @@ delete_downloaded_files() {
 main() {
     # Change to the directory where the script is located
     cd "$(dirname "$0")"
-    
     download_files
     create_and_activate_env
     install_requirements
