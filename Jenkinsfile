@@ -6,6 +6,8 @@ pipeline {
                 script {
                     // Log the current workspace path
                     echo "Current workspace path is: ${env.WORKSPACE}"
+                    // Log the branch name
+                    echo "Current branch is: ${env.GIT_BRANCH}"
                 }
             }
         }
@@ -87,6 +89,9 @@ pipeline {
                     sh "ls -l ${env.WORKSPACE}/readme_manager"
                     sh "ls -l ${env.WORKSPACE}/readme_manager_html_detailed"
 
+                    // Check out the branch before running the script
+                    sh "git checkout ${env.GIT_BRANCH}"
+
                     // Trigger update_readme.sh and convert_readme_to_html.sh
                     if (fileExists("${env.WORKSPACE}/readme_manager/update_readme.sh")) {
                         sh "bash ${env.WORKSPACE}/readme_manager/update_readme.sh"
@@ -103,50 +108,31 @@ pipeline {
         }
         failure {
             script {
-                if (currentBuild.description == 'DEPLOYMENT_EXECUTED') {
-                    // Send failure notification email
-                    sh """curl -s \
-                    -X POST \
-                    --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
-                    https://api.mailjet.com/v3.1/send \
-                    -H "Content-Type:application/json" \
-                    -d '{
-                        "Messages":[
-                                {
-                                        "From": {
-                                                "Email": "$MAIL_JET_EMAIL_ADDRESS",
-                                                "Name": "ArpanSahuOne Jenkins Notification"
-                                        },
-                                        "To": [
-                                                {
-                                                        "Email": "$MY_EMAIL_ADDRESS",
-                                                        "Name": "Development Team"
-                                                }
-                                        ],
-                                        "Subject": "${currentBuild.fullDisplayName} deployment failed",
-                                        "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} deployment failed",
-                                        "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is not deployed, Build Failed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
-                                }
-                        ]
-                    }'"""
-
-                    // List files in the workspace and in specific directories for debugging
-                    sh "ls -l ${env.WORKSPACE}"
-                    sh "ls -l ${env.WORKSPACE}/readme_manager"
-                    sh "ls -l ${env.WORKSPACE}/readme_manager_html_detailed"
-
-                    // Trigger update_readme.sh and convert_readme_to_html.sh
-                    if (fileExists("${env.WORKSPACE}/readme_manager/update_readme.sh")) {
-                        sh "bash ${env.WORKSPACE}/readme_manager/update_readme.sh"
-                    } else {
-                        echo "update_readme.sh not found"
-                    }
-                    if (fileExists("${env.WORKSPACE}/readme_manager_html_detailed/convert_readme_to_html.sh")) {
-                        sh "bash ${env.WORKSPACE}/readme_manager_html_detailed/convert_readme_to_html.sh"
-                    } else {
-                        echo "convert_readme_to_html.sh not found"
-                    }
-                }
+                // Send failure notification email
+                sh """curl -s \
+                -X POST \
+                --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
+                https://api.mailjet.com/v3.1/send \
+                -H "Content-Type:application/json" \
+                -d '{
+                    "Messages":[
+                            {
+                                    "From": {
+                                            "Email": "$MAIL_JET_EMAIL_ADDRESS",
+                                            "Name": "ArpanSahuOne Jenkins Notification"
+                                    },
+                                    "To": [
+                                            {
+                                                    "Email": "$MY_EMAIL_ADDRESS",
+                                                    "Name": "Development Team"
+                                            }
+                                    ],
+                                    "Subject": "${currentBuild.fullDisplayName} deployment failed",
+                                    "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} deployment failed",
+                                    "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is not deployed, Build Failed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
+                            }
+                    ]
+                }'"""
             }
         }
     }
