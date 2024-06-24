@@ -6,8 +6,6 @@ pipeline {
                 script {
                     // Log the current workspace path
                     echo "Current workspace path is: ${env.WORKSPACE}"
-                    // Log the branch name
-                    echo "Current branch is: ${env.GIT_BRANCH}"
                 }
             }
         }
@@ -83,23 +81,8 @@ pipeline {
                                 }
                         ]
                     }'"""
-
-                    // List files in the workspace and in specific directories for debugging
-                    sh "ls -l ${env.WORKSPACE}"
-                    sh "ls -l ${env.WORKSPACE}/readme_manager"
-                    sh "ls -l ${env.WORKSPACE}/readme_manager_html_detailed"
-
-                    // Trigger update_readme.sh and convert_readme_to_html.sh
-                    if (fileExists("${env.WORKSPACE}/readme_manager/update_readme.sh")) {
-                        sh "bash ${env.WORKSPACE}/readme_manager/update_readme.sh"
-                    } else {
-                        echo "update_readme.sh not found"
-                    }
-                    if (fileExists("${env.WORKSPACE}/readme_manager_html_detailed/convert_readme_to_html.sh")) {
-                        sh "bash ${env.WORKSPACE}/readme_manager_html_detailed/convert_readme_to_html.sh"
-                    } else {
-                        echo "convert_readme_to_html.sh not found"
-                    }
+                    // Trigger another Jenkins job
+                    build job: 'common_readme', parameters: [string(name: 'project_git_url', value: 'https://github.com/arpansahu/great_chat'), string(name: 'environment', value: 'prod')], wait: false
                 }
             }
         }

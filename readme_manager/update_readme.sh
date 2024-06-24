@@ -47,61 +47,17 @@ delete_downloaded_files() {
     done
 }
 
-# Function to set up the environment
-setup_environment() {
-    if [ "$ENVIRONMENT" != "local" ]; then
-        # Path to the GIT_ASKPASS helper script
-        GIT_ASKPASS_HELPER="$(pwd)/git-askpass.sh"
-
-        # Create the GIT_ASKPASS helper script
-        echo "Creating GIT_ASKPASS helper script"
-        echo '#!/bin/sh' > "$GIT_ASKPASS_HELPER"
-        echo 'echo $GIT_PASSWORD' >> "$GIT_ASKPASS_HELPER"
-        chmod +x "$GIT_ASKPASS_HELPER"
-
-        # Export GIT_ASKPASS
-        export GIT_ASKPASS="$GIT_ASKPASS_HELPER"
-    fi
-}
-
-# Function to check for changes, commit, and push
-check_and_commit_changes() {
-    git add .
-    if git diff-index --quiet HEAD; then
-        echo "No changes to commit"
-    else
-        git commit -m "Automated update of README"
-        git pull --rebase origin $BRANCH_NAME
-        git push origin $BRANCH_NAME
-    fi
-}
-
 # Main script execution
 main() {
     # Change to the directory where the script is located
     cd "$(dirname "$0")"
-    
-    # Determine the environment
-    ENVIRONMENT=${1:-prod}
-    
-    # Retrieve the branch name
-    BRANCH_NAME=${GIT_BRANCH:-"main"}
-    
-    # Check out the branch
-    git checkout $BRANCH_NAME
-
-    # Pull the latest changes
-    git pull origin $BRANCH_NAME
-    
-    setup_environment
     download_files
     create_and_activate_env
     install_requirements
     run_readme_updater
     cleanup_env
     delete_downloaded_files
-    check_and_commit_changes
 }
 
 # Execute the main function
-main "$@"
+main
