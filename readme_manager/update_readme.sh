@@ -71,8 +71,8 @@ check_and_commit_changes() {
         echo "No changes to commit"
     else
         git commit -m "Automated update of README"
-        git pull --rebase
-        git push
+        git pull --rebase origin $BRANCH_NAME
+        git push origin $BRANCH_NAME
     fi
 }
 
@@ -83,6 +83,15 @@ main() {
     
     # Determine the environment
     ENVIRONMENT=${1:-prod}
+    
+    # Retrieve the branch name
+    BRANCH_NAME=${GIT_BRANCH:-"main"}
+    
+    # Check out the branch
+    git checkout $BRANCH_NAME
+
+    # Pull the latest changes
+    git pull origin $BRANCH_NAME
     
     setup_environment
     download_files

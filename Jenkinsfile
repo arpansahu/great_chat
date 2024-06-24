@@ -89,9 +89,6 @@ pipeline {
                     sh "ls -l ${env.WORKSPACE}/readme_manager"
                     sh "ls -l ${env.WORKSPACE}/readme_manager_html_detailed"
 
-                    // Check out the branch before running the script
-                    sh "git checkout ${env.GIT_BRANCH}"
-
                     // Trigger update_readme.sh and convert_readme_to_html.sh
                     if (fileExists("${env.WORKSPACE}/readme_manager/update_readme.sh")) {
                         sh "bash ${env.WORKSPACE}/readme_manager/update_readme.sh"
