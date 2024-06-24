@@ -3,6 +3,7 @@ This WhatsApp clone project provides a comprehensive chat application with vario
 ## Project Features
 
 1. **Account Functionality:** Complete account management.
+3. **PostgreSql Integration:** Utilized as a database.
 2. **AWS S3/MinIO Integration:** For file storage.
 3. **Redis Integration:** Utilized for caching and message pub/sub.
 4. **Autocomplete JS Library:** Implemented for enhanced user experience.
