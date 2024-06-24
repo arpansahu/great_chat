@@ -89,9 +89,9 @@ main() {
     create_and_activate_env
     install_requirements
     run_readme_updater
-    check_and_commit_changes
     cleanup_env
     delete_downloaded_files
+    check_and_commit_changes
 }
 
 # Execute the main function
