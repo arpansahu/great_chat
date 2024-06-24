@@ -3,12 +3,14 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                // Checkout code from SCM
                 checkout scm
             }
         }
         stage('Dependencies') {
             steps {
                 script {
+                    // Copy .env file to the workspace
                     sh "sudo cp /root/projectenvs/great_chat/.env /var/lib/jenkins/workspace/great_chat"
                 }
             }
@@ -27,13 +29,16 @@ pipeline {
                         excludedFiles.contains(changedFile)
                     }
 
+                    // Proceed with deployment if not only excluded files are changed
                     return !onlyExcludedFilesChanged
                 }
             }
             steps {
                 script {
+                    // Deploy using Docker Compose
                     sh "docker compose up --build --detach"
-                    // Set a flag to true if the deployment stage is executed
+                    
+                    // Set a flag to indicate deployment execution
                     currentBuild.description = 'DEPLOYMENT_EXECUTED'
                 }
             }
@@ -43,6 +48,7 @@ pipeline {
         success {
             script {
                 if (currentBuild.description == 'DEPLOYMENT_EXECUTED') {
+                    // Send success notification email
                     sh """curl -s \
                     -X POST \
                     --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
@@ -67,16 +73,25 @@ pipeline {
                                 }
                         ]
                     }'"""
+
                     // Trigger readme_manager.sh and readme_manager_html_detailed.sh
-                    sh "/readme_manager/readme_manager.sh"
-                    sh "/readme_manager_html_detailed/readme_manager_html_detailed.sh"
+                    if (fileExists('readme_manager/readme_manager.sh')) {
+                        sh "./readme_manager/readme_manager.sh"
+                    } else {
+                        echo "readme_manager.sh not found"
+                    }
+                    if (fileExists('readme_manager/readme_manager_html_detailed.sh')) {
+                        sh "./readme_manager/readme_manager_html_detailed.sh"
+                    } else {
+                        echo "readme_manager_html_detailed.sh not found"
+                    }
                 }
-                
             }
         }
         failure {
             script {
                 if (currentBuild.description == 'DEPLOYMENT_EXECUTED') {
+                    // Send failure notification email
                     sh """curl -s \
                     -X POST \
                     --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
@@ -92,7 +107,7 @@ pipeline {
                                         "To": [
                                                 {
                                                         "Email": "$MY_EMAIL_ADDRESS",
-                                                        "Name": "Developer Team"
+                                                        "Name": "Development Team"
                                                 }
                                         ],
                                         "Subject": "${currentBuild.fullDisplayName} deployment failed",
@@ -101,6 +116,18 @@ pipeline {
                                 }
                         ]
                     }'"""
+
+                    // Trigger readme_manager.sh and readme_manager_html_detailed.sh
+                    if (fileExists('readme_manager/readme_manager.sh')) {
+                        sh "./readme_manager/readme_manager.sh"
+                    } else {
+                        echo "readme_manager.sh not found"
+                    }
+                    if (fileExists('readme_manager/readme_manager_html_detailed.sh')) {
+                        sh "./readme_manager/readme_manager_html_detailed.sh"
+                    } else {
+                        echo "readme_manager_html_detailed.sh not found"
+                    }
                 }
             }
         }
