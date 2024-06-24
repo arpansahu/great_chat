@@ -74,6 +74,9 @@ pipeline {
                         ]
                     }'"""
 
+                    // List files in the workspace for debugging
+                    sh 'ls -l'
+
                     // Trigger readme_manager.sh and readme_manager_html_detailed.sh
                     if (fileExists('readme_manager/readme_manager.sh')) {
                         sh "./readme_manager/readme_manager.sh"
@@ -116,6 +119,9 @@ pipeline {
                                 }
                         ]
                     }'"""
+
+                    // List files in the workspace for debugging
+                    sh 'ls -l'
 
                     // Trigger readme_manager.sh and readme_manager_html_detailed.sh
                     if (fileExists('readme_manager/readme_manager.sh')) {
