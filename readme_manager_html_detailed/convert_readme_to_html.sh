@@ -115,6 +115,7 @@ check_and_push_changes() {
     if ! git diff-index --quiet HEAD --; then
         echo "Changes detected, committing and pushing..."
         git commit -m "Update readme.html"
+        git pull --rebase
         git push
     else
         echo "No changes detected."

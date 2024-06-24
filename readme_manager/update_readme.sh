@@ -71,6 +71,7 @@ check_and_commit_changes() {
         echo "No changes to commit"
     else
         git commit -m "Automated update of README"
+        git pull --rebase
         git push
     fi
 }
