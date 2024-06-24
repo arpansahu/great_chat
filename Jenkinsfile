@@ -74,17 +74,14 @@ pipeline {
                         ]
                     }'"""
 
-                    // List files in the workspace for debugging
-                    sh 'ls -l'
-
                     // Trigger readme_manager.sh and readme_manager_html_detailed.sh
                     if (fileExists('readme_manager/readme_manager.sh')) {
-                        sh "./readme_manager/readme_manager.sh"
+                        sh "bash readme_manager/readme_manager.sh"
                     } else {
                         echo "readme_manager.sh not found"
                     }
-                    if (fileExists('readme_manager/readme_manager_html_detailed.sh')) {
-                        sh "./readme_manager/readme_manager_html_detailed.sh"
+                    if (fileExists('readme_manager_html_detailed/readme_manager_html_detailed.sh')) {
+                        sh "bash readme_manager_html_detailed/readme_manager_html_detailed.sh"
                     } else {
                         echo "readme_manager_html_detailed.sh not found"
                     }
@@ -120,17 +117,14 @@ pipeline {
                         ]
                     }'"""
 
-                    // List files in the workspace for debugging
-                    sh 'ls -l'
-
                     // Trigger readme_manager.sh and readme_manager_html_detailed.sh
                     if (fileExists('readme_manager/readme_manager.sh')) {
-                        sh "./readme_manager/readme_manager.sh"
+                        sh "bash readme_manager/readme_manager.sh"
                     } else {
                         echo "readme_manager.sh not found"
                     }
-                    if (fileExists('readme_manager/readme_manager_html_detailed.sh')) {
-                        sh "./readme_manager/readme_manager_html_detailed.sh"
+                    if (fileExists('readme_manager_html_detailed/readme_manager_html_detailed.sh')) {
+                        sh "bash readme_manager_html_detailed/readme_manager_html_detailed.sh"
                     } else {
                         echo "readme_manager_html_detailed.sh not found"
                     }
