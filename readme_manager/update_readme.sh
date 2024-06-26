@@ -55,8 +55,8 @@ main() {
     create_and_activate_env
     install_requirements
     run_readme_updater
-    # cleanup_env
-    # delete_downloaded_files
+    cleanup_env
+    delete_downloaded_files
 }
 
 # Execute the main function
