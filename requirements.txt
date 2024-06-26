@@ -16,7 +16,7 @@ daphne==4.1.2
 dj-database-url==2.2.0
 Django==5.0.6
 django-cleanup==8.1.0
-django-htmx==1.17.3
+django-htmx==1.18.0
 django-redis==5.4.0
 django-storages==1.14.3
 gunicorn==22.0.0
