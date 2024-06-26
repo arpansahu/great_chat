@@ -377,7 +377,47 @@ These files are specific to the project and should be updated within the project
 There are a few files which are common for all projects. For convenience, these are inside the `common_readme` repository so that if changes are made, they will be updated in all the projects' README files.
 
 ```python
+# Define a dictionary with the placeholders and their corresponding GitHub raw URLs or local paths
 
+include_files = {
+    # common files
+
+    "README of Docker Installation": "https://raw.githubusercontent.com/arpansahu/common_readme/main/Docker%20Readme/docker_installation.md",
+    "DOCKER_END": "https://raw.githubusercontent.com/arpansahu/common_readme/main/Docker%20Readme/docker_end.md",
+    "README of Nginx Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/nginx.md",
+    "README of Nginx HTTPS Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/nginx_https.md",
+    "README of Jenkins Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Jenkins/Jenkins.md",
+    "JENKINS_END": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Jenkins/jenkins_end.md",
+    "README of PostgreSql Server With Nginx Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Postgres.md",
+    "README of PGAdmin4 Server With Nginx Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Pgadmin.md",
+    "README of Portainer Server With Nginx Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Portainer.md",
+    "README of Redis Server Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Redis.md",
+    "README of Redis Commander Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/RedisComander.md",
+    "README of Minio Server Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Minio.md",
+    "README of Intro": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Intro.md",
+    "README of Readme Manager": "https://raw.githubusercontent.com/arpansahu/common_readme/main/Readme%20manager/readme_manager.md",
+    "AWS DEPLOYMENT INTRODUCTION": "https://raw.githubusercontent.com/arpansahu/common_readme/main/Introduction/aws_desployment_introduction.md",
+    "STATIC_FILES": "https://raw.githubusercontent.com/arpansahu/common_readme/main/Introduction/static_files_settings.md",
+    "README of Harbor" : "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/harbor/harbor.md",
+    "HARBOR DOCKER COMPOSE": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/harbor/docker-compose.yml",
+    "INCLUDE FILES": "https://raw.githubusercontent.com/arpansahu/common_readme/main/include_files.py",
+
+    # project files
+    "env.example": "../env.example",
+    "docker-compose.yml": "../docker-compose.yml",
+    "Dockerfile": "../Dockerfile",
+    "Jenkinsfile": "../Jenkinsfile",
+    
+    # project partials files
+    "INTRODUCTION": "../readme_manager/partials/introduction.md",
+    "DOC_AND_STACK": "../readme_manager/partials/documentation_and_stack.md",
+    "TECHNOLOGY QNA": "../readme_manager/partials/technology_qna.md",
+    "DEMO": "../readme_manager/partials/demo.md",
+    "INSTALLATION": "../readme_manager/partials/installation.md",
+    "DJANGO_COMMANDS": "../readme_manager/partials/django_commands.md",
+    "NGINX_SERVER": "../readme_manager/partials/nginx_server.md",
+    "SERVICES": "../readme_manager/partials/services.md",
+}
 ```
 
 Also, remember if you want to include new files, you need to change the `baseREADME` file and the `include_files` array in the `common_readme` repository itself.
@@ -487,6 +527,161 @@ Now in your Git Repository
 
 Create a file named Dockerfile with no extension and add following lines in it
 
+### Step 2: Private Docker Registry
+
+
+## Harbor (Self hosted Private Docker Registry)
+
+Harbor is an open-source container image registry that secures images with role-based access control, scans images for vulnerabilities, and signs images as trusted. It extends the Docker Distribution by adding functionalities usually required by enterprise users, such as security, identity, and management.
+
+### Installing Harbor
+
+1. **Download Harbor:**
+   Go to the Harbor releases page and download the latest offline installer tarball, e.g., harbor-offline-installer-<version>.tgz.
+   Alternatively, you can use wget to download it directly:
+
+    ```bash
+    wget https://github.com/goharbor/harbor/releases/download/v2.4.2/harbor-offline-installer-v2.4.2.tgz
+    ```
+
+2. **Extract the tarball:**
+
+    ```bash
+    tar -zxvf harbor-offline-installer-<version>.tgz
+    cd harbor
+    ```
+
+3. **Configure Harbor:**
+    Note: I am having multiple projects running in single machine and 1 nginx is handling subdomains and domain arpansahu.me. Similarly i want my harbor to be accessible 
+    from harbor.arpansahu.me. 
+
+    1.	Copy and edit the configuration file:
+
+        ```bash
+        cp harbor.yml.tmpl harbor.yml
+        vi harbor.yml
+        ```
+
+    2. Edit harbor.yml 
+        ```bash
+        # Configuration file of Harbor
+
+        # The IP address or hostname to access admin UI and registry service.
+        # DO NOT use localhost or 127.0.0.1, because Harbor needs to be accessed by external clients.
+        hostname: harbor.arpansahu.me
+
+        # http related config
+        http:
+        # port for http, default is 80. If https enabled, this port will redirect to https port
+        port: 8081
+        # https related config
+        https:
+        # https port for harbor, default is 443
+        port: 8443
+        # The path of cert and key files for nginx
+        certificate: /etc/letsencrypt/live/arpansahu.me/fullchain.pem 
+        private_key: /etc/letsencrypt/live/arpansahu.me/privkey.pem
+
+
+        .......
+        more lines
+        .......
+        ```
+
+        There are almost 250 lines of code in this yml file but we have to make sure to edit this much configuration particularly 
+        default http port is 80 and https port is 443 since default harbor docker-compose.yml have nginx setup also. But we have our own nginx
+        thats why we will change these both ports to available free port on the machine. I picked 8081 for http and 8443 for https. You can choose accordingly.
+
+
+    3. Edit docker-compose.yml
+
+        ```bash
+            vi docker-compose.yml
+        ```
+
+        ```bash
+        
+        ```
+
+        As you can see the ports we used in harbor.yml are configured here and nginx service have been removed.
+        ports:
+          - 8081:8080
+          - 8443:8443
+          - 4443:4443
+
+4. **Run the Harbor install script:**
+   
+   ```bash
+    sudo ./install.sh --with-notary --with-trivy --with-chartmuseum
+   ```
+
+5. **Complete Setup:**
+   Follow the on-screen instructions to complete the setup process. You may choose to deploy a local agent for better performance, but it's not required for basic functionality.
+
+Once the setup is complete, you should have access to the Portainer dashboard, where you can manage and monitor your Docker containers, images, volumes, and networks through a user-friendly web interface.
+
+Keep in mind that the instructions provided here assume a basic setup. For production environments, it's recommended to secure the Portainer instance, such as by using HTTPS and setting up authentication. Refer to the [Portainer documentation](https://documentation.portainer.io/) for more advanced configurations and security considerations.
+
+
+### Configuring Nginx as Reverse proxy
+
+1. Edit Nginx Configuration
+
+    ```bash
+    sudo vi /etc/nginx/sites-available/arpansahu
+    ```
+
+2. Add this server configuration
+
+    ```bash
+    server {
+        listen         80;
+        server_name    harbor.arpansahu.me;
+        # force https-redirects
+        if ($scheme = http) {
+            return 301 https://$server_name$request_uri;
+            }
+
+        location / {
+            proxy_pass              https://127.0.0.1:8443;
+            proxy_set_header        Host $host;
+            proxy_set_header    X-Forwarded-Proto $scheme;
+        }
+
+        listen 443 ssl; # managed by Certbot
+        ssl_certificate /etc/letsencrypt/live/arpansahu.me/fullchain.pem; # managed by Certbot
+        ssl_certificate_key /etc/letsencrypt/live/arpansahu.me/privkey.pem; # managed by Certbot
+        include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+        ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+    }
+    ```
+
+3. Test the Nginx Configuration
+
+    ```bash
+    sudo nginx -t
+    ```
+
+4. Reload Nginx to apply the new configuration
+
+    ```bash
+    sudo systemctl reload nginx
+    ```
+
+### Access Harbor UI
+
+Harbor UI can be accessed here : https://portainer.arpansahu.me/
+
+### Connecting Docker Registry 
+
+Login to Docker Registry
+
+You can connect to my Docker Registry  
+
+```bash
+    docker login harbor.arpansahu.me
+```
+
 ```bash
 FROM python:3.10.7
 
@@ -539,7 +734,7 @@ if you remove this tag it will be attached to terminal, and you will be able to 
 
 --build tag with docker compose up will force image to be rebuild every time before starting the container
 
-### Step2: Serving the requests from Nginx
+### Step 3: Serving the requests from Nginx
 
 #### Installing the Nginx server
 
@@ -617,7 +812,8 @@ sudo systemctl restart nginx
 
 Now it's time to enable HTTPS for this server
 
-### Step 3: Enabling HTTPS 
+### Step 4: Enabling HTTPS 
+
 
 1. Base Domain:  Enabling HTTPS for base domain only or a single subdomain
 
@@ -1118,7 +1314,7 @@ server {
 }
 ```
 
-### Step 4: CI/CD using Jenkins
+### Step 5: CI/CD using Jenkins
 
 ### Installing Jenkins
 
@@ -1385,11 +1581,15 @@ and add your GitHub credentials from there
 
 Now you are good to go.
 
+# Services on AWS EC2/ Home Server Ubuntu 22.0 LTS s
+
 ## Postgresql Server
 
 IT would be a nightmare to have your own vps to save cost and not hosting your own postgresql server.
 
-For more information, see the ### Installing PostgreSql
+postgresql_server can be access accessed
+
+### Installing PostgreSql
 
 1. Update the package list to make sure you have the latest information
 
@@ -1621,19 +1821,10 @@ Note: In previous steps we have already seen how to setup the reverse proxy with
     psql "postgres://username:password@domain/database_name?sslmode=require"
     ```
 
-    (https://github.com/arpansahu/common_readme/blob/main/AWS%20Deployment/Postgres.md).
-
-postgresql_server can be access accessed
-
+    
 ```bash
 psql "postgres://user:user_pass@arpansahu.me/database_name?sslmode=require"
 ```
-
-# Services on AWS EC2/ Home Server Ubuntu 22.0 LTS s
-
-## PGAdmin4
-
-pgAdmin 4 is a complete rewrite of pgAdmin, built using Python and Javascript/jQuery. A desktop runtime written in NWjs allows it to run standalone for individual users, or the web application code may be deployed directly on a web server for use by one or more users through their web browser. 
 
 ### Installing PgAdmin
 
@@ -1742,7 +1933,6 @@ vi /root/pgadmin_venv/lib/python3.10/site-packages/pgadmin4/config.py
 ### Conclusion
 
 This approach should help you manage the dependencies and resolve the version conflicts more effectively while ensuring pgAdmin runs in the background and is accessible via Nginx as a reverse proxy.
-
 
 My PGAdmin4 can be accessed here : https://pgadmin.arpansahu.me/
 
@@ -1904,7 +2094,6 @@ Keep in mind that the instructions provided here assume a basic setup. For produ
     4. Add Environment address domain:port combination is needed in my case portainer-agent.arpansahu.me: 9995
     5. Click Connect
 
-
 My Portainer can be accessed here : https://portainer.arpansahu.me/
 
 ## Redis Server
@@ -1964,7 +2153,7 @@ Mostly redis is used as cache and we want it to be super fast hence we are not p
 
 Also one more thing redis by default don't support ssl connections even if u use ssl
 
-redis serve can be accessed
+redis server can be accessed
 
 ```bash
 redis-cli -h arpansahu.me -p 6379 -a password_required
@@ -1974,117 +2163,400 @@ redis-cli -h arpansahu.me -p 6379 -a password_required
 
 Redis Commander is a web-based management tool for Redis databases. It provides a user-friendly interface to interact with Redis, making it easier to manage and monitor your Redis instances.
 
-### Installing Redis
+### Installing Redis Commander
 
-1. **Create a Docker Volume for Portainer Data (optional but recommended):**
-   This step is optional but recommended as it allows you to persist Portainer's data across container restarts.
-
-    ```bash
-    docker volume create portainer_data
-    ```
-
-2. **Run Portainer Container:**
-   Run the Portainer container using the following command. Replace `/var/run/docker.sock` with the path to your Docker socket if it's in a different location.
+1. Installation:
+    You can install redis-commander globally using npm (Node Package Manager) with the following command:
 
     ```bash
-    docker run -d -p 0.0.0.0:9998:9000 -p 9444:8000 -p 9443:9443 --name=portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce
-    to use it in nginx server configuration
+    npm install -g redis-commander
     ```
 
-   This command pulls the Portainer Community Edition image from Docker Hub, creates a persistent volume for Portainer data, and starts the Portainer container. The `-p 9000:9000` option maps Portainer's web interface to port 9000 on your host.
+2. Run
 
-3. **Access Portainer UI:**
-   Open your web browser and go to `http://localhost:9000` (or replace `localhost` with your server's IP address if you are using a remote server). You will be prompted to set up an admin user and password.
+    ```bash
+    redis-commander --redis-host your-redis-server-ip --redis-port your-redis-port --redis-password your-redis-password --port 9996
+    ```
 
-4. **Connect Portainer to the Docker Daemon:**
-   On the Portainer setup page, choose the "Docker" environment, and connect Portainer to the Docker daemon. You can usually use the default settings (`unix:///var/run/docker.sock` for the Docker API endpoint).
+### Serving with Nginx, as well password protecting Redis Commander
 
-5. **Complete Setup:**
-   Follow the on-screen instructions to complete the setup process. You may choose to deploy a local agent for better performance, but it's not required for basic functionality.
+Redis Commander d'ont have native password protection enabled
 
-Once the setup is complete, you should have access to the Portainer dashboard, where you can manage and monitor your Docker containers, images, volumes, and networks through a user-friendly web interface.
+1. Create a Basic Authentication File
+    Use the htpasswd utility to create a username and password combination. Replace your_username with your desired username.
 
-Keep in mind that the instructions provided here assume a basic setup. For production environments, it's recommended to secure the Portainer instance, such as by using HTTPS and setting up authentication. Refer to the [Portainer documentation](https://documentation.portainer.io/) for more advanced configurations and security considerations.
+    ```bash
+    sudo htpasswd -c /etc/nginx/.htpasswd your_username
+    ```
 
-Note: if u want to use ssl connection you can 
+    You’ll be prompted to enter a password.
 
-/etc/redis/redis.conf open this file and 
+2. Creating Server Block in Nginx config file
 
-```bash
-tls-port 6379
-port 0
+    ```bash
+    sudo vi /etc/nginx/sites-available/arpansahu
+    ```
 
-tls-cert-file /path/to/redis.crt
-tls-key-file /path/to/redis.key
-tls-dh-params-file /path/to/dhparam.pem
+3. Add this server block to it.
 
-tls-auth-clients no
-```
+    ```bash
+    server {
+        listen         80;
+        server_name    redis.arpansahu.me;
+        # force https-redirects
+        if ($scheme = http) {
+            return 301 https://$server_name$request_uri;
+            }
 
-Add this configuration 
+        location / {
+            proxy_pass              http://127.0.0.1:9996;
+            proxy_set_header        Host $host;
+            proxy_set_header    X-Forwarded-Proto $scheme;
+            auth_basic "Restricted Access";
+            auth_basic_user_file /etc/nginx/.htpasswd;
+        }
 
-Mostly redis is used as cache and we want it to be super fast hence we are not putting it behind reverse proxy e.g. nginx same as postgres
+        listen 443 ssl; # managed by Certbot
+        ssl_certificate /etc/letsencrypt/live/arpansahu.me/fullchain.pem; # managed by Certbot
+        ssl_certificate_key /etc/letsencrypt/live/arpansahu.me/privkey.pem; # managed by Certbot
+        include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    }
+    ```
 
-Also one more thing redis by default don't support ssl connections even if u use ssl
+4. Test the Nginx Configuration
+
+    ```bash
+    sudo nginx -t
+    ```
+    
+5. Reload Nginx to apply the new configuration
+
+    ```bash
+    sudo systemctl reload nginx
+    ```
+
+### Running Redis Commander in background Using pm2
+
+1.	Install pm2 globally (if not already installed):
+
+    ```bash
+    npm install -g pm2
+    ```
+
+
+2. Start redis-commander with pm2:
+
+    ```bash
+    pm2 start redis-commander --name redis-commander -- --port 9996 --redis-host your-redis-server-ip --redis-port your-redis-port --redis-password your-redis-password
+    ```
+
+    This starts redis-commander with pm2 and names the process “redis-commander.”
+
+3. 	Optionally, you can save the current processes to ensure they restart on system reboot:
+
+    ```bash
+    pm2 save
+    ```
+
+Now, redis-commander is running in the background managed by pm2. You can view its status, logs, and manage it using pm2 commands. For example:
+
+4. View the status:
+
+    ```bash
+    pm2 status  
+    ```
+
+    Stop the process:
+
+    ```bash
+    pm2 stop redis-commander
+    ```
+
+    Restart the process:
+
+    ```bash
+    pm2 restart redis-commander
+    ```
+
+    View logs:
+
+    ```bash
+    pm2 logs redis-commander
+    ```
+
+5. Using nohup 
+
+    The nohup command is designed to ignore the hangup (HUP) signal, allowing a command to continue running even after the user who initiated the command logs out or the terminal is closed. The message “ignoring input and appending output to ‘nohup.out’” is a standard message indicating that the command’s output is being redirected to a file named nohup.out in the current directory.
+
+    ```bash
+    nohup redis-commander --redis-host 0.0.0.0 --redis-port 6379 --redis-password redisKesar302 --port 9996 > redis-commander.log 2>&1 &
+    ```
 
 My Redis Commander can be accessed here : https://redis.arpansahu.me/
+
 
 ## MiniIo (Self hosted S3 Storage)
 
 MinIO is a high-performance, distributed object storage system designed for large-scale data infrastructures. It is open-source and compatible with the Amazon S3 API, making it a popular choice for organizations looking for scalable, secure, and cost-effective storage solutions. 
 
-### Installing Redis
+### Installing Minio
 
-1. **Create a Docker Volume for Portainer Data (optional but recommended):**
-   This step is optional but recommended as it allows you to persist Portainer's data across container restarts.
-
-    ```bash
-    docker volume create portainer_data
-    ```
-
-2. **Run Portainer Container:**
-   Run the Portainer container using the following command. Replace `/var/run/docker.sock` with the path to your Docker socket if it's in a different location.
+1. Install MinIO on your server. You can download it from the official website or use a package manager if available.
 
     ```bash
-    docker run -d -p 0.0.0.0:9998:9000 -p 9444:8000 -p 9443:9443 --name=portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce
-    to use it in nginx server configuration
+    wget https://dl.min.io/server/minio/release/linux-amd64/minio
+    chmod +x minio
+    sudo mv minio /usr/local/bin
     ```
 
-   This command pulls the Portainer Community Edition image from Docker Hub, creates a persistent volume for Portainer data, and starts the Portainer container. The `-p 9000:9000` option maps Portainer's web interface to port 9000 on your host.
+2. Generate SSL Certificates using Certbot
+    While setting up nginx we already automated this auto regeneration of certificates every3 months 
+    The certificates will be stored in /etc/letsencrypt/live/arpansahu.me/.
+    
+3. Configure MinIO with SSL Certificates:
+    Configure MinIO to use the SSL certificates generated by Certbot. Create a directory to store the certificates and copy them from the Certbot directory.
 
-3. **Access Portainer UI:**
-   Open your web browser and go to `http://localhost:9000` (or replace `localhost` with your server's IP address if you are using a remote server). You will be prompted to set up an admin user and password.
+    ```bash
+    sudo mkdir -p /etc/minio/certs
+    sudo cp /etc/letsencrypt/live/yourdomain.com/fullchain.pem /etc/minio/certs/public.crt
+    sudo cp /etc/letsencrypt/live/yourdomain.com/privkey.pem /etc/minio/certs/private.key
+    ```
 
-4. **Connect Portainer to the Docker Daemon:**
-   On the Portainer setup page, choose the "Docker" environment, and connect Portainer to the Docker daemon. You can usually use the default settings (`unix:///var/run/docker.sock` for the Docker API endpoint).
+4. Environment File Configuration
+    Ensure your environment file, usually located at /etc/default/minio, has the following content: if the file is not present create it
 
-5. **Complete Setup:**
-   Follow the on-screen instructions to complete the setup process. You may choose to deploy a local agent for better performance, but it's not required for basic functionality.
+    ```bash
+    MINIO_VOLUMES="/mnt/minio"
 
-Once the setup is complete, you should have access to the Portainer dashboard, where you can manage and monitor your Docker containers, images, volumes, and networks through a user-friendly web interface.
+    # Define where to find the TLS certificates
+    MINIO_OPTS="--certs-dir /etc/minio/certs --console-address :9001"
 
-Keep in mind that the instructions provided here assume a basic setup. For production environments, it's recommended to secure the Portainer instance, such as by using HTTPS and setting up authentication. Refer to the [Portainer documentation](https://documentation.portainer.io/) for more advanced configurations and security considerations.
+    # Define the admin user (min 3 characters)
+    MINIO_ROOT_USER=user_edit_this
 
-Note: if u want to use ssl connection you can 
+    # Define the default admin user password (min 8 characters)
+    MINIO_ROOT_PASSWORD=password_edit_this
+    ```
 
-/etc/redis/redis.conf open this file and 
+5. Setup Directory and Permissions
 
-```bash
-tls-port 6379
-port 0
+    ```bash
+    sudo mkdir -p /mnt/minio
+    sudo chown -R minio-user:minio-user /mnt/minio
+    
+    sudo mkdir -p /etc/minio/certs
+    sudo chown -R minio-user:minio-user /etc/minio/certs
+    
+    sudo chown minio-user:minio-user /etc/minio/certs/public.crt
+    sudo chown minio-user:minio-user /etc/minio/certs/private.key
+    ```
 
-tls-cert-file /path/to/redis.crt
-tls-key-file /path/to/redis.key
-tls-dh-params-file /path/to/dhparam.pem
+6. Reload Systemd and Start MinIO
+ Reload the system daemon and start the MinIO service
+    
+    ```echo
+    sudo systemctl daemon-reload
+    sudo systemctl start minio
+    ```
+Note: minio api and ui server both run at 0.0.0.0 host by default
 
-tls-auth-clients no
-```
 
-Add this configuration 
+### Nginx Setup as Reverse Proxy
 
-Mostly redis is used as cache and we want it to be super fast hence we are not putting it behind reverse proxy e.g. nginx same as postgres
+Note: Nginx is already set in the other steps as seen before right now I will discuss server configuration for minio and minioui
 
-Also one more thing redis by default don't support ssl connections even if u use ssl
+1. Nginx Server configuration for minio API server 
+
+     ```bash
+    server {
+        listen         80;
+        server_name    minio.arpansahu.me;
+
+        # Redirect HTTP to HTTPS
+        if ($scheme = http) {
+            return 301 https://$server_name$request_uri;
+        }
+    }
+
+    server {
+        listen         443 ssl;
+        server_name    minio.arpansahu.me;
+
+        # SSL certificates
+        ssl_certificate /etc/minio/certs/public.crt;
+        ssl_certificate_key /etc/minio/certs/private.key;
+
+        # Allow special characters in headers
+        ignore_invalid_headers off;
+
+        # Allow any size file to be uploaded.
+        # Set to a value such as 1000m; to restrict file size to a specific value
+        client_max_body_size 0;
+
+        # Disable buffering
+        proxy_buffering off;
+        proxy_request_buffering off;
+
+        location / {
+            proxy_pass          https://0.0.0.0:9000;
+            proxy_set_header    Host $host;
+            proxy_set_header    X-Real-IP $remote_addr;
+            proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header    X-Forwarded-Proto $scheme;
+
+            # Set maximum allowed body size for uploads
+            client_max_body_size 0; # Adjust the value as needed
+
+            proxy_connect_timeout 300;
+            # Default is HTTP/1, keepalive is only enabled in HTTP/1.1
+            proxy_http_version 1.1;
+            proxy_set_header Connection "";
+            chunked_transfer_encoding off;
+        }
+    }
+    ```
+
+2. Nginx Server configuration for minio ui server 
+
+    ```bash
+    server {
+        listen         80;
+        server_name    minioui.arpansahu.me;
+        # force https-redirects
+        if ($scheme = http) {
+            return 301 https://$server_name$request_uri;
+            }
+    
+        location / {
+             proxy_pass               https://0.0.0.0:9001;
+             proxy_set_header        Host $host;
+             proxy_set_header    X-Forwarded-Proto $scheme;
+    
+             # WebSocket support
+             proxy_http_version 1.1;
+             proxy_set_header Upgrade $http_upgrade;
+             proxy_set_header Connection "upgrade";
+        }
+    
+        listen 443 ssl; # managed by Certbot
+        ssl_certificate /etc/letsencrypt/live/arpansahu.me/fullchain.pem; # managed by Certbot
+        ssl_certificate_key /etc/letsencrypt/live/arpansahu.me/privkey.pem; # managed by Certbot
+        include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+        ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+    }
+    ```
+
+#### Setup Copy Cron to copy whenever cerbot updates the certificate to /etc/minio/certs
+
+1. Create a Cron Shell file 
+
+    ```bash
+    sudo vi /usr/local/bin/update_minio_certs.sh
+    ```
+
+
+2. Add this script to update_minio_certs.sh
+
+    ```bash
+    #!/bin/bash
+    # Paths to the Let's Encrypt certificates
+    CERT_SRC_DIR="/etc/letsencrypt/live/yourdomain.com"
+    CERT_DST_DIR="/etc/minio/certs"
+
+    # Path to the public certificate and private key in the source directory
+    SRC_PUBLIC_CERT="${CERT_SRC_DIR}/fullchain.pem"
+    SRC_PRIVATE_KEY="${CERT_SRC_DIR}/privkey.pem"
+
+    # Path to the public certificate and private key in the destination directory
+    DST_PUBLIC_CERT="${CERT_DST_DIR}/public.crt"
+    DST_PRIVATE_KEY="${CERT_DST_DIR}/private.key"
+
+    # Function to send email using Mailjet API
+    send_email() {
+        local subject=$1
+        local body=$2
+
+        python3 <<END
+    import os
+    from mailjet_rest import Client
+
+    api_key = 'your-mailjet-api-key'
+    api_secret = 'your-mailjet-api-secret'
+    mailjet = Client(auth=(api_key, api_secret), version='v3.1')
+
+    data = {
+    'Messages': [
+        {
+        "From": {
+            "Email": "your-email@example.com",
+            "Name": "MinIO Cert Update"
+        },
+        "To": [
+            {
+            "Email": "recipient-email@example.com",
+            "Name": "Recipient"
+            }
+        ],
+        "Subject": "$subject",
+        "TextPart": "$body"
+        }
+    ]
+    }
+
+    result = mailjet.send.create(data=data)
+    print(result.status_code)
+    print(result.json())
+    END
+    }
+
+    # Check if the certificates have changed and copy if they have
+    if ! cmp -s "$SRC_PUBLIC_CERT" "$DST_PUBLIC_CERT" || ! cmp -s "$SRC_PRIVATE_KEY" "$DST_PRIVATE_KEY"; then
+        sudo cp "$SRC_PUBLIC_CERT" "$DST_PUBLIC_CERT"
+        sudo cp "$SRC_PRIVATE_KEY" "$DST_PRIVATE_KEY"
+        sudo systemctl restart minio
+        echo "MinIO certificates updated and service restarted at $(date)" >> /var/log/minio_cert_update.log
+        send_email "MinIO Certificates Updated" "MinIO certificates were updated and the service was restarted on $(date)."
+    else
+        echo "No changes detected in MinIO certificates at $(date)" >> /var/log/minio_cert_update.log
+        send_email "No Changes in MinIO Certificates" "No changes were detected in MinIO certificates on $(date)."
+    fi
+    ```
+
+    Here you need to replace your-mailjet-api-key, your-mailjet-api-secret, your-email@example.com and yourdomain.com
+
+    1. Get Api Credentials from mailJet visit https://www.mailjet.com
+
+
+3. Changing permissions to execute update_minio_certs.sh
+
+    ```bash
+    sudo chmod +x /usr/local/bin/update_minio_certs.sh
+    ```
+    
+4.  Update Cron Job or Systemd Timer
+
+    ```bash
+    sudo crontab -e
+    ```
+
+    Add the following line to run the script every day at midnight:
+
+    ```bash
+    0 0 * * * /usr/local/bin/update_minio_certs.sh
+    ```
+
+5. Install mailjet-rest python module
+
+    ```bash
+    pip install mailjet-rest
+    ```
+
+6. Test the script 
+
+    ```bash
+        cd /usr/local/bin
+        ./update_minio_certs.sh
+    ```
 
 You can connect to my MiniIo Server using terminal 
 ```bash
@@ -2092,7 +2564,6 @@ You can connect to my MiniIo Server using terminal
   mc ls
 ```
 
-Also there is a MiniIo UI Server which can be accessed here https://minioui.arpansahu.me/
 
 ## Documentation
 
