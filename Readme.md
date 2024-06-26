@@ -1,3 +1,5 @@
+# Great Chat
+
 This WhatsApp clone project provides a comprehensive chat application with various advanced features. Below are the main components and functionalities of the project.
 
 ## Project Features
@@ -34,6 +36,36 @@ This WhatsApp clone project provides a comprehensive chat application with vario
 6. **Message Display:**
    - View the last 30 messages.
    - See user online/offline status.
+
+-Deployed on AWS / Now in My Own Home Ubuntu Server LTS 22.0 / Hostinger VPS Server
+
+1. Used Ubuntu 22.0 LTS
+2. Used Nginx as a Web Proxy Server
+3. Used Let's Encrypt Wildcard certificate 
+4. Used Acme-dns server for automating renewal of wildcard certificates
+5. Used docker to run inside a container since other projects are also running on the same server
+6. Used Jenkins for CI/CD Integration Jenkins Server Running at: https://jenkins.arpansahu.me
+7. Used AWS Elastic Cache for redis which is not accessible outside AWS, Used Redis Server, hosted on Home Server itself as Redis on Home Server
+8. Used PostgresSql Schema based Database, all projects are using single Postgresql. 
+9. PostgresSQL is also hosted on Home Server Itself.
+10. Using MINIIO as self hosted S3 Storage Server.
+
+## What is Python ?
+Python is a high-level, general-purpose programming language. Its design philosophy emphasizes code readability with the
+use of significant indentation. Python is dynamically typed and garbage-collected. It supports multiple programming 
+paradigms, including structured, object-oriented and functional programming.
+
+## What is Django ?
+Django is a Python-based free and open-source web framework that follows the model-template-view architectural pattern.
+
+## What is Redis ?
+    
+Redis is an in-memory data structure project implementing a distributed, in-memory key-value database with optional durability. 
+The most common Redis use cases are session cache, full-page cache, queues, leader boards and counting, publish-subscribe, and much more. in this case, we will use Redis as a message broker.
+
+## What is Ajax?
+Ajax is a set of web development techniques that uses various web technologies on the client-side to create asynchronous web applications. With Ajax, web applications can send and retrieve data from a server asynchronously without interfering with the display and behavior of the existing page.
+
 
 ## Tech Stack
 
@@ -146,6 +178,151 @@ else:
             },
         },
     }
+```
+
+Change settings.py static files and media files settings | Now I have added support for BlackBlaze Static Storage also which also based on AWS S3 protocols 
+
+```python
+if not DEBUG:
+    BUCKET_TYPE = config('BUCKET_TYPE')
+
+    if BUCKET_TYPE == 'AWS':
+
+        AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+        AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+        AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+        AWS_DEFAULT_ACL = 'public-read'
+        AWS_S3_OBJECT_PARAMETERS = {
+            'CacheControl': 'max-age=86400'
+        }
+        AWS_LOCATION = 'static'
+        AWS_QUERYSTRING_AUTH = False
+        AWS_HEADERS = {
+            'Access-Control-Allow-Origin': '*',
+        }
+        # s3 static settings
+        AWS_STATIC_LOCATION = 'portfolio/great_chat/static'
+        STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_STATIC_LOCATION}/'
+        STATICFILES_STORAGE = 'great_chat.storage_backends.StaticStorage'
+        # s3 public media settings
+        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/great_chat/media'
+        MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_PUBLIC_MEDIA_LOCATION}/'
+        DEFAULT_FILE_STORAGE = 'great_chat.storage_backends.PublicMediaStorage'
+        # s3 private media settings
+        PRIVATE_MEDIA_LOCATION = 'portfolio/great_chat/private'
+        PRIVATE_FILE_STORAGE = 'great_chat.storage_backends.PrivateMediaStorage'
+
+    elif BUCKET_TYPE == 'BLACKBLAZE':
+
+        AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+        AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+        AWS_S3_REGION_NAME = 'us-east-005'
+
+        AWS_S3_ENDPOINT = f's3.{AWS_S3_REGION_NAME}.backblazeb2.com'
+        AWS_S3_ENDPOINT_URL = f'https://{AWS_S3_ENDPOINT}'
+        
+        AWS_DEFAULT_ACL = 'public-read'
+        AWS_S3_OBJECT_PARAMETERS = {
+            'CacheControl': 'max-age=86400',
+        }
+
+        AWS_LOCATION = 'static'
+        AWS_QUERYSTRING_AUTH = False
+        AWS_HEADERS = {
+            'Access-Control-Allow-Origin': '*',
+        }
+        # s3 static settings
+        AWS_STATIC_LOCATION = 'portfolio/great_chat/static'
+        STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.{AWS_STATIC_LOCATION}/'
+        STATICFILES_STORAGE = 'great_chat.storage_backends.StaticStorage'
+        # s3 public media settings
+        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/great_chat/media'
+        MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.{AWS_PUBLIC_MEDIA_LOCATION}/'
+        DEFAULT_FILE_STORAGE = 'great_chat.storage_backends.PublicMediaStorage'
+        # s3 private media settings
+        PRIVATE_MEDIA_LOCATION = 'portfolio/great_chat/private'
+        PRIVATE_FILE_STORAGE = 'great_chat.storage_backends.PrivateMediaStorage'
+
+    elif BUCKET_TYPE == 'MINIO':
+        AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+        AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+        AWS_S3_REGION_NAME = 'us-east-1'  # MinIO doesn't require this, but boto3 does
+        AWS_S3_ENDPOINT_URL = 'https://minio.arpansahu.me'
+        AWS_DEFAULT_ACL = 'public-read'
+        AWS_S3_OBJECT_PARAMETERS = {
+            'CacheControl': 'max-age=86400',
+        }
+        AWS_LOCATION = 'static'
+        AWS_QUERYSTRING_AUTH = False
+        AWS_HEADERS = {
+            'Access-Control-Allow-Origin': '*',
+        }
+
+        # s3 static settings
+        AWS_STATIC_LOCATION = 'portfolio/great_chat/static'
+        STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}/{AWS_STATIC_LOCATION}/'
+        STATICFILES_STORAGE = 'great_chat.storage_backends.StaticStorage'
+
+        # s3 public media settings
+        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/great_chat/media'
+        MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}/{AWS_PUBLIC_MEDIA_LOCATION}/'
+        DEFAULT_FILE_STORAGE = 'great_chat.storage_backends.PublicMediaStorage'
+
+        # s3 private media settings
+        PRIVATE_MEDIA_LOCATION = 'portfolio/great_chat/private'
+        PRIVATE_FILE_STORAGE = 'great_chat.storage_backends.PrivateMediaStorage'
+
+    
+
+else:
+    # Static files (CSS, JavaScript, Images)
+    # https://docs.djangoproject.com/en/3.2/howto/static-files/
+
+    STATIC_URL = '/static/'
+
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static"), ]
+```
+
+run below command 
+
+```bash
+python manage.py collectstatic
+```
+
+and you are good to go
+
+
+## Custom Django Management Commands
+
+1. Test DB
+  Django management command designed to test the basic functionality of the database. It performs a series of CRUD (Create, Read, Update, Delete) operations to ensure the database is working correctly.
+```bash
+python manage.py test_db
+```
+
+2. Test Cache
+   Django management command designed to test the basic functionality of the caching system. It performs a set and get operation to ensure the cache is working correctly and validates the expiration of cache entries.
+```bash
+python manage.py test_cache
+```
+
+3. Test Channels
+  Django management command designed to test the functionality of Django Channels, ensuring that it is properly configured and operational.
+```bash
+python manage.py test_channels
+```
+
+4. Sync Media to S3
+  In case if you are using production database and debug mode is on. all the media send in the chats will be stored to local media folder which might not get synced to s3 bucket and when you run in production those media will be missing.
+```bash
+python manage.py sync_media_to_s3
 ```
 
 ## Readme Manager
