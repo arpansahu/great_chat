@@ -1,3 +1,5 @@
+# Great Chat
+
 This WhatsApp clone project provides a comprehensive chat application with various advanced features. Below are the main components and functionalities of the project.
 
 ## Project Features
@@ -34,3 +36,7 @@ This WhatsApp clone project provides a comprehensive chat application with vario
 6. **Message Display:**
    - View the last 30 messages.
    - See user online/offline status.
+
+[AWS DEPLOYMENT INTRODUCTION]
+
+[TECHNOLOGY QNA]

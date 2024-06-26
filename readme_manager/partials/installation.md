@@ -77,3 +77,9 @@ else:
         },
     }
 ```
+
+[STATIC_FILES]
+
+## Custom Django Management Commands
+
+[DJANGO_COMMANDS]
