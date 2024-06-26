@@ -598,8 +598,8 @@ Harbor is an open-source container image registry that secures images with role-
             vi docker-compose.yml
         ```
 
-        ```bash
-        version: '2.3'
+        ```yml
+            version: '2.3'
 services:
   log:
     image: goharbor/harbor-log:v2.4.2
