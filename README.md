@@ -398,7 +398,7 @@ include_files = {
     "AWS DEPLOYMENT INTRODUCTION": "https://raw.githubusercontent.com/arpansahu/common_readme/main/Introduction/aws_desployment_introduction.md",
     "STATIC_FILES": "https://raw.githubusercontent.com/arpansahu/common_readme/main/Introduction/static_files_settings.md",
     "README of Harbor" : "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/harbor/harbor.md",
-    "HARBOR DOCKER COMPOSE": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/harbor/docker-compose.yml",
+    "HARBOR DOCKER COMPOSE": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/harbor/docker-compose.md",
     "INCLUDE FILES": "https://raw.githubusercontent.com/arpansahu/common_readme/main/include_files.py",
 
     # project files
@@ -599,8 +599,8 @@ Harbor is an open-source container image registry that secures images with role-
             vi docker-compose.yml
         ```
 
-        ```yml
-            version: '2.3'
+        ```bash
+version: '2.3'
 services:
   log:
     image: goharbor/harbor-log:v2.4.2
@@ -876,7 +876,8 @@ services:
       - ./common/config/notary:/etc/notary:z
       - type: bind
         source: /data/secret/notary/notary-signer-ca
-        ```
+```
+
 
         As you can see the ports we used in harbor.yml are configured here and nginx service have been removed.
         ports:
