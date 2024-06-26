@@ -2,7 +2,7 @@
 
 # Define the URL to the GitHub repository and the files to download
 REPO_URL="https://raw.githubusercontent.com/arpansahu/common_readme/main"
-FILES=("requirements.txt" "readme_updater.py" "baseREADME.md")
+FILES=("requirements.txt" "readme_updater.py" "baseREADME.md" "include_files.py")
 
 # Function to download files
 download_files() {
@@ -55,8 +55,8 @@ main() {
     create_and_activate_env
     install_requirements
     run_readme_updater
-    cleanup_env
-    delete_downloaded_files
+    # cleanup_env
+    # delete_downloaded_files
 }
 
 # Execute the main function
