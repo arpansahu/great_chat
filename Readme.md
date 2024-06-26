@@ -4,38 +4,38 @@ This WhatsApp clone project provides a comprehensive chat application with vario
 
 ## Project Features
 
-- **Account Functionality:** Complete account management.
-- **PostgreSQL Integration:** Utilized as a database.
-- **AWS S3/MinIO Integration:** For file storage.
-- **Redis Integration:** Utilized for caching and message pub/sub.
-- **Autocomplete JS Library:** Implemented for enhanced user experience.
-- **MailJet Integration:** Used for email services.
-- **Dockerized Project:** Fully containerized for easy deployment.
-- **CI/CD Pipeline:** Continuous integration and deployment included.
+1. **Account Functionality:** Complete account management.
+3. **PostgreSql Integration:** Utilized as a database.
+2. **AWS S3/MinIO Integration:** For file storage.
+3. **Redis Integration:** Utilized for caching and message pub/sub.
+4. **Autocomplete JS Library:** Implemented for enhanced user experience.
+5. **MailJet Integration:** Used for email services.
+6. **Dockerized Project:** Fully containerized for easy deployment.
+7. **CI/CD Pipeline:** Continuous integration and deployment included.
 
 ## WhatsApp Clone Functionalities
 
-- **Messaging:**
-  - Send text messages and files.
-  - Download files via download links.
-  - View images and GIFs directly in the chat.
-- **Private Chat:**
-  - Chat privately with your contacts.
-  - Search your private contacts.
-- **Group Chat:**
-  - Chat with friends or others in private groups.
-  - Invite people to your private group.
-  - Leave a group chat if desired.
-  - Admins can delete their own group chats.
-  - Remove members from your own group.
-- **Global Chat:**
-  - Participate in a global chat room.
-- **Profile Management:**
-  - Set profile photos.
-  - Set group chat photos.
-- **Message Display:**
-  - View the last 30 messages.
-  - See user online/offline status.
+1. **Messaging:**
+   - Send text messages and files.
+   - Download files via download links.
+   - View images and GIFs directly in the chat.
+2. **Private Chat:**
+   - Chat privately with your contacts.
+   - Search your private contacts.
+3. **Group Chat:**
+   - Chat with friends or others in private groups.
+   - Invite people to your private group.
+   - Leave a group chat if desired.
+   - Admins can delete their own group chats.
+   - Remove members from your own group.
+4. **Global Chat:**
+   - Participate in a global chat room.
+5. **Profile Management:**
+   - Set profile photos.
+   - Set group chat photos.
+6. **Message Display:**
+   - View the last 30 messages.
+   - See user online/offline status.
 
 -Deployed on AWS / Now in My Own Home Ubuntu Server LTS 22.0 / Hostinger VPS Server
 
@@ -377,39 +377,7 @@ These files are specific to the project and should be updated within the project
 There are a few files which are common for all projects. For convenience, these are inside the `common_readme` repository so that if changes are made, they will be updated in all the projects' README files.
 
 ```python
-include_files = {
-    # common readme files
-    "README of Docker Installation": "https://raw.githubusercontent.com/arpansahu/common_readme/main/Docker%20Readme/docker_installation.md",
-    "DOCKER_END": "https://raw.githubusercontent.com/arpansahu/common_readme/main/Docker%20Readme/docker_end.md",
-    "README of Nginx Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/nginx.md",
-    "README of Jenkins Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Jenkins/Jenkins.md",
-    "JENKINS_END": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Jenkins/jenkins_end.md",
-    "README of PostgreSql Server With Nginx Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Postgres.md",
-    "README of PGAdmin4 Server With Nginx Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/PostgresUI.md",
-    "README of Portainer Server With Nginx Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Portainer.md",
-    "README of Redis Server Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Redis.md",
-    "README of Redis Commander Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/RedisComander.md",
-    "README of Minio Server Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Minio.md",
-    "README of Intro": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Intro.md",
-    "AWS DEPLOYMENT INTRODUCTION": "https://raw.githubusercontent.com/arpansahu/common_readme/main/Introduction/aws_desployment_introduction.md",
-    "STATIC_FILES": "https://raw.githubusercontent.com/arpansahu/common_readme/main/Introduction/static_files_settings.md",
-    "README of Readme Manager": "https://raw.githubusercontent.com/arpansahu/common_readme/main/Readme%20manager/readme_manager.md",
 
-    # Project-Specific Partial Files
-    "INTRODUCTION": "../readme_manager/partials/introduction.md",
-    "DOC_AND_STACK": "../readme_manager/partials/documentation_and_stack.md",
-    "TECHNOLOGY QNA": "../readme_manager/partials/technology_qna.md",
-    "DEMO": "../readme_manager/partials/demo.md",
-    "INSTALLATION": "../readme_manager/partials/installation.md",
-    "DJANGO_COMMANDS": "../readme_manager/partials/django_commands.md",
-    "NGINX_SERVER": "../readme_manager/partials/nginx_server.md",
-
-    # Project-Specific Core Files
-    "env.example": "../env.example",
-    "docker-compose.yml": "../docker-compose.yml",
-    "Dockerfile": "../Dockerfile",
-    "Jenkinsfile": "../Jenkinsfile",
-}
 ```
 
 Also, remember if you want to include new files, you need to change the `baseREADME` file and the `include_files` array in the `common_readme` repository itself.
@@ -1859,6 +1827,83 @@ Keep in mind that the instructions provided here assume a basic setup. For produ
     ```bash
     sudo systemctl reload nginx
     ```
+
+### Running Portainer Agent 
+
+1. Run this command to start the portainer agent docker container
+
+    ```bash
+        docker run -d -p 9995:9001 \
+        --name portainer_agent \
+        --restart=always \
+        -v /var/run/docker.sock:/var/run/docker.sock \
+        -v /var/lib/docker/volumes:/var/lib/docker/volumes \
+        portainer/agent:2.19.5
+    ```
+
+2. Configuring Nginx as Reverse proxy
+
+    1. Edit Nginx Configuration
+
+    ```bash
+    sudo vi /etc/nginx/sites-available/arpansahu
+    ```
+
+    2. Add this server configuration
+
+        ```bash
+        server {
+            listen         80;
+            server_name    portainer-agent.arpansahu.me;
+            # force https-redirects
+            if ($scheme = http) {
+                return 301 https://$server_name$request_uri;
+                }
+
+            location / {
+                proxy_pass              http://0.0.0.0:9995;
+                proxy_set_header        Host $host;
+                proxy_set_header    X-Forwarded-Proto $scheme;
+            }
+
+            listen 443 ssl; # managed by Certbot
+            ssl_certificate /etc/letsencrypt/live/arpansahu.me/fullchain.pem; # managed by Certbot
+            ssl_certificate_key /etc/letsencrypt/live/arpansahu.me/privkey.pem; # managed by Certbot
+            include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+            ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+        }
+        ```
+
+    3. Test the Nginx Configuration
+
+        ```bash
+        sudo nginx -t
+        ```
+
+    4. Reload Nginx to apply the new configuration
+
+        ```bash
+        sudo systemctl reload nginx
+        ```
+3. Adding Environment
+
+    1. Go to environment ---> Choose Docker Standalone ----> Start Wizard
+
+    2. Will show you a command same as step 1. Run this command to start the portainer agent docker container, this is default command we have modified ports although
+
+        ```bash
+            docker run -d -p 9001:9001 \    
+            --name portainer_agent \
+            --restart=always \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v /var/lib/docker/volumes:/var/lib/docker/volumes \
+            portainer/agent:2.19.5
+        ```
+
+    3. Add Name, I have used docker-prod-env
+    4. Add Environment address domain:port combination is needed in my case portainer-agent.arpansahu.me: 9995
+    5. Click Connect
+
 
 My Portainer can be accessed here : https://portainer.arpansahu.me/
 
