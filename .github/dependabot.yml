@@ -1,0 +1,24 @@
+# To get started with Dependabot version updates, you'll need to specify which
+# package ecosystems to update and where the package manifests are located.
+# Please see the documentation for all configuration options:
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  # Check for updates to pip dependencies (Python)
+  - package-ecosystem: "pip"
+    directory: "/" # Location of your requirements.txt or pyproject.toml file
+    schedule:
+      interval: "weekly" # Check for updates weekly
+    # Optionally, you can specify an 'open-pull-requests-limit' to avoid having too many open PRs at once
+    open-pull-requests-limit: 10
+    # Optionally, you can exclude certain dependencies from being updated
+    ignore:
+      - dependency-name: "django" # Example of ignoring Django updates
+        versions: ["3.*"]
+
+  # Check for updates to GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/" # Location of your GitHub Actions workflows
+    schedule:
+      interval: "weekly" # Check for updates weekly
