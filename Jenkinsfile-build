@@ -21,7 +21,7 @@ pipeline {
         }
         stage('Build Image') {
             steps {
-                    script {
+                script {
                     // Ensure Docker is running and can be accessed
                     sh 'docker --version'
                     
@@ -32,12 +32,25 @@ pipeline {
                     sh """
                     docker build -t ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG} .
                     docker tag ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG} ${REGISTRY}/${REPOSITORY}:latest
-                    docker push ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}
-                    docker push ${REGISTRY}/${REPOSITORY}:latest
                     """
-                    
-                    // Log completion
-                    echo "Docker image ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG} built and pushed successfully"
+                }
+            }
+        }
+        stage('Push Image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'harbor-credentials', passwordVariable: 'DOCKER_REGISTRY_PASSWORD', usernameVariable: 'DOCKER_REGISTRY_USERNAME')]) {
+                    script {
+                        // Log in to Docker registry
+                        sh """
+                        echo $DOCKER_REGISTRY_PASSWORD | docker login ${REGISTRY} -u $DOCKER_REGISTRY_USERNAME --password-stdin
+                        """
+                        
+                        // Push the Docker image to the registry
+                        sh """
+                        docker push ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}
+                        docker push ${REGISTRY}/${REPOSITORY}:latest
+                        """
+                    }
                 }
             }
         }
