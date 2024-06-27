@@ -40,16 +40,16 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'harbor-credentials', passwordVariable: 'DOCKER_REGISTRY_PASSWORD', usernameVariable: 'DOCKER_REGISTRY_USERNAME')]) {
                     script {
-                        // Log in to Docker registry
-                        sh """
-                        docker login ${REGISTRY} -u $DOCKER_REGISTRY_USERNAME --password-stdin
-                        """
+                        // Log in to Docker registry using environment variables without direct interpolation
+                        sh '''
+                        echo $DOCKER_REGISTRY_PASSWORD | docker login ${REGISTRY} -u $DOCKER_REGISTRY_USERNAME --password-stdin
+                        '''
                         
                         // Push the Docker image to the registry
-                        sh """
+                        sh '''
                         docker push ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}
                         docker push ${REGISTRY}/${REPOSITORY}:latest
-                        """
+                        '''
                     }
                 }
             }
