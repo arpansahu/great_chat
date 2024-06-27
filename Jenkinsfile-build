@@ -42,7 +42,7 @@ pipeline {
                     script {
                         // Log in to Docker registry
                         sh """
-                        echo $DOCKER_REGISTRY_PASSWORD | docker login ${REGISTRY} -u $DOCKER_REGISTRY_USERNAME --password-stdin
+                        docker login ${REGISTRY} -u $DOCKER_REGISTRY_USERNAME --password-stdin
                         """
                         
                         // Push the Docker image to the registry
