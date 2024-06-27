@@ -2,7 +2,7 @@ version: '3'
 
 services:
   web:
-    build: .
+    image: harbor.arpansahu.me/library/great_chat:latest
     env_file: ./.env
     command: bash -c "python manage.py makemigrations && python manage.py migrate && daphne -b 0.0.0.0 -p 8002 great_chat.asgi:application"
     container_name: great_chat

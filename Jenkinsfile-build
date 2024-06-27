@@ -1,0 +1,97 @@
+pipeline {
+    agent any
+    environment {
+        REGISTRY = "harbor.arpansahu.me"
+        REPOSITORY = "library/great_chat"
+        IMAGE_TAG = "${env.BUILD_ID}"
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Dependencies') {
+            steps {
+                script {
+                    // Copy .env file to the workspace
+                    sh "sudo cp /root/projectenvs/great_chat/.env ${env.WORKSPACE}/"
+                }
+            }
+        }
+        stage('Build Image') {
+            steps {
+                script {
+                    def image = docker.build("${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}")
+                    image.push()
+                    image.push('latest')
+                }
+            }
+        }
+    }
+    post {
+        success {
+            script {
+                currentBuild.description = "Image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
+                
+                // Send success notification email
+                sh """curl -s \
+                -X POST \
+                --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
+                https://api.mailjet.com/v3.1/send \
+                -H "Content-Type:application/json" \
+                -d '{
+                    "Messages":[
+                            {
+                                    "From": {
+                                            "Email": "$MAIL_JET_EMAIL_ADDRESS",
+                                            "Name": "ArpanSahuOne Jenkins Notification"
+                                    },
+                                    "To": [
+                                            {
+                                                    "Email": "$MY_EMAIL_ADDRESS",
+                                                    "Name": "Development Team"
+                                            }
+                                    ],
+                                    "Subject": "${currentBuild.fullDisplayName} built successfully",
+                                    "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} is now built and pushed to the registry",
+                                    "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is now built and pushed to the registry </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
+                            }
+                    ]
+                }'"""
+
+                // Trigger another Jenkins job
+                build job: 'great_chat', wait: false
+            }
+        }
+        failure {
+            script {
+                // Send failure notification email
+                sh """curl -s \
+                -X POST \
+                --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
+                https://api.mailjet.com/v3.1/send \
+                -H "Content-Type:application/json" \
+                -d '{
+                    "Messages":[
+                            {
+                                    "From": {
+                                            "Email": "$MAIL_JET_EMAIL_ADDRESS",
+                                            "Name": "ArpanSahuOne Jenkins Notification"
+                                    },
+                                    "To": [
+                                            {
+                                                    "Email": "$MY_EMAIL_ADDRESS",
+                                                    "Name": "Development Team"
+                                            }
+                                    ],
+                                    "Subject": "${currentBuild.fullDisplayName} build failed",
+                                    "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} build failed",
+                                    "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} build failed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
+                            }
+                    ]
+                }'"""
+            }
+        }
+    }
+}

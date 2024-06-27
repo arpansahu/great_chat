@@ -1,52 +1,43 @@
 pipeline {
     agent { label 'local' }
+    environment {
+        REGISTRY = "harbor.arpansahu.me"
+        REPOSITORY = "library/great_chat"
+        IMAGE_TAG = "latest"  // or use a specific tag if needed
+    }
     stages {
         stage('Initialize') {
             steps {
                 script {
-                    // Log the current workspace path
                     echo "Current workspace path is: ${env.WORKSPACE}"
                 }
             }
         }
         stage('Checkout') {
             steps {
-                // Checkout code from SCM
                 checkout scm
-            }
-        }
-        stage('Dependencies') {
-            steps {
-                script {
-                    // Copy .env file to the workspace
-                    sh "sudo cp /root/projectenvs/great_chat/.env ${env.WORKSPACE}/"
-                }
             }
         }
         stage('Production') {
             when {
                 expression {
-                    // Collect all changed files
                     def changes = currentBuild.changeSets.collect { it.items.collect { it.affectedFiles.collect { it.path } } }.flatten()
-
-                    // Define the file(s) to be excluded from triggering a deploy
                     def excludedFiles = ['Readme.md']
-
-                    // Check if the only changed files are in the excluded list
                     def onlyExcludedFilesChanged = changes.every { changedFile -> 
                         excludedFiles.contains(changedFile)
                     }
-
-                    // Proceed with deployment if not only excluded files are changed
                     return !onlyExcludedFilesChanged
                 }
             }
             steps {
                 script {
+                    // Ensure the correct image tag is used in the docker-compose.yml
+                    sh """
+                    sed -i 's|image: .*|image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}|' docker-compose.yml
+                    """
                     // Deploy using Docker Compose
-                    sh "docker compose up --build --detach"
-                    
-                    // Set a flag to indicate deployment execution
+                    sh "docker-compose down"
+                    sh "docker-compose up -d"
                     currentBuild.description = 'DEPLOYMENT_EXECUTED'
                 }
             }
@@ -56,7 +47,6 @@ pipeline {
         success {
             script {
                 if (currentBuild.description == 'DEPLOYMENT_EXECUTED') {
-                    // Send success notification email
                     sh """curl -s \
                     -X POST \
                     --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
@@ -81,14 +71,12 @@ pipeline {
                                 }
                         ]
                     }'"""
-                    // Trigger another Jenkins job
                     build job: 'common_readme', parameters: [string(name: 'project_git_url', value: 'https://github.com/arpansahu/great_chat'), string(name: 'environment', value: 'prod')], wait: false
                 }
             }
         }
         failure {
             script {
-                // Send failure notification email
                 sh """curl -s \
                 -X POST \
                 --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
