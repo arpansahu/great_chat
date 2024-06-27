@@ -21,16 +21,23 @@ pipeline {
         }
         stage('Build Image') {
             steps {
-                script {
+                    script {
                     // Ensure Docker is running and can be accessed
                     sh 'docker --version'
                     
-                    // Build the Docker image
-                    def image = docker.build("${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}")
+                    // Log the image details
+                    echo "Building Docker image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
                     
-                    // Push the Docker image to the registry
-                    image.push()
-                    image.push('latest')
+                    // Build the Docker image
+                    sh """
+                    docker build -t ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG} .
+                    docker tag ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG} ${REGISTRY}/${REPOSITORY}:latest
+                    docker push ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}
+                    docker push ${REGISTRY}/${REPOSITORY}:latest
+                    """
+                    
+                    // Log completion
+                    echo "Docker image ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG} built and pushed successfully"
                 }
             }
         }
