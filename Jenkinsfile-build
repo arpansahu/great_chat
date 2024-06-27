@@ -22,7 +22,13 @@ pipeline {
         stage('Build Image') {
             steps {
                 script {
+                    // Ensure Docker is running and can be accessed
+                    sh 'docker --version'
+                    
+                    // Build the Docker image
                     def image = docker.build("${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}")
+                    
+                    // Push the Docker image to the registry
                     image.push()
                     image.push('latest')
                 }
@@ -60,8 +66,8 @@ pipeline {
                     ]
                 }'"""
 
-                // Trigger another Jenkins job
-                build job: 'great_chat', wait: false
+                // Trigger deploy job only if the build is stable
+                build job: 'deploy', wait: false
             }
         }
         failure {
