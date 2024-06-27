@@ -86,7 +86,7 @@ pipeline {
                     ]
                 }'"""
 
-                // Trigger deploy job only if the build is stable
+                // Trigger great_chat job only if the build is stable
                 build job: 'great_chat', wait: false
             }
         }
