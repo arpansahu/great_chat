@@ -21,17 +21,17 @@ pipeline {
         stage('Check for New Image') {
             steps {
                 script {
-                    // Get the digest of the currently running image
-                    def currentDigest = sh(script: "docker inspect --format='{{index .RepoDigests 0}}' great_chat || echo 'none'", returnStdout: true).trim()
-                    echo "Current image digest: ${currentDigest}"
+                    // Get the ImageID of the currently running container
+                    def currentImageID = sh(script: "docker inspect -f '{{.Image}}' great_chat || echo 'none'", returnStdout: true).trim()
+                    echo "Current image ID: ${currentImageID}"
 
-                    // Pull the latest image to get its digest
+                    // Pull the latest image to get its ImageID
                     sh "docker pull ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
-                    def latestDigest = sh(script: "docker inspect --format='{{index .RepoDigests 0}}' ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}", returnStdout: true).trim()
-                    echo "Latest image digest: ${latestDigest}"
+                    def latestImageID = sh(script: "docker inspect -f '{{.Id}}' ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}", returnStdout: true).trim()
+                    echo "Latest image ID: ${latestImageID}"
 
-                    // Check if the image digests are different
-                    if (currentDigest != latestDigest) {
+                    // Check if the ImageIDs are different
+                    if (currentImageID != latestImageID) {
                         env.NEW_IMAGE_AVAILABLE = 'true'
                         echo "New image available, proceeding with deployment."
                     } else {
