@@ -63,7 +63,6 @@ pipeline {
     post {
         success {
             script {
-                // Send deployment success notification if deployment was executed
                 if (currentBuild.description == 'DEPLOYMENT_EXECUTED') {
                     sh '''
                     curl -s -X POST --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET https://api.mailjet.com/v3.1/send -H "Content-Type:application/json" -d '{
@@ -87,8 +86,6 @@ pipeline {
                     }'
                     '''
                 }
-                // Trigger the common_readme job regardless of deployment
-                build job: 'common_readme', parameters: [string(name: 'project_git_url', value: 'https://github.com/arpansahu/great_chat'), string(name: 'environment', value: 'prod')], wait: false
             }
         }
         failure {
@@ -115,6 +112,12 @@ pipeline {
                     ]
                 }'
                 '''
+            }
+        }
+        always {
+            script {
+                // Trigger the common_readme job regardless of deployment
+                build job: 'common_readme', parameters: [string(name: 'project_git_url', value: 'https://github.com/arpansahu/great_chat'), string(name: 'environment', value: 'prod')], wait: false
             }
         }
     }
