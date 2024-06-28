@@ -4,7 +4,7 @@ pipeline {
         REGISTRY = "harbor.arpansahu.me"
         REPOSITORY = "library/great_chat"
         IMAGE_TAG = "${env.BUILD_ID}"
-        COMMIT_FILE = "last_commit.txt"
+        COMMIT_FILE = "${env.WORKSPACE}/last_commit.txt"
     }
     stages {
         stage('Checkout') {
