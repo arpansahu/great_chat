@@ -19,16 +19,6 @@ pipeline {
             }
         }
         stage('Production') {
-            when {
-                expression {
-                    def changes = currentBuild.changeSets.collect { it.items.collect { it.affectedFiles.collect { it.path } } }.flatten()
-                    def excludedFiles = ['Readme.md']
-                    def onlyExcludedFilesChanged = changes.every { changedFile -> 
-                        excludedFiles.contains(changedFile)
-                    }
-                    return !onlyExcludedFilesChanged
-                }
-            }
             steps {
                 script {
                     // Ensure the correct image tag is used in the docker-compose.yml
@@ -46,7 +36,7 @@ pipeline {
     post {
         success {
             script {
-                if (currentBuild.description == 'DEPLOYMENT_EXECUTED') {
+                {
                     sh """curl -s \
                     -X POST \
                     --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
