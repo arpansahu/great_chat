@@ -86,6 +86,8 @@ pipeline {
                     }'
                     '''
                 }
+                // Trigger the common_readme job on success
+                build job: 'common_readme', parameters: [string(name: 'project_git_url', value: 'https://github.com/arpansahu/great_chat'), string(name: 'environment', value: 'prod')], wait: false
             }
         }
         failure {
@@ -112,12 +114,6 @@ pipeline {
                     ]
                 }'
                 '''
-            }
-        }
-        always {
-            script {
-                // Trigger the common_readme job regardless of deployment
-                build job: 'common_readme', parameters: [string(name: 'project_git_url', value: 'https://github.com/arpansahu/great_chat'), string(name: 'environment', value: 'prod')], wait: false
             }
         }
     }
