@@ -18,16 +18,43 @@ pipeline {
                 checkout scm
             }
         }
-        stage('Production') {
+        stage('Check for New Image') {
+            steps {
+                script {
+                    // Get the currently running image
+                    def currentImage = sh(script: "docker inspect -f '{{.Config.Image}}' great_chat || echo 'none'", returnStdout: true).trim()
+                    echo "Current image: ${currentImage}"
+
+                    // Get the latest image
+                    def latestImage = "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
+                    echo "Latest image: ${latestImage}"
+
+                    // Check if the images are different
+                    if (currentImage != latestImage) {
+                        env.NEW_IMAGE_AVAILABLE = 'true'
+                        echo "New image available, proceeding with deployment."
+                    } else {
+                        env.NEW_IMAGE_AVAILABLE = 'false'
+                        echo "No new image available, skipping deployment."
+                    }
+                }
+            }
+        }
+        stage('Deploy') {
+            when {
+                expression {
+                    env.NEW_IMAGE_AVAILABLE == 'true'
+                }
+            }
             steps {
                 script {
                     // Ensure the correct image tag is used in the docker-compose.yml
-                    sh """
-                    sed -i 's|image: .*|image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}|' docker-compose.yml
-                    """
+                    sh '''
+                    sed -i "s|image: .*|image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}|" docker-compose.yml
+                    '''
                     // Deploy using Docker Compose
-                    sh "docker-compose down"
-                    sh "docker-compose up -d"
+                    sh 'docker-compose down'
+                    sh 'docker-compose up -d'
                     currentBuild.description = 'DEPLOYMENT_EXECUTED'
                 }
             }
@@ -36,61 +63,55 @@ pipeline {
     post {
         success {
             script {
-                {
-                    sh """curl -s \
-                    -X POST \
-                    --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
-                    https://api.mailjet.com/v3.1/send \
-                    -H "Content-Type:application/json" \
-                    -d '{
-                        "Messages":[
+                if (currentBuild.description == 'DEPLOYMENT_EXECUTED') {
+                sh '''
+                curl -s -X POST --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET https://api.mailjet.com/v3.1/send -H "Content-Type:application/json" -d '{
+                    "Messages":[
+                        {
+                            "From": {
+                                "Email": "$MAIL_JET_EMAIL_ADDRESS",
+                                "Name": "ArpanSahuOne Jenkins Notification"
+                            },
+                            "To": [
                                 {
-                                        "From": {
-                                                "Email": "$MAIL_JET_EMAIL_ADDRESS",
-                                                "Name": "ArpanSahuOne Jenkins Notification"
-                                        },
-                                        "To": [
-                                                {
-                                                        "Email": "$MY_EMAIL_ADDRESS",
-                                                        "Name": "Development Team"
-                                                }
-                                        ],
-                                        "Subject": "${currentBuild.fullDisplayName} deployed successfully",
-                                        "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed",
-                                        "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
+                                    "Email": "$MY_EMAIL_ADDRESS",
+                                    "Name": "Development Team"
                                 }
-                        ]
-                    }'"""
-                    build job: 'common_readme', parameters: [string(name: 'project_git_url', value: 'https://github.com/arpansahu/great_chat'), string(name: 'environment', value: 'prod')], wait: false
+                            ],
+                            "Subject": "${currentBuild.fullDisplayName} deployed successfully",
+                            "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed",
+                            "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
+                        }
+                    ]
+                }'
+                '''
                 }
+                build job: 'common_readme', parameters: [string(name: 'project_git_url', value: 'https://github.com/arpansahu/great_chat'), string(name: 'environment', value: 'prod')], wait: false
             }
         }
         failure {
             script {
-                sh """curl -s \
-                -X POST \
-                --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
-                https://api.mailjet.com/v3.1/send \
-                -H "Content-Type:application/json" \
-                -d '{
+                sh '''
+                curl -s -X POST --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET https://api.mailjet.com/v3.1/send -H "Content-Type:application/json" -d '{
                     "Messages":[
-                            {
-                                    "From": {
-                                            "Email": "$MAIL_JET_EMAIL_ADDRESS",
-                                            "Name": "ArpanSahuOne Jenkins Notification"
-                                    },
-                                    "To": [
-                                            {
-                                                    "Email": "$MY_EMAIL_ADDRESS",
-                                                    "Name": "Development Team"
-                                            }
-                                    ],
-                                    "Subject": "${currentBuild.fullDisplayName} deployment failed",
-                                    "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} deployment failed",
-                                    "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is not deployed, Build Failed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
-                            }
+                        {
+                            "From": {
+                                "Email": "$MAIL_JET_EMAIL_ADDRESS",
+                                "Name": "ArpanSahuOne Jenkins Notification"
+                            },
+                            "To": [
+                                {
+                                    "Email": "$MY_EMAIL_ADDRESS",
+                                    "Name": "Development Team"
+                                }
+                            ],
+                            "Subject": "${currentBuild.fullDisplayName} deployment failed",
+                            "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} deployment failed",
+                            "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is not deployed, Build Failed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
+                        }
                     ]
-                }'"""
+                }'
+                '''
             }
         }
     }
