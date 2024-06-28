@@ -21,16 +21,17 @@ pipeline {
         stage('Check for New Image') {
             steps {
                 script {
-                    // Get the currently running image
-                    def currentImage = sh(script: "docker inspect -f '{{.Config.Image}}' great_chat || echo 'none'", returnStdout: true).trim()
-                    echo "Current image: ${currentImage}"
+                    // Get the digest of the currently running image
+                    def currentDigest = sh(script: "docker inspect --format='{{index .RepoDigests 0}}' great_chat || echo 'none'", returnStdout: true).trim()
+                    echo "Current image digest: ${currentDigest}"
 
-                    // Get the latest image
-                    def latestImage = "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
-                    echo "Latest image: ${latestImage}"
+                    // Pull the latest image to get its digest
+                    sh "docker pull ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
+                    def latestDigest = sh(script: "docker inspect --format='{{index .RepoDigests 0}}' ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}", returnStdout: true).trim()
+                    echo "Latest image digest: ${latestDigest}"
 
-                    // Check if the images are different
-                    if (currentImage != latestImage) {
+                    // Check if the image digests are different
+                    if (currentDigest != latestDigest) {
                         env.NEW_IMAGE_AVAILABLE = 'true'
                         echo "New image available, proceeding with deployment."
                     } else {
