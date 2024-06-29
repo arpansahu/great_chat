@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   web:
     image: harbor.arpansahu.me/library/great_chat:latest

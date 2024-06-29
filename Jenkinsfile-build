@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    parameters {
+        booleanParam(name: 'skip_checks', defaultValue: false, description: 'Skip the Check for Changes stage')
+    }
     environment {
         REGISTRY = "harbor.arpansahu.me"
         REPOSITORY = "library/great_chat"
@@ -13,6 +16,9 @@ pipeline {
             }
         }
         stage('Check for Changes') {
+            when {
+                expression { return !params.skip_checks }
+            }
             steps {
                 script {
                     // Get the current commit hash
