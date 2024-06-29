@@ -1037,8 +1037,6 @@ CMD ["bash", "-c", "python manage.py collectstatic --noinput && gunicorn --bind 
 Create a file named docker-compose.yml and add following lines in it
 
 ```bash
-version: '3'
-
 services:
   web:
     image: harbor.arpansahu.me/library/great_chat:latest
@@ -1761,6 +1759,9 @@ in Jenkinsfile-build to copy .env file into build directory
 ```bash
 pipeline {
     agent any
+    parameters {
+        booleanParam(name: 'skip_checks', defaultValue: false, description: 'Skip the Check for Changes stage')
+    }
     environment {
         REGISTRY = "harbor.arpansahu.me"
         REPOSITORY = "library/great_chat"
@@ -1774,6 +1775,9 @@ pipeline {
             }
         }
         stage('Check for Changes') {
+            when {
+                expression { return !params.skip_checks }
+            }
             steps {
                 script {
                     // Get the current commit hash
