@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: great-chat-app
+  labels:
+    app: great-chat
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: great-chat
+  template:
+    metadata:
+      labels:
+        app: great-chat
+    spec:
+      containers:
+        - image: harbor.arpansahu.me/library/great_chat:latest
+          name: great-chat
+          env:
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: great-chat-secret
+                  key: SECRET_KEY
+            - name: DEBUG
+              valueFrom:
+                secretKeyRef:
+                  name: great-chat-secret
+                  key: DEBUG
+            - name: ALLOWED_HOSTS
+              valueFrom:
+                secretKeyRef:
+                  name: great-chat-secret
+                  key: ALLOWED_HOSTS
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: great-chat-secret
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: great-chat-secret
+                  key: AWS_SECRET_ACCESS_KEY
+            - name: AWS_STORAGE_BUCKET_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: great-chat-secret
+                  key: AWS_STORAGE_BUCKET_NAME
+            - name: AWS_S3_REGION_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: great-chat-secret
+                  key: AWS_S3_REGION_NAME
+            - name: BUCKET_TYPE
+              valueFrom:
+                secretKeyRef:
+                  name: great-chat-secret
+                  key: BUCKET_TYPE
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: great-chat-secret
+                  key: DATABASE_URL
+            - name: REDISCLOUD_URL
+              valueFrom:
+                secretKeyRef:
+                  name: great-chat-secret
+                  key: REDISCLOUD_URL
+            - name: MAIL_JET_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: great-chat-secret
+                  key: MAIL_JET_API_KEY
+            - name: MAIL_JET_API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: great-chat-secret
+                  key: MAIL_JET_API_SECRET
+            - name: MY_EMAIL_ADDRESS
+              valueFrom:
+                secretKeyRef:
+                  name: great-chat-secret
+                  key: MY_EMAIL_ADDRESS
+            - name: DOMAIN
+              valueFrom:
+                secretKeyRef:
+                  name: great-chat-secret
+                  key: DOMAIN
+            - name: PROTOCOL
+              valueFrom:
+                secretKeyRef:
+                  name: great-chat-secret
+                  key: PROTOCOL
+          ports:
+            - containerPort: 8002
+              name: gunicorn
