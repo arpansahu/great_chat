@@ -14,8 +14,10 @@ spec:
       labels:
         app: great-chat
     spec:
+      imagePullSecrets:
+        - name: harbor-registry-secret
       containers:
-        - image: harbor.arpansahu.me/library/great_chat:latest
+        - image: harbor.arpansahu.me/library/great_chat_mac:latest
           name: great-chat
           env:
             - name: SECRET_KEY
@@ -93,6 +95,11 @@ spec:
                 secretKeyRef:
                   name: great-chat-secret
                   key: PROTOCOL
+            - name: AWS_S3_REGION_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: great-chat-secret
+                  key: AWS_S3_REGION_NAME
           ports:
             - containerPort: 8002
               name: gunicorn

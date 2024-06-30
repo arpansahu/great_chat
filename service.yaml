@@ -1,13 +1,25 @@
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: great-chat-service
+#   labels:
+#     app: great-chat-service
+# spec:
+#   selector:
+#     app: great-chat
+#   ports:
+#     - port: 8002
+#       targetPort: 8002
+#   type: NodePort
 apiVersion: v1
 kind: Service
 metadata:
   name: great-chat-service
-  labels:
-    app: great-chat-service
 spec:
   selector:
     app: great-chat
   ports:
-    - port: 8002
+    - protocol: TCP
+      port: 8002
       targetPort: 8002
-  type: NodePort
+  type: LoadBalancer
