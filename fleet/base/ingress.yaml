@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: great-chat-ingress
+  namespace: arpansahu-one-namespace
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: arpansahu-one-namespace-default-headers@kubernetescrd
+spec:
+  rules:
+    - host: great-chat-kube.arpansahu.me
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: great-chat-service
+                port:
+                  number: 8002
+  tls:
+    - hosts:
+        - great-chat-kube.arpansahu.me
+      secretName: great-chat-secret
