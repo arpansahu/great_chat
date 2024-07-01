@@ -8,10 +8,10 @@ metadata:
     app.kubernetes.io/instance: great-chat
     app.kubernetes.io/name: great-chat
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: great-chat
+  replicas: 1
   template:
     metadata:
       labels:
@@ -96,10 +96,6 @@ spec:
               name: great-chat-secret
               key: DOMAIN
         - name: PROTOCOL
-          valueFrom:
-            secretKeyRef:
-              name: great-chat-secret
-              key: PROTOCOL
         ports:
         - containerPort: 8002
         volumeMounts:
@@ -109,3 +105,39 @@ spec:
       - name: great-chat
         persistentVolumeClaim:
           claimName: great-chat
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: great-chat
+  namespace: arpansahu-one-namespace
+  labels:
+    app: great-chat
+    app.kubernetes.io/instance: great-chat
+    app.kubernetes.io/name: great-chat
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 8002
+    protocol: TCP
+    targetPort: 8002
+  selector:
+    app: great-chat
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: great-chat
+  namespace: arpansahu-one-namespace
+  labels:
+    app: great-chat
+    app.kubernetes.io/instance: great-chat
+    app.kubernetes.io/name: great-chat
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: longhorn
