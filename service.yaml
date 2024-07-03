@@ -9,4 +9,5 @@ spec:
     - protocol: TCP
       port: 8002
       targetPort: 8002
-  type: LoadBalancer
+      nodePort: 32002
+  type: NodePort
