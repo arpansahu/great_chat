@@ -3,10 +3,10 @@ kind: Service
 metadata:
   name: great-chat-service
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector:
     app: great-chat
   ports:
     - port: 8002
       targetPort: 8002
-      protocol: TCP
+      nodePort: 32002
