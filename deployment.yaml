@@ -102,4 +102,3 @@ spec:
                   key: AWS_S3_REGION_NAME
           ports:
             - containerPort: 8002
-              name: gunicorn
