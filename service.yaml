@@ -7,6 +7,6 @@ spec:
     app: great-chat
   ports:
   - protocol: TCP
-    port: 8020
-    targetPort: 8020
+    port: 8002
+    targetPort: 8002
   type: ClusterIP

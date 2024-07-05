@@ -17,4 +17,4 @@ spec:
           service:
             name: great-chat-service
             port:
-              number: 8020
+              number: 8002
