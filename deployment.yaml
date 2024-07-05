@@ -100,5 +100,3 @@ spec:
                 secretKeyRef:
                   name: great-chat-secret
                   key: AWS_S3_REGION_NAME
-          ports:
-            - containerPort: 8002
