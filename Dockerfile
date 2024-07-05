@@ -12,5 +12,5 @@ COPY . .
 # Expose the application port
 EXPOSE 8002
 
-# Run collectstatic and gunicorn in a single command
-CMD ["bash", "-c", "python manage.py collectstatic --noinput && gunicorn --bind 0.0.0.0:8002 great_chat.wsgi"]
+# Run collectstatic and daphne in a single command
+CMD ["bash", "-c", "python manage.py collectstatic --noinput && daphne -b 0.0.0.0 -p 8002 great_chat.asgi:application"]
