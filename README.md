@@ -1111,7 +1111,7 @@ if you remove this tag it will be attached to terminal, and you will be able to 
 
     ```yaml
 
-            kind: Cluster
+        kind: Cluster
     apiVersion: kind.x-k8s.io/v1alpha4
     nodes:
     - role: control-plane
