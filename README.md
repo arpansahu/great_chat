@@ -1110,6 +1110,7 @@ if you remove this tag it will be attached to terminal, and you will be able to 
     paste the below code into the file
 
     ```yaml
+
             kind: Cluster
     apiVersion: kind.x-k8s.io/v1alpha4
     nodes:
