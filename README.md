@@ -1110,7 +1110,8 @@ if you remove this tag it will be attached to terminal, and you will be able to 
     paste the below code into the file
 
     ```bash
-            kind: Cluster
+            # Ignore this line 
+    kind: Cluster
     apiVersion: kind.x-k8s.io/v1alpha4
     nodes:
     - role: control-plane
@@ -1161,8 +1162,9 @@ if you remove this tag it will be attached to terminal, and you will be able to 
 
     copy and paste below content into it
 
-    ```yaml
-            apiVersion: v1
+    ```bash
+            # Ignore this line 
+    apiVersion: v1
     kind: ServiceAccount
     metadata:
       name: admin-user
@@ -1180,8 +1182,9 @@ if you remove this tag it will be attached to terminal, and you will be able to 
 
     copy and paste below content into it
 
-    ```yaml
-            apiVersion: rbac.authorization.k8s.io/v1
+    ```bash
+            # Ignore this line 
+    apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRoleBinding
     metadata:
       name: admin-user
@@ -1211,8 +1214,9 @@ if you remove this tag it will be attached to terminal, and you will be able to 
 
 2. Modify the service to use NodePort:
 
-    ```yaml
-            # Please edit the object below. Lines beginning with a '#' will be ignored,
+    ```bash
+            # Ignore this line 
+    # Please edit the object below. Lines beginning with a '#' will be ignored,
     # and an empty file will abort the edit. If an error occurs while saving this file will be
     # reopened with the relevant failures.
     #
@@ -1334,8 +1338,9 @@ if you remove this tag it will be attached to terminal, and you will be able to 
 
     copy this and past it in the file
 
-    ```yaml
-            apiVersion: v1
+    ```bash
+            # Ignore this line 
+    apiVersion: v1
     kind: ServiceAccount
     metadata:
       name: dashboard-admin-sa
@@ -1351,8 +1356,9 @@ if you remove this tag it will be attached to terminal, and you will be able to 
 
     copy this and past it in the file
 
-    ```yaml
-            apiVersion: rbac.authorization.k8s.io/v1
+    ```bash
+            # Ignore this line 
+    apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRoleBinding
     metadata:
       name: dashboard-admin-sa-binding
@@ -1375,8 +1381,9 @@ if you remove this tag it will be attached to terminal, and you will be able to 
 
     copy this and past it in the file
 
-    ```yaml
-            apiVersion: v1
+    ```bash
+            # Ignore this line 
+    apiVersion: v1
     kind: Secret
     metadata:
       name: dashboard-admin-sa-token
