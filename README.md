@@ -1109,18 +1109,16 @@ if you remove this tag it will be attached to terminal, and you will be able to 
 
     paste the below code into the file
 
-    ```yaml
-        ```yaml
-kind: Cluster
-apiVersion: kind.x-k8s.io/v1alpha4
-nodes:
-- role: control-plane
-  extraPortMappings:
-  - containerPort: 80
-    hostPort: 7800
-  - containerPort: 443
-    hostPort: 7801
-```
+    ```bash
+            kind: Cluster
+    apiVersion: kind.x-k8s.io/v1alpha4
+    nodes:
+    - role: control-plane
+      extraPortMappings:
+      - containerPort: 80
+        hostPort: 7800
+      - containerPort: 443
+        hostPort: 7801
     ```
 
 2. Create the Kind cluster:
