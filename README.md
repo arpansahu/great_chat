@@ -590,11 +590,11 @@ Harbor is an open-source container image registry that secures images with role-
         # http related config
         http:
         # port for http, default is 80. If https enabled, this port will redirect to https port
-        port: 8081
+        port: 8601
         # https related config
         https:
         # https port for harbor, default is 443
-        port: 8443
+        port: 8602
         # The path of cert and key files for nginx
         certificate: /etc/letsencrypt/live/arpansahu.me/fullchain.pem 
         private_key: /etc/letsencrypt/live/arpansahu.me/privkey.pem
@@ -895,8 +895,8 @@ Harbor is an open-source container image registry that secures images with role-
             - harbor
             - harbor-notary
             ports:
-            - 8081:8080
-            - 8443:8443
+            - 8601:8080
+            - 8602:8443
             - 4443:4443
             depends_on:
             - registry
@@ -924,8 +924,8 @@ Harbor is an open-source container image registry that secures images with role-
 
         As you can see the ports we used in harbor.yml are configured here and nginx service have been removed.
         ports:
-          - 8081:8080
-          - 8443:8443
+          - 8601:8080
+          - 8602:8443
           - 4443:4443
 
 4. **Run the Harbor install script:**
@@ -1030,8 +1030,8 @@ COPY . .
 # Expose the application port
 EXPOSE 8002
 
-# Run collectstatic and gunicorn in a single command
-CMD ["bash", "-c", "python manage.py collectstatic --noinput && gunicorn --bind 0.0.0.0:8002 great_chat.wsgi"]
+# Run collectstatic and daphne in a single command
+CMD ["bash", "-c", "python manage.py collectstatic --noinput && daphne -b 0.0.0.0 -p 8002 great_chat.asgi:application"]
 ```
 
 Create a file named docker-compose.yml and add following lines in it
@@ -1067,7 +1067,11 @@ if you remove this tag it will be attached to terminal, and you will be able to 
 
 --build tag with docker compose up will force image to be rebuild every time before starting the container
 
-### Step 3: Serving the requests from Nginx
+### Step 3.1: Installing Kubernetes cluster and Setting A Dashboard
+
+
+
+### Step 4: Serving the requests from Nginx
 
 #### Installing the Nginx server
 
@@ -1145,7 +1149,7 @@ sudo systemctl restart nginx
 
 Now it's time to enable HTTPS for this server
 
-### Step 4: Enabling HTTPS 
+### Step 5: Enabling HTTPS 
 
 
 1. Base Domain:  Enabling HTTPS for base domain only or a single subdomain
@@ -1647,7 +1651,7 @@ server {
 }
 ```
 
-### Step 5: CI/CD using Jenkins
+### Step 6: CI/CD using Jenkins
 
 ### Installing Jenkins
 
