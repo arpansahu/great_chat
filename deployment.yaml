@@ -50,11 +50,11 @@ spec:
                 secretKeyRef:
                   name: great-chat-secret
                   key: AWS_STORAGE_BUCKET_NAME
-            - name: AWS_S3_REGION_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: great-chat-secret
-                  key: AWS_S3_REGION_NAME
+            # - name: AWS_S3_REGION_NAME
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: great-chat-secret
+            #       key: AWS_S3_REGION_NAME
             - name: BUCKET_TYPE
               valueFrom:
                 secretKeyRef:
