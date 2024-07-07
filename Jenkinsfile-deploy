@@ -9,6 +9,7 @@ pipeline {
         REPOSITORY = "library/great_chat"
         IMAGE_TAG = "latest"  // or use a specific tag if needed
         KUBECONFIG = "${env.WORKSPACE}/kubeconfig"  // Set the KUBECONFIG environment variable
+        NGINX_CONF = "/etc/nginx/sites-available/arpansahu"
     }
     stages {
         stage('Initialize') {
@@ -114,12 +115,21 @@ pipeline {
                             def clusterIP = sh(script: "kubectl get nodes -o=jsonpath='{.items[0].status.addresses[0].address}'", returnStdout: true).trim()
                             echo "Cluster IP: ${clusterIP}"
 
-                            // Verify if the service is accessible and delete the Docker container if accessible
-                            sh """
+                            // Verify if the service is accessible
+                            sh "curl -v http://${clusterIP}:${nodePort}"
+
+                            // Delete the Docker container if the service is accessible
+                            sh '''
                             curl -v http://${clusterIP}:${nodePort} && \
                             if [ \$(docker ps -q -f name=great_chat) ]; then
                                 docker rm -f great_chat
                             fi
+                            '''
+
+                            // Update Nginx configuration
+                            sh """
+                            sudo sed -i 's|proxy_pass .*;|proxy_pass http://${clusterIP}:${nodePort};|' ${NGINX_CONF}
+                            sudo nginx -s reload
                             """
                         } else {
                             error ".env file not found in the workspace."
