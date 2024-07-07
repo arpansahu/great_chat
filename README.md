@@ -2452,6 +2452,10 @@ pipeline {
 ```bash
 pipeline {
     agent { label 'local' }
+    parameters {
+        booleanParam(name: 'skip_checks', defaultValue: false, description: 'Skip the Check for Changes stage')
+        choice(name: 'DEPLOY_TYPE', choices: ['kubernetes', 'docker'], description: 'Select deployment type')
+    }
     environment {
         REGISTRY = "harbor.arpansahu.me"
         REPOSITORY = "library/great_chat"
@@ -2471,6 +2475,9 @@ pipeline {
             }
         }
         stage('Check for New Image') {
+            when {
+                expression { !params.skip_checks }
+            }
             steps {
                 script {
                     // Get the ImageID of the currently running container
@@ -2496,18 +2503,27 @@ pipeline {
         stage('Deploy') {
             when {
                 expression {
-                    env.NEW_IMAGE_AVAILABLE == 'true'
+                    return params.skip_checks || env.NEW_IMAGE_AVAILABLE == 'true'
                 }
             }
             steps {
                 script {
-                    // Ensure the correct image tag is used in the docker-compose.yml
-                    sh '''
-                    sed -i "s|image: .*|image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}|" docker-compose.yml
-                    '''
-                    // Deploy using Docker Compose
-                    sh 'docker-compose down'
-                    sh 'docker-compose up -d'
+                    if (params.DEPLOY_TYPE == 'docker') {
+                        // Ensure the correct image tag is used in the docker-compose.yml
+                        sh '''
+                        sed -i "s|image: .*|image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}|" docker-compose.yml
+                        '''
+                        // Deploy using Docker Compose
+                        sh 'docker-compose down'
+                        sh 'docker-compose up -d'
+                    } else if (params.DEPLOY_TYPE == 'kubernetes') {
+                        // Deploy to Kubernetes
+                        sh '''
+                        kubectl create secret generic great-chat-secret --from-env-file=/root/projectenvs/great_chat/.env
+                        kubectl apply -f deployment.yaml
+                        kubectl apply -f service.yaml
+                        '''
+                    }
                     currentBuild.description = 'DEPLOYMENT_EXECUTED'
                 }
             }
