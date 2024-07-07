@@ -2522,7 +2522,7 @@ pipeline {
 
                         // Deploy to Kubernetes
                         sh '''
-                        kubectl create secret generic great-chat-secret --from-env-file=${env.WORKSPACE}/.env
+                        kubectl create secret generic great-chat-secret --from-env-file=${WORKSPACE}/.env
                         kubectl apply -f deployment.yaml
                         kubectl apply -f service.yaml
                         '''
