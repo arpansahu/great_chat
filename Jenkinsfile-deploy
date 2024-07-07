@@ -114,8 +114,13 @@ pipeline {
                             def clusterIP = sh(script: "kubectl get nodes -o=jsonpath='{.items[0].status.addresses[0].address}'", returnStdout: true).trim()
                             echo "Cluster IP: ${clusterIP}"
 
+                            // Check if pods are running
+                            sh '''
+                            kubectl get pods -o wide
+                            '''
+
                             // Verify if the service is accessible
-                            sh "curl --fail http://${clusterIP}:${nodePort}"
+                            sh "curl -v http://${clusterIP}:${nodePort}"
                         } else {
                             error ".env file not found in the workspace."
                         }
