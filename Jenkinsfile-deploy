@@ -69,19 +69,23 @@ pipeline {
                         sh "sudo cp /root/projectenvs/great_chat/.env ${env.WORKSPACE}/"
 
                         // Check if the file is copied successfully
-                        script {
-                            if (fileExists("${env.WORKSPACE}/.env")) {
-                                echo ".env file copied successfully."
-                                
-                                // Deploy to Kubernetes
-                                sh '''
-                                kubectl create secret generic great-chat-secret --from-env-file=.env
-                                kubectl apply -f deployment.yaml
-                                kubectl apply -f service.yaml
-                                '''
-                            } else {
-                                error ".env file not found in the workspace."
-                            }
+                        if (fileExists("${env.WORKSPACE}/.env")) {
+                            echo ".env file copied successfully."
+                            
+                            // Verify Kubernetes configuration
+                            sh 'kubectl cluster-info'
+                            
+                            // Print current directory
+                            sh 'pwd'
+                            
+                            // Deploy to Kubernetes
+                            sh '''
+                            kubectl create secret generic great-chat-secret --from-env-file=${WORKSPACE}/.env
+                            kubectl apply -f ${WORKSPACE}/deployment.yaml
+                            kubectl apply -f ${WORKSPACE}/service.yaml
+                            '''
+                        } else {
+                            error ".env file not found in the workspace."
                         }
                     }
                     currentBuild.description = 'DEPLOYMENT_EXECUTED'
