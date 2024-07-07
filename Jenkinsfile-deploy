@@ -115,12 +115,12 @@ pipeline {
                             echo "Cluster IP: ${clusterIP}"
 
                             // Verify if the service is accessible and delete the Docker container if accessible
-                            sh '''
+                            sh """
                             curl -v http://${clusterIP}:${nodePort} && \
-                            if [ "$(docker ps -q -f name=great_chat)" ]; then
+                            if [ \$(docker ps -q -f name=great_chat) ]; then
                                 docker rm -f great_chat
                             fi
-                            '''
+                            """
                         } else {
                             error ".env file not found in the workspace."
                         }
