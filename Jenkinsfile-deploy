@@ -8,6 +8,7 @@ pipeline {
         REGISTRY = "harbor.arpansahu.me"
         REPOSITORY = "library/great_chat"
         IMAGE_TAG = "latest"  // or use a specific tag if needed
+        KUBECONFIG = "${env.WORKSPACE}/kubeconfig"  // Set the KUBECONFIG environment variable
     }
     stages {
         stage('Initialize') {
@@ -20,6 +21,14 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
+            }
+        }
+        stage('Setup Kubernetes Config') {
+            steps {
+                script {
+                    // Copy the kubeconfig file to the workspace
+                    sh "sudo cp /root/.kube/config ${env.WORKSPACE}/kubeconfig"
+                }
             }
         }
         stage('Check for New Image') {
