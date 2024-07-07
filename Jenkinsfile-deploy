@@ -28,6 +28,8 @@ pipeline {
                 script {
                     // Copy the kubeconfig file to the workspace
                     sh "sudo cp /root/.kube/config ${env.WORKSPACE}/kubeconfig"
+                    // Change permissions of the kubeconfig file
+                    sh "sudo chmod 644 ${env.WORKSPACE}/kubeconfig"
                 }
             }
         }
