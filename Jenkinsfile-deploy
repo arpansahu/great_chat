@@ -1,135 +1,62 @@
 pipeline {
-    agent any
-    parameters {
-        booleanParam(name: 'skip_checks', defaultValue: false, description: 'Skip the Check for Changes stage')
-        choice(name: 'DEPLOY_TYPE', choices: ['docker', 'kubernetes'], description: 'Select deployment type', defaultValue: 'kubernetes')
-    }
+    agent { label 'local' }
     environment {
         REGISTRY = "harbor.arpansahu.me"
         REPOSITORY = "library/great_chat"
-        IMAGE_TAG = "${env.BUILD_ID}"
-        COMMIT_FILE = "${env.WORKSPACE}/last_commit.txt"
+        IMAGE_TAG = "latest"  // or use a specific tag if needed
     }
     stages {
+        stage('Initialize') {
+            steps {
+                script {
+                    echo "Current workspace path is: ${env.WORKSPACE}"
+                }
+            }
+        }
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
-        stage('Check for Changes') {
-            when {
-                expression { return !params.skip_checks }
-            }
+        stage('Check for New Image') {
             steps {
                 script {
-                    def currentCommit = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
-                    echo "Current commit: ${currentCommit}"
+                    // Get the ImageID of the currently running container
+                    def currentImageID = sh(script: "docker inspect -f '{{.Image}}' great_chat || echo 'none'", returnStdout: true).trim()
+                    echo "Current image ID: ${currentImageID}"
 
-                    if (fileExists(COMMIT_FILE)) {
-                        def lastCommit = readFile(COMMIT_FILE).trim()
-                        echo "Last commit: ${lastCommit}"
+                    // Pull the latest image to get its ImageID
+                    sh "docker pull ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
+                    def latestImageID = sh(script: "docker inspect -f '{{.Id}}' ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}", returnStdout: true).trim()
+                    echo "Latest image ID: ${latestImageID}"
 
-                        if (currentCommit == lastCommit) {
-                            echo "No changes detected. Skipping build."
-                            currentBuild.result = 'NOT_BUILT'
-                            error("No changes detected. Skipping build.")
-                        } else {
-                            def changes = sh(script: "git diff --name-only ${lastCommit} ${currentCommit}", returnStdout: true).trim().split("\n")
-                            def relevantChanges = changes.findAll { 
-                                !(it in ['README.md', 'SECURITY.md', 'CHANGELOG.md', '.github/dependabot.yml'])
-                            }
-                            
-                            if (relevantChanges.isEmpty()) {
-                                echo "No relevant changes detected. Skipping build."
-                                currentBuild.result = 'NOT_BUILT'
-                                error("No relevant changes detected. Skipping build.")
-                            } else {
-                                echo "Relevant changes detected. Proceeding with build."
-                            }
-                        }
+                    // Check if the ImageIDs are different
+                    if (currentImageID != latestImageID) {
+                        env.NEW_IMAGE_AVAILABLE = 'true'
+                        echo "New image available, proceeding with deployment."
                     } else {
-                        echo "No last commit file found. Proceeding with initial build."
-                    }
-
-                    writeFile(file: COMMIT_FILE, text: currentCommit)
-                }
-            }
-        }
-        stage('Dependencies') {
-            when {
-                not {
-                    equals expected: 'NOT_BUILT', actual: currentBuild.result
-                }
-            }
-            steps {
-                script {
-                    sh "sudo cp /root/projectenvs/great_chat/.env ${env.WORKSPACE}/"
-                }
-            }
-        }
-        stage('Build Image') {
-            when {
-                not {
-                    equals expected: 'NOT_BUILT', actual: currentBuild.result
-                }
-            }
-            steps {
-                script {
-                    sh 'docker --version'
-                    echo "Building Docker image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
-                    sh """
-                    docker build -t ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG} .
-                    docker tag ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG} ${REGISTRY}/${REPOSITORY}:latest
-                    """
-                }
-            }
-        }
-        stage('Push Image') {
-            when {
-                not {
-                    equals expected: 'NOT_BUILT', actual: currentBuild.result
-                }
-            }
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'harbor-credentials', passwordVariable: 'DOCKER_REGISTRY_PASSWORD', usernameVariable: 'DOCKER_REGISTRY_USERNAME')]) {
-                    script {
-                        sh '''
-                        echo $DOCKER_REGISTRY_PASSWORD | docker login ${REGISTRY} -u $DOCKER_REGISTRY_USERNAME --password-stdin
-                        '''
-                        sh '''
-                        docker push ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}
-                        docker push ${REGISTRY}/${REPOSITORY}:latest
-                        '''
+                        env.NEW_IMAGE_AVAILABLE = 'false'
+                        echo "No new image available, skipping deployment."
                     }
                 }
             }
         }
         stage('Deploy') {
             when {
-                not {
-                    equals expected: 'NOT_BUILT', actual: currentBuild.result
+                expression {
+                    env.NEW_IMAGE_AVAILABLE == 'true'
                 }
             }
             steps {
                 script {
-                    if (params.DEPLOY_TYPE == 'kubernetes') {
-                        echo "Deploying to Kubernetes"
-                        sh """
-                        kubectl create secret generic great-chat-secret --from-env-file=/root/projectenvs/great_chat/.env
-                        kubectl apply -f deployment.yaml
-                        kubectl apply -f service.yaml
-                        """
-                    } else if (params.DEPLOY_TYPE == 'docker') {
-                        echo "Deploying with Docker"
-                        // Add your Docker deployment steps here
-                    } else {
-                        echo "No deployment type selected. Defaulting to Kubernetes"
-                        sh """
-                        kubectl create secret generic great-chat-secret --from-env-file=/root/projectenvs/great_chat/.env
-                        kubectl apply -f deployment.yaml
-                        kubectl apply -f service.yaml
-                        """
-                    }
+                    // Ensure the correct image tag is used in the docker-compose.yml
+                    sh '''
+                    sed -i "s|image: .*|image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}|" docker-compose.yml
+                    '''
+                    // Deploy using Docker Compose
+                    sh 'docker-compose down'
+                    sh 'docker-compose up -d'
+                    currentBuild.description = 'DEPLOYMENT_EXECUTED'
                 }
             }
         }
@@ -137,60 +64,57 @@ pipeline {
     post {
         success {
             script {
-                currentBuild.description = "Image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
-                sh """curl -s \
-                -X POST \
-                --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
-                https://api.mailjet.com/v3.1/send \
-                -H "Content-Type:application/json" \
-                -d '{
-                    "Messages":[
+                if (currentBuild.description == 'DEPLOYMENT_EXECUTED') {
+                    sh '''
+                    curl -s -X POST --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET https://api.mailjet.com/v3.1/send -H "Content-Type:application/json" -d '{
+                        "Messages":[
                             {
-                                    "From": {
-                                            "Email": "$MAIL_JET_EMAIL_ADDRESS",
-                                            "Name": "ArpanSahuOne Jenkins Notification"
-                                    },
-                                    "To": [
-                                            {
-                                                    "Email": "$MY_EMAIL_ADDRESS",
-                                                    "Name": "Development Team"
-                                            }
-                                    ],
-                                    "Subject": "${currentBuild.fullDisplayName} built successfully",
-                                    "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} is now built and pushed to the registry",
-                                    "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is now built and pushed to the registry </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
+                                "From": {
+                                    "Email": "$MAIL_JET_EMAIL_ADDRESS",
+                                    "Name": "ArpanSahuOne Jenkins Notification"
+                                },
+                                "To": [
+                                    {
+                                        "Email": "$MY_EMAIL_ADDRESS",
+                                        "Name": "Development Team"
+                                    }
+                                ],
+                                "Subject": "${currentBuild.fullDisplayName} deployed successfully",
+                                "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed",
+                                "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
                             }
-                    ]
-                }'"""
-                build job: 'great_chat', wait: false
+                        ]
+                    }'
+                    '''
+                }
+                // Trigger the common_readme job on success
+                build job: 'common_readme', parameters: [string(name: 'project_git_url', value: 'https://github.com/arpansahu/great_chat'), string(name: 'environment', value: 'prod')], wait: false
             }
         }
         failure {
             script {
-                sh """curl -s \
-                -X POST \
-                --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
-                https://api.mailjet.com/v3.1/send \
-                -H "Content-Type:application/json" \
-                -d '{
+                // Send deployment failure notification
+                sh '''
+                curl -s -X POST --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET https://api.mailjet.com/v3.1/send -H "Content-Type:application/json" -d '{
                     "Messages":[
-                            {
-                                    "From": {
-                                            "Email": "$MAIL_JET_EMAIL_ADDRESS",
-                                            "Name": "ArpanSahuOne Jenkins Notification"
-                                    },
-                                    "To": [
-                                            {
-                                                    "Email": "$MY_EMAIL_ADDRESS",
-                                                    "Name": "Development Team"
-                                            }
-                                    ],
-                                    "Subject": "${currentBuild.fullDisplayName} build failed",
-                                    "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} build failed",
-                                    "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} build failed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
-                            }
+                        {
+                            "From": {
+                                "Email": "$MAIL_JET_EMAIL_ADDRESS",
+                                "Name": "ArpanSahuOne Jenkins Notification"
+                            },
+                            "To": [
+                                {
+                                    "Email": "$MY_EMAIL_ADDRESS",
+                                    "Name": "Development Team"
+                                }
+                            ],
+                            "Subject": "${currentBuild.fullDisplayName} deployment failed",
+                            "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} deployment failed",
+                            "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is not deployed, Build Failed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
+                        }
                     ]
-                }'"""
+                }'
+                '''
             }
         }
     }
