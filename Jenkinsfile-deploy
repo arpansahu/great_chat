@@ -70,7 +70,7 @@ pipeline {
 
                         // Deploy to Kubernetes
                         sh '''
-                        kubectl create secret generic great-chat-secret --from-env-file=${WORKSPACE}/.env
+                        kubectl create secret generic great-chat-secret --from-env-file=.env
                         kubectl apply -f deployment.yaml
                         kubectl apply -f service.yaml
                         '''
@@ -107,7 +107,7 @@ pipeline {
                     '''
                 }
                 // Trigger the common_readme job on success
-                build job: 'common_readme', parameters: [string(name: 'project_git_url', value: 'https://github.com/arpansahu/great_chat'), string(name: 'environment', value: 'prod')], wait: false
+                // build job: 'common_readme', parameters: [string(name: 'project_git_url', value: 'https://github.com/arpansahu/great_chat'), string(name: 'environment', value: 'prod')], wait: false
             }
         }
         failure {
