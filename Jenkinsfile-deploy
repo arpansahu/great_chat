@@ -65,9 +65,12 @@ pipeline {
                         sh 'docker-compose down'
                         sh 'docker-compose up -d'
                     } else if (params.DEPLOY_TYPE == 'kubernetes') {
+                        // Copy the .env file to the workspace
+                        sh "sudo cp /root/projectenvs/great_chat/.env ${env.WORKSPACE}/"
+
                         // Deploy to Kubernetes
                         sh '''
-                        kubectl create secret generic great-chat-secret --from-env-file=/root/projectenvs/great_chat/.env
+                        kubectl create secret generic great-chat-secret --from-env-file=${env.WORKSPACE}/.env
                         kubectl apply -f deployment.yaml
                         kubectl apply -f service.yaml
                         '''
