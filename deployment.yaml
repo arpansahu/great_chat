@@ -95,11 +95,6 @@ spec:
                 secretKeyRef:
                   name: great-chat-secret
                   key: PROTOCOL
-            - name: AWS_S3_REGION_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: great-chat-secret
-                  key: AWS_S3_REGION_NAME
           ports:
             - containerPort: 8002
               name: daphne
