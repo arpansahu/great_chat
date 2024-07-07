@@ -103,7 +103,7 @@ pipeline {
                             
                             // Check deployment status
                             sh '''
-                            kubectl rollout status deployment/great-chat-deployment
+                            kubectl rollout status deployment/great-chat-app
                             '''
                             
                             // Verify service and get NodePort
