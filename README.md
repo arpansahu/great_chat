@@ -1161,7 +1161,7 @@ if you remove this tag it will be attached to terminal, and you will be able to 
 
     copy and paste below content into it
 
-    ```bash
+    ```yaml
     apiVersion: v1
     kind: ServiceAccount
     metadata:
@@ -1180,7 +1180,7 @@ if you remove this tag it will be attached to terminal, and you will be able to 
 
     copy and paste below content into it
 
-    ```bash
+    ```yaml
     apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRoleBinding
     metadata:
@@ -1211,7 +1211,7 @@ if you remove this tag it will be attached to terminal, and you will be able to 
 
 2. Modify the service to use NodePort:
 
-    ```bash
+    ```yaml
     # Please edit the object below. Lines beginning with a '#' will be ignored,
     # and an empty file will abort the edit. If an error occurs while saving this file will be
     # reopened with the relevant failures.
@@ -1294,7 +1294,7 @@ if you remove this tag it will be attached to terminal, and you will be able to 
 
 4. Test the Nginx Configuration
 
-    ```bash
+    ```bas
     sudo nginx -t
     ```
 
@@ -1334,7 +1334,7 @@ if you remove this tag it will be attached to terminal, and you will be able to 
 
     copy this and past it in the file
 
-    ```bash
+    ```yaml
     apiVersion: v1
     kind: ServiceAccount
     metadata:
@@ -1351,7 +1351,7 @@ if you remove this tag it will be attached to terminal, and you will be able to 
 
     copy this and past it in the file
 
-    ```bash
+    ```yaml
     apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRoleBinding
     metadata:
@@ -1375,7 +1375,7 @@ if you remove this tag it will be attached to terminal, and you will be able to 
 
     copy this and past it in the file
 
-    ```bash
+    ```yaml
     apiVersion: v1
     kind: Secret
     metadata:
