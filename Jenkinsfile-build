@@ -49,6 +49,7 @@ pipeline {
                                     error("No relevant changes detected. Skipping build.")
                                 } else {
                                     echo "Relevant changes detected. Proceeding with build."
+                                    currentBuild.result = 'BUILT'
                                 }
                             }
                         } else {
