@@ -8,6 +8,7 @@ pipeline {
         REPOSITORY = "library/great_chat"
         IMAGE_TAG = "${env.BUILD_ID}"
         COMMIT_FILE = "${env.WORKSPACE}/last_commit.txt"
+        BUILD_STATUS = 'UNKNOWN'
     }
     stages {
         stage('Checkout') {
@@ -18,10 +19,10 @@ pipeline {
         stage('Check for Changes') {
             steps {
                 script {
-                    if (params.skip_checks){
+                    if (params.skip_checks) {
                         echo "Skipping Checks is True. Proceeding with build."
-                    }
-                    else{
+                        BUILD_STATUS = 'BUILT'
+                    } else {
                         // Get the current commit hash
                         def currentCommit = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
                         echo "Current commit: ${currentCommit}"
@@ -39,34 +40,33 @@ pipeline {
                             } else {
                                 // Check for changes in relevant files
                                 def changes = sh(script: "git diff --name-only ${lastCommit} ${currentCommit}", returnStdout: true).trim().split("\n")
-                                def relevantChanges = changes.findAll { 
+                                def relevantChanges = changes.findAll {
                                     !(it in ['README.md', 'SECURITY.md', 'CHANGELOG.md', '.github/dependabot.yml'])
                                 }
-                                
+
                                 if (relevantChanges.isEmpty()) {
                                     echo "No relevant changes detected. Skipping build."
                                     currentBuild.result = 'NOT_BUILT'
                                     error("No relevant changes detected. Skipping build.")
                                 } else {
                                     echo "Relevant changes detected. Proceeding with build."
-                                    currentBuild.result = 'BUILT'
+                                    BUILD_STATUS = 'BUILT'
                                 }
                             }
                         } else {
                             echo "No last commit file found. Proceeding with initial build."
+                            BUILD_STATUS = 'BUILT'
                         }
+
+                        // Save the current commit hash to the file
+                        writeFile(file: COMMIT_FILE, text: currentCommit)
                     }
-                    
-                    // Save the current commit hash to the file
-                    writeFile(file: COMMIT_FILE, text: currentCommit)
                 }
             }
         }
         stage('Dependencies') {
             when {
-                not {
-                    environment name: 'BUILD_STATUS', value: 'NOT_BUILT'
-                }
+                expression { return BUILD_STATUS != 'NOT_BUILT' }
             }
             steps {
                 script {
@@ -77,18 +77,16 @@ pipeline {
         }
         stage('Build Image') {
             when {
-                not {
-                    environment name: 'BUILD_STATUS', value: 'NOT_BUILT'
-                }
+                expression { return BUILD_STATUS != 'NOT_BUILT' }
             }
             steps {
                 script {
                     // Ensure Docker is running and can be accessed
                     sh 'docker --version'
-                    
+
                     // Log the image details
                     echo "Building Docker image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
-                    
+
                     // Build the Docker image
                     sh """
                     docker build -t ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG} .
@@ -99,9 +97,7 @@ pipeline {
         }
         stage('Push Image') {
             when {
-                not {
-                    environment name: 'BUILD_STATUS', value: 'NOT_BUILT'
-                }
+                expression { return BUILD_STATUS != 'NOT_BUILT' }
             }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'harbor-credentials', passwordVariable: 'DOCKER_REGISTRY_PASSWORD', usernameVariable: 'DOCKER_REGISTRY_USERNAME')]) {
@@ -110,7 +106,7 @@ pipeline {
                         sh '''
                         echo $DOCKER_REGISTRY_PASSWORD | docker login ${REGISTRY} -u $DOCKER_REGISTRY_USERNAME --password-stdin
                         '''
-                        
+
                         // Push the Docker image to the registry
                         sh '''
                         docker push ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}
@@ -125,7 +121,7 @@ pipeline {
         success {
             script {
                 currentBuild.description = "Image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
-                
+
                 // Send success notification email
                 sh """curl -s \
                 -X POST \
