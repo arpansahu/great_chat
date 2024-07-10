@@ -155,7 +155,7 @@ pipeline {
                                         "Name": "Development Team"
                                     }
                                 ],
-                                "Subject": "${currentBuild.fullDisplayName} deployed successfully",
+                                "Subject": "Jenkins Build Pipeline your project ${currentBuild.fullDisplayName} Ran Successfully",
                                 "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed",
                                 "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
                             }
@@ -184,7 +184,7 @@ pipeline {
                                     "Name": "Development Team"
                                 }
                             ],
-                            "Subject": "${currentBuild.fullDisplayName} deployment failed",
+                            "Subject": "Jenkins Build Pipeline your project ${currentBuild.fullDisplayName} Ran Failed",
                             "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} deployment failed",
                             "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is not deployed, Build Failed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
                         }
