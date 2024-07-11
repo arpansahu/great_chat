@@ -142,7 +142,7 @@ pipeline {
                                             }
                                     ],
                                     "Subject": "${currentBuild.description}",
-                                    "TextPart": "ola Development Team, your project ${currentBuild.fullDisplayName} : ${currentBuild.description}",
+                                    "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} : ${currentBuild.description}",
                                     "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} : ${currentBuild.description} </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
                             }
                     ]
@@ -174,8 +174,8 @@ pipeline {
                                             }
                                     ],
                                     "Subject": "${currentBuild.fullDisplayName} build failed",
-                                    "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} build failed",
-                                    "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} build failed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
+                                    "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} build failed ${currentBuild.description} ",
+                                    "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} build failed </h3> <br> <p> ${currentBuild.description}  </p>"
                             }
                     ]
                 }'"""
