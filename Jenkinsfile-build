@@ -33,7 +33,6 @@ pipeline {
                             // Compare the current commit with the last commit
                             if (currentCommit == lastCommit) {
                                 echo "No changes detected. Skipping build."
-                                currentBuild.result = 'NOT_BUILT'
                                 currentBuild.description = "${currentBuild.fullDisplayName} build skipped due to no changes detected"
                                 return
                             } else {
@@ -45,7 +44,6 @@ pipeline {
                                 
                                 if (relevantChanges.isEmpty()) {
                                     echo "No relevant changes detected. Skipping build."
-                                    currentBuild.result = 'NOT_BUILT'
                                     currentBuild.description = "${currentBuild.fullDisplayName} build skipped due to no relevant changes"
                                     return
                                 } else {
