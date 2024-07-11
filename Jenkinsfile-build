@@ -128,13 +128,15 @@ pipeline {
                         def repo = "great_chat"
                         def auth = "${env.DOCKER_REGISTRY_USERNAME}:${env.DOCKER_REGISTRY_PASSWORD}"
                         
-                        def response = sh(script: "curl -s -u $auth '${harborUrl}/api/v2.0/projects/${project}/repositories/${repo}/artifacts?page_size=100&with_tag=true'", returnStdout: true)
-                        def artifacts = new groovy.json.JsonSlurper().parseText(response)
-                        
-                        artifacts.sort { it.push_time }.reverse().drop(3).each { artifact ->
-                            artifact.tags.each { tag ->
-                                sh "curl -u $auth -X DELETE '${harborUrl}/api/v2.0/projects/${project}/repositories/${repo}/artifacts/${tag.name}'"
-                                echo "Deleted image: ${tag.name}"
+                        withEnv(["HARBOR_AUTH=${auth}"]) {
+                            def response = sh(script: "curl -s -u ${HARBOR_AUTH} '${harborUrl}/api/v2.0/projects/${project}/repositories/${repo}/artifacts?page_size=100&with_tag=true'", returnStdout: true)
+                            def artifacts = new groovy.json.JsonSlurper().parseText(response)
+                            
+                            artifacts.sort { it.push_time }.reverse().drop(3).each { artifact ->
+                                artifact.tags.each { tag ->
+                                    sh "curl -u ${HARBOR_AUTH} -X DELETE '${harborUrl}/api/v2.0/projects/${project}/repositories/${repo}/artifacts/${tag.name}'"
+                                    echo "Deleted image: ${tag.name}"
+                                }
                             }
                         }
                     }
