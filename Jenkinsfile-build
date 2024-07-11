@@ -117,6 +117,31 @@ pipeline {
                 }
             }
         }
+        stage('Cleanup Old Images') {
+            when {
+                expression { return BUILD_STATUS != 'NOT_BUILT' }
+            }
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'harbor-credentials', passwordVariable: 'DOCKER_REGISTRY_PASSWORD', usernameVariable: 'DOCKER_REGISTRY_USERNAME')]) {
+                    script {
+                        def harborUrl = "${REGISTRY}"
+                        def project = "library"
+                        def repo = "great_chat"
+                        def auth = "${env.DOCKER_REGISTRY_USERNAME}:${env.DOCKER_REGISTRY_PASSWORD}"
+                        
+                        def response = sh(script: "curl -s -u $auth '${harborUrl}/api/v2.0/projects/${project}/repositories/${repo}/artifacts?page_size=100&with_tag=true'", returnStdout: true)
+                        def artifacts = new groovy.json.JsonSlurper().parseText(response)
+                        
+                        artifacts.sort { it.push_time }.reverse().drop(3).each { artifact ->
+                            artifact.tags.each { tag ->
+                                sh "curl -u $auth -X DELETE '${harborUrl}/api/v2.0/projects/${project}/repositories/${repo}/artifacts/${tag.name}'"
+                                echo "Deleted image: ${tag.name}"
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
     post {
         success {
