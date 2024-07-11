@@ -10,6 +10,7 @@ pipeline {
         IMAGE_TAG = "latest"  // or use a specific tag if needed
         KUBECONFIG = "${env.WORKSPACE}/kubeconfig"  // Set the KUBECONFIG environment variable
         NGINX_CONF = "/etc/nginx/sites-available/arpansahu"
+        SERVER_NAME = "great-chat.arpansahu.me"  // Define the server name to be updated
     }
     stages {
         stage('Initialize') {
@@ -123,9 +124,9 @@ pipeline {
                             fi
                             """
 
-                            // Update Nginx configuration
+                            // Update Nginx configuration for the specific server block
                             // sh """
-                            // sudo sed -i 's|proxy_pass .*;|proxy_pass http://${clusterIP}:${nodePort};|' ${NGINX_CONF}
+                            // sudo sed -i '/server_name ${SERVER_NAME}/,/}/ s|proxy_pass .*;|proxy_pass http://${clusterIP}:${nodePort};|' ${NGINX_CONF}
                             // sudo nginx -s reload
                             // """
                         } else {
