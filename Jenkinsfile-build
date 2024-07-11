@@ -20,6 +20,7 @@ pipeline {
                 script {
                     if (params.skip_checks) {
                         echo "Skipping Checks is True. Proceeding with build."
+                        BUILD_STATUS = 'BUILT'
                     } else {
                         // Get the current commit hash
                         def currentCommit = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
