@@ -126,20 +126,24 @@ pipeline {
                         def harborUrl = "${REGISTRY}"
                         def project = "library"
                         def repo = "great_chat"
-                        def auth = "${env.DOCKER_REGISTRY_USERNAME}:${env.DOCKER_REGISTRY_PASSWORD}"
                         
                         sh """
-                        curl -s -u ${env.DOCKER_REGISTRY_USERNAME}:${env.DOCKER_REGISTRY_PASSWORD} '${harborUrl}/api/v2.0/projects/${project}/repositories/${repo}/artifacts?page_size=100&with_tag=true' > artifacts.json
+                        curl -s -u $DOCKER_REGISTRY_USERNAME:$DOCKER_REGISTRY_PASSWORD '${harborUrl}/api/v2.0/projects/${project}/repositories/${repo}/artifacts?page_size=100&with_tag=true' > artifacts.json
                         """
                         
                         def artifacts = readJSON file: 'artifacts.json'
-                        
-                        artifacts.sort { it.push_time }.reverse().drop(3).each { artifact ->
-                            artifact.tags.each { tag ->
-                                sh """
-                                curl -u ${env.DOCKER_REGISTRY_USERNAME}:${env.DOCKER_REGISTRY_PASSWORD} -X DELETE '${harborUrl}/api/v2.0/projects/${project}/repositories/${repo}/artifacts/${tag.name}'
-                                """
-                                echo "Deleted image: ${tag.name}"
+                        echo "Fetched artifacts: ${artifacts}"
+
+                        if (artifacts.size() <= 3) {
+                            echo "No old images to delete. Total images: ${artifacts.size()}"
+                        } else {
+                            artifacts.sort { it.push_time }.reverse().drop(3).each { artifact ->
+                                artifact.tags.each { tag ->
+                                    sh """
+                                    curl -u $DOCKER_REGISTRY_USERNAME:$DOCKER_REGISTRY_PASSWORD -X DELETE '${harborUrl}/api/v2.0/projects/${project}/repositories/${repo}/artifacts/${tag.name}'
+                                    """
+                                    echo "Deleted image: ${tag.name}"
+                                }
                             }
                         }
                     }
