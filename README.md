@@ -2277,54 +2277,57 @@ pipeline {
             }
         }
         stage('Check for Changes') {
-            when {
-                expression { return !params.skip_checks }
-            }
             steps {
                 script {
-                    // Get the current commit hash
-                    def currentCommit = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
-                    echo "Current commit: ${currentCommit}"
-
-                    // Check if the last commit file exists
-                    if (fileExists(COMMIT_FILE)) {
-                        def lastCommit = readFile(COMMIT_FILE).trim()
-                        echo "Last commit: ${lastCommit}"
-
-                        // Compare the current commit with the last commit
-                        if (currentCommit == lastCommit) {
-                            echo "No changes detected. Skipping build."
-                            currentBuild.result = 'NOT_BUILT'
-                            error("No changes detected. Skipping build.")
-                        } else {
-                            // Check for changes in relevant files
-                            def changes = sh(script: "git diff --name-only ${lastCommit} ${currentCommit}", returnStdout: true).trim().split("\n")
-                            def relevantChanges = changes.findAll { 
-                                !(it in ['README.md', 'SECURITY.md', 'CHANGELOG.md', '.github/dependabot.yml'])
-                            }
-                            
-                            if (relevantChanges.isEmpty()) {
-                                echo "No relevant changes detected. Skipping build."
-                                currentBuild.result = 'NOT_BUILT'
-                                error("No relevant changes detected. Skipping build.")
-                            } else {
-                                echo "Relevant changes detected. Proceeding with build."
-                            }
-                        }
+                    if (params.skip_checks) {
+                        echo "Skipping Checks is True. Proceeding with build."
                     } else {
-                        echo "No last commit file found. Proceeding with initial build."
-                    }
+                        // Get the current commit hash
+                        def currentCommit = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
+                        echo "Current commit: ${currentCommit}"
 
-                    // Save the current commit hash to the file
-                    writeFile(file: COMMIT_FILE, text: currentCommit)
+                        // Check if the last commit file exists
+                        if (fileExists(COMMIT_FILE)) {
+                            def lastCommit = readFile(COMMIT_FILE).trim()
+                            echo "Last commit: ${lastCommit}"
+
+                            // Compare the current commit with the last commit
+                            if (currentCommit == lastCommit) {
+                                echo "No changes detected. Skipping build."
+                                currentBuild.result = 'NOT_BUILT'
+                                currentBuild.description = "${currentBuild.fullDisplayName} build skipped due to no changes detected"
+                                return
+                            } else {
+                                // Check for changes in relevant files
+                                def changes = sh(script: "git diff --name-only ${lastCommit} ${currentCommit}", returnStdout: true).trim().split("\n")
+                                def relevantChanges = changes.findAll { 
+                                    !(it in ['README.md', 'SECURITY.md', 'CHANGELOG.md', '.github/dependabot.yml'])
+                                }
+                                
+                                if (relevantChanges.isEmpty()) {
+                                    echo "No relevant changes detected. Skipping build."
+                                    currentBuild.result = 'NOT_BUILT'
+                                    currentBuild.description = "${currentBuild.fullDisplayName} build skipped due to no relevant changes"
+                                    return
+                                } else {
+                                    echo "Relevant changes detected. Proceeding with build."
+                                    BUILD_STATUS = 'BUILT'
+                                }
+                            }
+                        } else {
+                            echo "No last commit file found. Proceeding with initial build."
+                            BUILD_STATUS = 'BUILT'
+                        }
+
+                        // Save the current commit hash to the file
+                        writeFile(file: COMMIT_FILE, text: currentCommit)
+                    }
                 }
             }
         }
         stage('Dependencies') {
             when {
-                not {
-                    environment name: 'BUILD_STATUS', value: 'NOT_BUILT'
-                }
+                expression { return BUILD_STATUS != 'NOT_BUILT' }
             }
             steps {
                 script {
@@ -2335,18 +2338,16 @@ pipeline {
         }
         stage('Build Image') {
             when {
-                not {
-                    environment name: 'BUILD_STATUS', value: 'NOT_BUILT'
-                }
+                expression { return BUILD_STATUS != 'NOT_BUILT' }
             }
             steps {
                 script {
                     // Ensure Docker is running and can be accessed
                     sh 'docker --version'
-                    
+
                     // Log the image details
                     echo "Building Docker image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
-                    
+
                     // Build the Docker image
                     sh """
                     docker build -t ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG} .
@@ -2357,9 +2358,7 @@ pipeline {
         }
         stage('Push Image') {
             when {
-                not {
-                    environment name: 'BUILD_STATUS', value: 'NOT_BUILT'
-                }
+                expression { return BUILD_STATUS != 'NOT_BUILT' }
             }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'harbor-credentials', passwordVariable: 'DOCKER_REGISTRY_PASSWORD', usernameVariable: 'DOCKER_REGISTRY_USERNAME')]) {
@@ -2368,7 +2367,7 @@ pipeline {
                         sh '''
                         echo $DOCKER_REGISTRY_PASSWORD | docker login ${REGISTRY} -u $DOCKER_REGISTRY_USERNAME --password-stdin
                         '''
-                        
+
                         // Push the Docker image to the registry
                         sh '''
                         docker push ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}
@@ -2382,7 +2381,9 @@ pipeline {
     post {
         success {
             script {
-                currentBuild.description = "Image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
+                if (!currentBuild.description) {
+                    currentBuild.description = "Image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG} built and pushed successfully"
+                }
                 
                 // Send success notification email
                 sh """curl -s \
@@ -2403,9 +2404,9 @@ pipeline {
                                                     "Name": "Development Team"
                                             }
                                     ],
-                                    "Subject": "${currentBuild.fullDisplayName} built successfully",
-                                    "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} is now built and pushed to the registry",
-                                    "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is now built and pushed to the registry </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
+                                    "Subject": "${currentBuild.description}",
+                                    "TextPart": "ola Development Team, your project ${currentBuild.fullDisplayName} : ${currentBuild.description}",
+                                    "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} : ${currentBuild.description} </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
                             }
                     ]
                 }'"""
@@ -2460,6 +2461,8 @@ pipeline {
         REGISTRY = "harbor.arpansahu.me"
         REPOSITORY = "library/great_chat"
         IMAGE_TAG = "latest"  // or use a specific tag if needed
+        KUBECONFIG = "${env.WORKSPACE}/kubeconfig"  // Set the KUBECONFIG environment variable
+        NGINX_CONF = "/etc/nginx/sites-available/arpansahu"
     }
     stages {
         stage('Initialize') {
@@ -2472,6 +2475,16 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
+            }
+        }
+        stage('Setup Kubernetes Config') {
+            steps {
+                script {
+                    // Copy the kubeconfig file to the workspace
+                    sh "sudo cp /root/.kube/config ${env.WORKSPACE}/kubeconfig"
+                    // Change permissions of the kubeconfig file
+                    sh "sudo chmod 644 ${env.WORKSPACE}/kubeconfig"
+                }
             }
         }
         stage('Check for New Image') {
@@ -2520,12 +2533,57 @@ pipeline {
                         // Copy the .env file to the workspace
                         sh "sudo cp /root/projectenvs/great_chat/.env ${env.WORKSPACE}/"
 
-                        // Deploy to Kubernetes
-                        sh '''
-                        kubectl create secret generic great-chat-secret --from-env-file=${WORKSPACE}/.env
-                        kubectl apply -f deployment.yaml
-                        kubectl apply -f service.yaml
-                        '''
+                        // Check if the file is copied successfully
+                        if (fileExists("${env.WORKSPACE}/.env")) {
+                            echo ".env file copied successfully."
+                            
+                            // Verify Kubernetes configuration
+                            sh 'kubectl cluster-info'
+                            
+                            // Print current directory
+                            sh 'pwd'
+                            
+                            // Delete existing secret if it exists
+                            sh '''
+                            kubectl delete secret great-chat-secret || true
+                            '''
+
+                            // Deploy to Kubernetes
+                            sh '''
+                            kubectl create secret generic great-chat-secret --from-env-file=${WORKSPACE}/.env
+                            kubectl apply -f ${WORKSPACE}/deployment.yaml
+                            kubectl apply -f ${WORKSPACE}/service.yaml
+                            '''
+                            
+                            // Check deployment status
+                            sh '''
+                            kubectl rollout status deployment/great-chat-app
+                            '''
+                            
+                            // Verify service and get NodePort
+                            def nodePort = sh(script: "kubectl get service great-chat-service -o=jsonpath='{.spec.ports[0].nodePort}'", returnStdout: true).trim()
+                            echo "Service NodePort: ${nodePort}"
+
+                            // Get cluster IP address
+                            def clusterIP = sh(script: "kubectl get nodes -o=jsonpath='{.items[0].status.addresses[0].address}'", returnStdout: true).trim()
+                            echo "Cluster IP: ${clusterIP}"
+
+                            // Verify if the service is accessible and delete the Docker container if accessible
+                            sh """
+                            curl -v http://${clusterIP}:${nodePort} && \
+                            if [ \$(docker ps -q -f name=great_chat) ]; then
+                                docker rm -f great_chat
+                            fi
+                            """
+
+                            // Update Nginx configuration
+                            // sh """
+                            // sudo sed -i 's|proxy_pass .*;|proxy_pass http://${clusterIP}:${nodePort};|' ${NGINX_CONF}
+                            // sudo nginx -s reload
+                            // """
+                        } else {
+                            error ".env file not found in the workspace."
+                        }
                     }
                     currentBuild.description = 'DEPLOYMENT_EXECUTED'
                 }
@@ -2550,7 +2608,7 @@ pipeline {
                                         "Name": "Development Team"
                                     }
                                 ],
-                                "Subject": "${currentBuild.fullDisplayName} deployed successfully",
+                                "Subject": "Jenkins Build Pipeline your project ${currentBuild.fullDisplayName} Ran Successfully",
                                 "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed",
                                 "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
                             }
@@ -2559,7 +2617,7 @@ pipeline {
                     '''
                 }
                 // Trigger the common_readme job on success
-                build job: 'common_readme', parameters: [string(name: 'project_git_url', value: 'https://github.com/arpansahu/great_chat'), string(name: 'environment', value: 'prod')], wait: false
+                // build job: 'common_readme', parameters: [string(name: 'project_git_url', value: 'https://github.com/arpansahu/great_chat'), string(name: 'environment', value: 'prod')], wait: false
             }
         }
         failure {
@@ -2579,7 +2637,7 @@ pipeline {
                                     "Name": "Development Team"
                                 }
                             ],
-                            "Subject": "${currentBuild.fullDisplayName} deployment failed",
+                            "Subject": "Jenkins Build Pipeline your project ${currentBuild.fullDisplayName} Ran Failed",
                             "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} deployment failed",
                             "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is not deployed, Build Failed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
                         }
