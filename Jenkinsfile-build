@@ -131,6 +131,9 @@ pipeline {
                         curl -s -u $DOCKER_REGISTRY_USERNAME:$DOCKER_REGISTRY_PASSWORD '${harborUrl}/api/v2.0/projects/${project}/repositories/${repo}/artifacts?page_size=100&with_tag=true' > artifacts.json
                         """
                         
+                        // Print raw response
+                        sh 'cat artifacts.json'
+                        
                         def artifacts = readJSON file: 'artifacts.json'
                         echo "Fetched artifacts: ${artifacts}"
 
@@ -140,9 +143,9 @@ pipeline {
                             artifacts.sort { it.push_time }.reverse().drop(3).each { artifact ->
                                 artifact.tags.each { tag ->
                                     sh """
-                                    curl -u $DOCKER_REGISTRY_USERNAME:$DOCKER_REGISTRY_PASSWORD -X DELETE '${harborUrl}/api/v2.0/projects/${project}/repositories/${repo}/artifacts/${tag.name}'
+                                    curl -u $DOCKER_REGISTRY_USERNAME:$DOCKER_REGISTRY_PASSWORD -X DELETE '${harborUrl}/api/v2.0/projects/${project}/repositories/${repo}/artifacts/${artifact.digest}'
                                     """
-                                    echo "Deleted image: ${tag.name}"
+                                    echo "Deleted image: ${artifact.digest}"
                                 }
                             }
                         }
