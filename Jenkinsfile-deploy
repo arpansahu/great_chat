@@ -76,6 +76,23 @@ pipeline {
                         // Deploy using Docker Compose
                         sh 'docker-compose down'
                         sh 'docker-compose up -d'
+
+                        // Verify the container is running
+                        def containerRunning = sh(script: "docker ps -q -f name=great_chat", returnStdout: true).trim()
+                        if (!containerRunning) {
+                            error "Container great_chat is not running"
+                        } else {
+                            echo "Container great_chat is running"
+                        }
+
+                        // Check if the service is accessible
+                        def serviceAccessible = sh(script: "curl -s -o /dev/null -w '%{http_code}' http://0.0.0.0:8002", returnStdout: true).trim()
+                        if (serviceAccessible == '200') {
+                            echo "Service is accessible"
+                        } else {
+                            error "Service is not accessible"
+                        }
+
                     } else if (params.DEPLOY_TYPE == 'kubernetes') {
                         // Copy the .env file to the workspace
                         sh "sudo cp /root/projectenvs/great_chat/.env ${env.WORKSPACE}/"
