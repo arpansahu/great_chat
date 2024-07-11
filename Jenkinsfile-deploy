@@ -1,7 +1,7 @@
 pipeline {
     agent { label 'local' }
     parameters {
-        booleanParam(name: 'skip_checks', defaultValue: false, description: 'Skip the Check for Changes stage')
+        booleanParam(name: 'skip_checks', defaultValue: true, description: 'Skip the Check for Changes stage')
         choice(name: 'DEPLOY_TYPE', choices: ['docker', 'kubernetes'], description: 'Select deployment type')
     }
     environment {
