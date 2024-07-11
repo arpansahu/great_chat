@@ -133,7 +133,7 @@ pipeline {
 
                             // Verify if the Nginx configuration is updated
                             echo "Checking if Nginx configuration is modified:"
-                            sh "sudo grep -A 10 'server_name ${SERVER_NAME}' ${NGINX_CONF}"
+                            sh "sudo awk '/server_name ${SERVER_NAME}/,/\}/' ${NGINX_CONF}"
                             
                             // Reload Nginx
                             sh "sudo nginx -s reload"
