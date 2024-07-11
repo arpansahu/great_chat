@@ -129,8 +129,14 @@ pipeline {
                             sudo sed -i '/server_name ${SERVER_NAME}/,/}/ { 
                                 s|proxy_pass .*;|proxy_pass http://${clusterIP}:${nodePort};| 
                             }' ${NGINX_CONF}
-                            sudo nginx -s reload
                             """
+
+                            // Verify if the Nginx configuration is updated
+                            echo "Checking if Nginx configuration is modified:"
+                            sh "sudo grep -A 10 'server_name ${SERVER_NAME}' ${NGINX_CONF}"
+                            
+                            // Reload Nginx
+                            sh "sudo nginx -s reload"
                         } else {
                             error ".env file not found in the workspace."
                         }
