@@ -88,12 +88,28 @@ pipeline {
                             echo "Container great_chat is running"
                         }
 
-                        // Check if the service is accessible
-                        def serviceAccessible = sh(script: "curl -s -o /dev/null -w '%{http_code}' http://0.0.0.0:8002", returnStdout: true).trim()
-                        if (serviceAccessible == '200') {
-                            echo "Service is accessible"
+                        // Check container logs
+                        sh "docker logs great_chat"
+
+                        // Retry the service check with some delay
+                        def maxRetries = 5
+                        def sleepInterval = 10  // seconds
+                        def serviceAccessible = false
+
+                        for (int i = 0; i < maxRetries; i++) {
+                            def statusCode = sh(script: "curl -s -o /dev/null -w '%{http_code}' http://0.0.0.0:8002", returnStdout: true).trim()
+                            if (statusCode == '200') {
+                                serviceAccessible = true
+                                break
+                            }
+                            echo "Service check failed with status code: ${statusCode}. Retrying in ${sleepInterval} seconds..."
+                            sleep sleepInterval
+                        }
+
+                        if (!serviceAccessible) {
+                            error "Service is not accessible after ${maxRetries} retries"
                         } else {
-                            error "Service is not accessible, returned HTTP status code: ${serviceAccessible}"
+                            echo "Service is accessible"
                         }
 
                     } else if (params.DEPLOY_TYPE == 'kubernetes') {
@@ -206,12 +222,4 @@ pipeline {
                             ],
                             "Subject": "Jenkins Build Pipeline your project ${currentBuild.fullDisplayName} Ran Failed",
                             "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} deployment failed",
-                            "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is not deployed, Build Failed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
-                        }
-                    ]
-                }'
-                '''
-            }
-        }
-    }
-}
+                            "HTMLPart": "<h3>Hola Development Team
