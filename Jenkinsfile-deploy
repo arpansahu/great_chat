@@ -93,7 +93,7 @@ pipeline {
                         if (serviceAccessible == '200') {
                             echo "Service is accessible"
                         } else {
-                            error "Service is not accessible"
+                            error "Service is not accessible, returned HTTP status code: ${serviceAccessible}"
                         }
 
                     } else if (params.DEPLOY_TYPE == 'kubernetes') {
