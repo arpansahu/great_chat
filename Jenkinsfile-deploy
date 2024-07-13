@@ -222,4 +222,12 @@ pipeline {
                             ],
                             "Subject": "Jenkins Build Pipeline your project ${currentBuild.fullDisplayName} Ran Failed",
                             "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} deployment failed",
-                            "HTMLPart": "<h3>Hola Development Team
+                            "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is not deployed, Build Failed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
+                        }
+                    ]
+                }'
+                '''
+            }
+        }
+    }
+}
