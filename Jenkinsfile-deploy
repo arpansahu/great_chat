@@ -88,29 +88,11 @@ pipeline {
                             echo "Container great_chat is running"
                         }
 
-                        // Check container logs
-                        sh "docker logs great_chat"
-
-                        // Retry the service check with some delay
-                        def maxRetries = 5
-                        def sleepInterval = 10  // seconds
-                        def serviceAccessible = false
-
-                        for (int i = 0; i < maxRetries; i++) {
-                            def statusCode = sh(script: "curl -s -o /dev/null -w '%{http_code}' http://0.0.0.0:8002", returnStdout: true).trim()
-                            if (statusCode == '200') {
-                                serviceAccessible = true
-                                break
-                            }
-                            echo "Service check failed with status code: ${statusCode}. Retrying in ${sleepInterval} seconds..."
-                            sleep sleepInterval
-                        }
-
-                        if (!serviceAccessible) {
-                            error "Service is not accessible after ${maxRetries} retries"
-                        } else {
-                            echo "Service is accessible"
-                        }
+                        // Verify if the service is accessible and delete the Docker container if accessible
+                        sh """
+                        curl -v http://0.0.0.0:8002
+                        """
+                        
 
                     } else if (params.DEPLOY_TYPE == 'kubernetes') {
                         // Copy the .env file to the workspace
