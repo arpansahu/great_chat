@@ -88,9 +88,9 @@ pipeline {
                             echo "Container great_chat is running"
                         }
 
-                        // Verify if the service is accessible and delete the Docker container if accessible
+                        // Verify if the service is accessible
                         sh """
-                        curl -v http://0.0.0.0:8002
+                        curl -v http:/localhost:8002
                         """
                         
 
