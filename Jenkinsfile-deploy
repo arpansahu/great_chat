@@ -90,7 +90,7 @@ pipeline {
 
                         // Verify if the service is accessible and delete the Docker container if accessible
                         sh """
-                        curl -v http://178.16.137.37:8002
+                        curl -v http://0.0.0.0:8002
                         """
                         
 
