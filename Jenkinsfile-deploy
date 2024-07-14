@@ -81,25 +81,16 @@ pipeline {
                         sh 'docker-compose up -d'
 
                         // Wait for a few seconds to let the app start
-                        sleep 10  // Wait for the application to start
+                        sleep 10
 
+                        // Verify the container is running
                         def containerRunning = sh(script: "docker ps -q -f name=great_chat", returnStdout: true).trim()
                         if (!containerRunning) {
                             error "Container great_chat is not running"
                         } else {
                             echo "Container great_chat is running"
-                            // Fetch and display the response to see if the service is accessible
-                            def serviceResponse = sh(script: "curl -s -o /dev/null -w '%{http_code}' http://0.0.0.0:8002", returnStdout: true).trim()
-                            if (serviceResponse == '200') {
-                                echo "Service at http://0.0.0.0:8002 is up and running."
-
-                                // Check for any existing Kubernetes pods and delete them if they are running
-                                sh '''
-                                kubectl get pods --selector=app=great_chat -o=jsonpath='{.items[*].metadata.name}' | xargs -r kubectl delete pod
-                                '''
-                            } else {
-                                error "Failed to access Docker service at http://0.0.0.0:8002"
-                            }
+                            // Fetch and display the logs to see startup output
+                            sh "curl -v http://0.0.0.0:8002"
                         }
                     } else if (params.DEPLOY_TYPE == 'kubernetes') {
                         // Copy the .env file to the workspace
