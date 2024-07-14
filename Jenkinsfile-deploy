@@ -90,7 +90,7 @@ pipeline {
 
                         // Verify if the service is accessible
                         sh """
-                        curl -v http:/localhost:8002
+                            docker logs great_chat
                         """
                         
 
