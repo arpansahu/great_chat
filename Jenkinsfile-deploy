@@ -90,6 +90,7 @@ pipeline {
 
                         // Verify if the service is accessible
                         sh """
+                            docker ps
                             docker logs great_chat
                         """
                         
