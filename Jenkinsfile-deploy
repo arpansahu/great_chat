@@ -90,7 +90,7 @@ pipeline {
                         } else {
                             echo "Container great_chat is running"
                             // Fetch and display the logs to see startup output
-                            sh "docker logs great_chat"
+                            sh "curl -v http://0.0.0.0:8002"
                         }
                     } else if (params.DEPLOY_TYPE == 'kubernetes') {
                         // Copy the .env file to the workspace
