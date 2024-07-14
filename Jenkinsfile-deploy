@@ -7,8 +7,8 @@ pipeline {
     environment {
         REGISTRY = "harbor.arpansahu.me"
         REPOSITORY = "library/great_chat"
-        IMAGE_TAG = "latest"  // or use a specific tag if needed
-        KUBECONFIG = "${env.WORKSPACE}/kubeconfig"  // Set the KUBECONFIG environment variable
+        IMAGE_TAG = "latest"  // Optionally, this could be set dynamically to support CI/CD best practices
+        KUBECONFIG = "${env.WORKSPACE}/kubeconfig"  // Set the KUBECONFIG environment variable securely
         NGINX_CONF = "/etc/nginx/sites-available/great-chat"
     }
     stages {
@@ -30,9 +30,8 @@ pipeline {
             }
             steps {
                 script {
-                    // Copy the kubeconfig file to the workspace
+                    // Ensure the kubeconfig is securely copied and permissions set
                     sh "sudo cp /root/.kube/config ${env.WORKSPACE}/kubeconfig"
-                    // Change permissions of the kubeconfig file
                     sh "sudo chmod 644 ${env.WORKSPACE}/kubeconfig"
                 }
             }
@@ -43,16 +42,14 @@ pipeline {
             }
             steps {
                 script {
-                    // Get the ImageID of the currently running container
+                    // Checking for the new Docker image
                     def currentImageID = sh(script: "docker inspect -f '{{.Image}}' great_chat || echo 'none'", returnStdout: true).trim()
                     echo "Current image ID: ${currentImageID}"
 
-                    // Pull the latest image to get its ImageID
                     sh "docker pull ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
                     def latestImageID = sh(script: "docker inspect -f '{{.Id}}' ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}", returnStdout: true).trim()
                     echo "Latest image ID: ${latestImageID}"
 
-                    // Check if the ImageIDs are different
                     if (currentImageID != latestImageID) {
                         env.NEW_IMAGE_AVAILABLE = 'true'
                         echo "New image available, proceeding with deployment."
@@ -72,78 +69,53 @@ pipeline {
             steps {
                 script {
                     if (params.DEPLOY_TYPE == 'docker') {
-                        // Ensure the correct image tag is used in the docker-compose.yml
-                        sh '''
-                        sed -i "s|image: .*|image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}|" docker-compose.yml
-                        '''
-                        // Deploy using Docker Compose
+                        sh "sed -i 's|image: .*|image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}|' docker-compose.yml"
                         sh 'docker-compose down'
                         sh 'docker-compose up -d'
 
-                        // Wait for a few seconds to let the app start
-                        sleep 10
+                        sleep 10  // Giving the service time to start
 
-                        // Verify the container is running
                         def containerRunning = sh(script: "docker ps -q -f name=great_chat", returnStdout: true).trim()
                         if (!containerRunning) {
                             error "Container great_chat is not running"
                         } else {
                             echo "Container great_chat is running"
-                            // Fetch and display the logs to see startup output
-                            sh "curl -v http://0.0.0.0:8002"
+
+                            // Retry logic to ensure the service is reachable
+                            for (int i = 0; i < 5; i++) {
+                                def response = sh(script: "curl -s -o /dev/null -w '%{http_code}' http://0.0.0.0:8002", returnStdout: true).trim()
+                                if (response == '200') {
+                                    echo "Service is up and running."
+                                    break
+                                }
+                                if (i < 4) {
+                                    echo "Service not ready, retrying in 10 seconds..."
+                                    sleep 10
+                                } else {
+                                    error "Service failed to start after multiple attempts."
+                                }
+                            }
                         }
                     } else if (params.DEPLOY_TYPE == 'kubernetes') {
-                        // Copy the .env file to the workspace
                         sh "sudo cp /root/projectenvs/great_chat/.env ${env.WORKSPACE}/"
 
-                        // Check if the file is copied successfully
                         if (fileExists("${env.WORKSPACE}/.env")) {
                             echo ".env file copied successfully."
-                            
-                            // Verify Kubernetes configuration
                             sh 'kubectl cluster-info'
-                            
-                            // Print current directory
                             sh 'pwd'
-                            
-                            // Delete existing secret if it exists
-                            sh '''
-                            kubectl delete secret great-chat-secret || true
-                            '''
+                            sh "kubectl delete secret great-chat-secret || true"
+                            sh "kubectl create secret generic great-chat-secret --from-env-file=${WORKSPACE}/.env"
+                            sh "kubectl apply -f ${WORKSPACE}/deployment.yaml"
+                            sh "kubectl apply -f ${WORKSPACE}/service.yaml"
+                            sh "kubectl rollout status deployment/great-chat-app"
 
-                            // Deploy to Kubernetes
-                            sh '''
-                            kubectl create secret generic great-chat-secret --from-env-file=${WORKSPACE}/.env
-                            kubectl apply -f ${WORKSPACE}/deployment.yaml
-                            kubectl apply -f ${WORKSPACE}/service.yaml
-                            '''
-                            
-                            // Check deployment status
-                            sh '''
-                            kubectl rollout status deployment/great-chat-app
-                            '''
-                            
-                            // Verify service and get NodePort
                             def nodePort = sh(script: "kubectl get service great-chat-service -o=jsonpath='{.spec.ports[0].nodePort}'", returnStdout: true).trim()
-                            echo "Service NodePort: ${nodePort}"
-
-                            // Get cluster IP address
                             def clusterIP = sh(script: "kubectl get nodes -o=jsonpath='{.items[0].status.addresses[0].address}'", returnStdout: true).trim()
-                            echo "Cluster IP: ${clusterIP}"
 
-                            // Verify if the service is accessible and delete the Docker container if accessible
-                            sh """
-                            curl -v http://${clusterIP}:${nodePort} && \
-                            if [ \$(docker ps -q -f name=great_chat) ]; then
-                                docker rm -f great_chat
-                            fi
-                            """
+                            sh "curl -v http://${clusterIP}:${nodePort}"
 
-                            // Update Nginx configuration
-                            sh """
-                            sudo sed -i 's|proxy_pass .*;|proxy_pass http://${clusterIP}:${nodePort};|' ${NGINX_CONF}
-                            sudo nginx -s reload
-                            """
+                            sh "sudo sed -i 's|proxy_pass .*;|proxy_pass http://${clusterIP}:${nodePort};|' ${NGINX_CONF}"
+                            sh "sudo nginx -s reload"
                         } else {
                             error ".env file not found in the workspace."
                         }
@@ -156,36 +128,31 @@ pipeline {
     post {
         success {
             script {
-                if (currentBuild.description == 'DEPLOYMENT_EXECUTED') {
-                    sh '''
-                    curl -s -X POST --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET https://api.mailjet.com/v3.1/send -H "Content-Type:application/json" -d '{
-                        "Messages":[
-                            {
-                                "From": {
-                                    "Email": "$MAIL_JET_EMAIL_ADDRESS",
-                                    "Name": "ArpanSahuOne Jenkins Notification"
-                                },
-                                "To": [
-                                    {
-                                        "Email": "$MY_EMAIL_ADDRESS",
-                                        "Name": "Development Team"
-                                    }
-                                ],
-                                "Subject": "Jenkins Build Pipeline your project ${currentBuild.fullDisplayName} Ran Successfully",
-                                "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed",
-                                "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
-                            }
-                        ]
-                    }'
-                    '''
-                }
-                // Trigger the common_readme job on success
-                // build job: 'common_readme', parameters: [string(name: 'project_git_url', value: 'https://github.com/arpansahu/great_chat'), string(name: 'environment', value: 'prod')], wait: false
+                sh '''
+                curl -s -X POST --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET https://api.mailjet.com/v3.1/send -H "Content-Type:application/json" -d '{
+                    "Messages":[
+                        {
+                            "From": {
+                                "Email": "$MAIL_JET_EMAIL_ADDRESS",
+                                "Name": "ArpanSahuOne Jenkins Notification"
+                            },
+                            "To": [
+                                {
+                                    "Email": "$MY_EMAIL_ADDRESS",
+                                    "Name": "Development Team"
+                                }
+                            ],
+                            "Subject": "Jenkins Build Pipeline your project ${currentBuild.fullDisplayName} Ran Successfully",
+                            "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed",
+                            "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed </h3> <br> <p> Build Url: ${env.BUILD_URL} </p>"
+                        }
+                    ]
+                }'
+                '''
             }
         }
         failure {
             script {
-                // Send deployment failure notification
                 sh '''
                 curl -s -X POST --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET https://api.mailjet.com/v3.1/send -H "Content-Type:application/json" -d '{
                     "Messages":[
@@ -202,7 +169,7 @@ pipeline {
                             ],
                             "Subject": "Jenkins Build Pipeline your project ${currentBuild.fullDisplayName} Ran Failed",
                             "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} deployment failed",
-                            "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is not deployed, Build Failed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
+                            "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is not deployed, Build Failed </h3> <br> <p> Build Url: ${env.BUILD_URL} </p>"
                         }
                     ]
                 }'
