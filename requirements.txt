@@ -18,7 +18,7 @@ Django==5.0.6
 django-cleanup==8.1.0
 django-htmx==1.18.0
 django-redis==5.4.0
-django-storages==1.14.3
+django-storages==1.14.4
 gunicorn==22.0.0
 hyperlink==21.0.0
 idna==3.7
