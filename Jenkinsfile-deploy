@@ -155,59 +155,61 @@ pipeline {
     }
     post {
         success {
-            script {
-                if (currentBuild.description == 'DEPLOYMENT_EXECUTED') {
-                    sh '''
-                    curl -s -X POST --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET https://api.mailjet.com/v3.1/send -H "Content-Type:application/json" -d '{
-                        "Messages":[
+            if (currentBuild.description == 'DEPLOYMENT_EXECUTED') {
+                sh """curl -s \
+                -X POST \
+                --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
+                https://api.mailjet.com/v3.1/send \
+                -H "Content-Type:application/json" \
+                -d '{
+                    "Messages":[
                             {
-                            "From": {
-                                    "Email": "$MAIL_JET_EMAIL_ADDRESS",
-                                    "Name": "ArpanSahuOne Jenkins Notification"
-                            },
-                            "To": [
-                                    {
-                                            "Email": "$MY_EMAIL_ADDRESS",
-                                            "Name": "Development Team"
-                                    }
-                            ],
-                                "Subject": "Jenkins Build Pipeline your project ${currentBuild.fullDisplayName} Ran Successfully",
-                                "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed",
-                                "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
+                                    "From": {
+                                            "Email": "$MAIL_JET_EMAIL_ADDRESS",
+                                            "Name": "ArpanSahuOne Jenkins Notification"
+                                    },
+                                    "To": [
+                                            {
+                                                    "Email": "$MY_EMAIL_ADDRESS",
+                                                    "Name": "Development Team"
+                                            }
+                                    ],
+                                    "Subject": "Jenkins Build Pipeline your project ${currentBuild.fullDisplayName} Ran Successfully",
+                                    "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed",
+                                    "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
                             }
-                        ]
-                    }'
-                    '''
-                }
-                // Trigger the common_readme job on success
-                // build job: 'common_readme', parameters: [string(name: 'project_git_url', value: 'https://github.com/arpansahu/great_chat'), string(name: 'environment', value: 'prod')], wait: false
+                    ]
+                }'"""
             }
+            // Trigger the common_readme job on success
+            // build job: 'common_readme', parameters: [string(name: 'project_git_url', value: 'https://github.com/arpansahu/great_chat'), string(name: 'environment', value: 'prod')], wait: false
+
         }
         failure {
-            script {
-                // Send deployment failure notification
-                sh '''
-                curl -s -X POST --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET https://api.mailjet.com/v3.1/send -H "Content-Type:application/json" -d '{
-                    "Messages":[
+            sh """curl -s \
+            -X POST \
+            --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
+            https://api.mailjet.com/v3.1/send \
+            -H "Content-Type:application/json" \
+            -d '{
+                "Messages":[
                         {
-                            "From": {
-                                    "Email": "$MAIL_JET_EMAIL_ADDRESS",
-                                    "Name": "ArpanSahuOne Jenkins Notification"
-                            },
-                            "To": [
-                                    {
-                                            "Email": "$MY_EMAIL_ADDRESS",
-                                            "Name": "Development Team"
-                                    }
-                            ],
+                                "From": {
+                                        "Email": "$MAIL_JET_EMAIL_ADDRESS",
+                                        "Name": "ArpanSahuOne Jenkins Notification"
+                                },
+                                "To": [
+                                        {
+                                                "Email": "$MY_EMAIL_ADDRESS",
+                                                "Name": "Developer Team"
+                                        }
+                                ],
                             "Subject": "Jenkins Build Pipeline your project ${currentBuild.fullDisplayName} Ran Failed",
                             "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} deployment failed",
                             "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is not deployed, Build Failed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
                         }
-                    ]
-                }'
-                '''
-            }
+                ]
+            }'"""
         }
     }
 }
