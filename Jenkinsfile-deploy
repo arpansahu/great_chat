@@ -100,7 +100,6 @@ pipeline {
                                 else
                                     echo 'No running Kubernetes deployment to scale down.'
                                 fi
-                                
                             """
                         }
                     } else if (params.DEPLOY_TYPE == 'kubernetes') {
@@ -129,6 +128,9 @@ pipeline {
                             kubectl apply -f ${WORKSPACE}/service.yaml
                             '''
                             
+                            // Wait for a few seconds to let the app start
+                            sleep 10
+
                             // Check deployment status
                             sh '''
                             kubectl rollout status deployment/great-chat-app
