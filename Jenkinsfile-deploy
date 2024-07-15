@@ -1,8 +1,8 @@
 pipeline {
     agent { label 'local' }
     parameters {
-        booleanParam(name: 'skip_checks', defaultValue: true, description: 'Skip the Check for Changes stage')
-        choice(name: 'DEPLOY_TYPE', choices: ['docker', 'kubernetes'], description: 'Select deployment type')
+        booleanParam(name: 'skip_checks', defaultValue: false, description: 'Skip the Check for Changes stage')
+        choice(name: 'DEPLOY_TYPE', choices: ['kubernetes', 'docker'], description: 'Select deployment type')
     }
     environment {
         REGISTRY = "harbor.arpansahu.me"
@@ -144,18 +144,13 @@ pipeline {
                             def clusterIP = sh(script: "kubectl get nodes -o=jsonpath='{.items[0].status.addresses[0].address}'", returnStdout: true).trim()
                             echo "Cluster IP: ${clusterIP}"
 
-                            // Verify if the service is accessible and delete the Docker container if accessible
+                            // Verify if the service is accessible and delete the Docker container if accessible and update nginx configuration
                             sh """
                             curl -v http://${clusterIP}:${nodePort} && \
                             if [ \$(docker ps -q -f name=great_chat) ]; then
-                                docker rm -f great_chat
+                                docker rm -f great_chat && \\
+                                sudo sed -i 's|proxy_pass .*;|proxy_pass http://${clusterIP}:${nodePort};|' ${NGINX_CONF} && sudo nginx -s reload
                             fi
-                            """
-
-                            // Update Nginx configuration
-                            sh """
-                            sudo sed -i 's|proxy_pass .*;|proxy_pass http://${clusterIP}:${nodePort};|' ${NGINX_CONF}
-                            sudo nginx -s reload
                             """
                         } else {
                             error ".env file not found in the workspace."
@@ -196,7 +191,7 @@ pipeline {
                     }'"""
                 }
                 // Trigger the common_readme job on success
-                // build job: 'common_readme', parameters: [string(name: 'project_git_url', value: 'https://github.com/arpansahu/great_chat'), string(name: 'environment', value: 'prod')], wait: false
+                build job: 'common_readme', parameters: [string(name: 'project_git_url', value: 'https://github.com/arpansahu/great_chat'), string(name: 'environment', value: 'prod')], wait: false
             }
         }
         failure {
