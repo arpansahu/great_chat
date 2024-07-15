@@ -89,16 +89,14 @@ pipeline {
                             error "Container great_chat is not running"
                         } else {
                             echo "Container great_chat is running"
-                            // Fetch and display the response to see if the service is accessible
-                            def serviceResponse = sh(script: "curl -s -o /dev/null -w '%{http_code}' http://0.0.0.0:8002", returnStdout: true).trim()
-                            if (serviceResponse == '200') {
-                                echo "Service at http://0.0.0.0:8002 is up and running."
-
-                                // Scale down the Kubernetes deployment if it is running
-                                sh "kubectl scale deployment great-chat --replicas=0"
-                            } else {
-                                error "Failed to access Docker service at http://0.0.0.0:8002"
-                            }
+                            // Execute curl and scale down Kubernetes deployment if curl is successful
+                            sh """
+                                curl -v http://0.0.0.0:8002 && \\
+                                if [ \$(kubectl get deployment great-chat -o=jsonpath='{.spec.replicas}') -gt 0 ]; then
+                                    kubectl scale deployment great-chat --replicas=0
+                                    echo 'Kubernetes deployment scaled down successfully.'
+                                fi
+                            """
                         }
                     } else if (params.DEPLOY_TYPE == 'kubernetes') {
                         // Copy the .env file to the workspace
