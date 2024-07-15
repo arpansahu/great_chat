@@ -2309,6 +2309,8 @@ pipeline {
                 script {
                     if (params.skip_checks) {
                         echo "Skipping Checks is True. Proceeding with build."
+                        BUILD_STATUS = 'BUILT'
+                        currentBuild.description = "${currentBuild.fullDisplayName} Skipping Checks is True. Proceeding with build."
                     } else {
                         // Get the current commit hash
                         def currentCommit = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
@@ -2322,7 +2324,6 @@ pipeline {
                             // Compare the current commit with the last commit
                             if (currentCommit == lastCommit) {
                                 echo "No changes detected. Skipping build."
-                                currentBuild.result = 'NOT_BUILT'
                                 currentBuild.description = "${currentBuild.fullDisplayName} build skipped due to no changes detected"
                                 return
                             } else {
@@ -2334,7 +2335,6 @@ pipeline {
                                 
                                 if (relevantChanges.isEmpty()) {
                                     echo "No relevant changes detected. Skipping build."
-                                    currentBuild.result = 'NOT_BUILT'
                                     currentBuild.description = "${currentBuild.fullDisplayName} build skipped due to no relevant changes"
                                     return
                                 } else {
@@ -2433,7 +2433,7 @@ pipeline {
                                             }
                                     ],
                                     "Subject": "${currentBuild.description}",
-                                    "TextPart": "ola Development Team, your project ${currentBuild.fullDisplayName} : ${currentBuild.description}",
+                                    "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} : ${currentBuild.description}",
                                     "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} : ${currentBuild.description} </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
                             }
                     ]
@@ -2465,8 +2465,8 @@ pipeline {
                                             }
                                     ],
                                     "Subject": "${currentBuild.fullDisplayName} build failed",
-                                    "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} build failed",
-                                    "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} build failed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
+                                    "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} build failed ${currentBuild.description} ",
+                                    "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} build failed </h3> <br> <p> ${currentBuild.description}  </p>"
                             }
                     ]
                 }'"""
@@ -2490,7 +2490,7 @@ pipeline {
         REPOSITORY = "library/great_chat"
         IMAGE_TAG = "latest"  // or use a specific tag if needed
         KUBECONFIG = "${env.WORKSPACE}/kubeconfig"  // Set the KUBECONFIG environment variable
-        NGINX_CONF = "/etc/nginx/sites-available/arpansahu"
+        NGINX_CONF = "/etc/nginx/sites-available/great-chat"
     }
     stages {
         stage('Initialize') {
@@ -2506,6 +2506,9 @@ pipeline {
             }
         }
         stage('Setup Kubernetes Config') {
+            when {
+                expression { return params.DEPLOY_TYPE == 'kubernetes' }
+            }
             steps {
                 script {
                     // Copy the kubeconfig file to the workspace
@@ -2557,6 +2560,29 @@ pipeline {
                         // Deploy using Docker Compose
                         sh 'docker-compose down'
                         sh 'docker-compose up -d'
+
+                        // Wait for a few seconds to let the app start
+                        sleep 10
+
+                        // Verify the container is running
+                        def containerRunning = sh(script: "docker ps -q -f name=great_chat", returnStdout: true).trim()
+                        if (!containerRunning) {
+                            error "Container great_chat is not running"
+                        } else {
+                            echo "Container great_chat is running"
+                            // Execute curl and scale down Kubernetes deployment if curl is successful
+                            sh """
+                                curl -v http://0.0.0.0:8002 && \\
+                                replicas=\$(kubectl get deployment great-chat-app -o=jsonpath='{.spec.replicas}') || true
+                                if [ "\$replicas" != "" ] && [ \$replicas -gt 0 ]; then
+                                    kubectl scale deployment great-chat-app --replicas=0 && \\
+                                    echo 'Kubernetes deployment scaled down successfully.' && \\
+                                    sudo sed -i 's|proxy_pass .*;|proxy_pass http://0.0.0.0:8002;|' ${NGINX_CONF} && sudo nginx -s reload
+                                else
+                                    echo 'No running Kubernetes deployment to scale down.'
+                                fi
+                            """
+                        }
                     } else if (params.DEPLOY_TYPE == 'kubernetes') {
                         // Copy the .env file to the workspace
                         sh "sudo cp /root/projectenvs/great_chat/.env ${env.WORKSPACE}/"
@@ -2583,6 +2609,9 @@ pipeline {
                             kubectl apply -f ${WORKSPACE}/service.yaml
                             '''
                             
+                            // Wait for a few seconds to let the app start
+                            sleep 10
+
                             // Check deployment status
                             sh '''
                             kubectl rollout status deployment/great-chat-app
@@ -2596,19 +2625,14 @@ pipeline {
                             def clusterIP = sh(script: "kubectl get nodes -o=jsonpath='{.items[0].status.addresses[0].address}'", returnStdout: true).trim()
                             echo "Cluster IP: ${clusterIP}"
 
-                            // Verify if the service is accessible and delete the Docker container if accessible
+                            // Verify if the service is accessible and delete the Docker container if accessible and update nginx configuration
                             sh """
                             curl -v http://${clusterIP}:${nodePort} && \
                             if [ \$(docker ps -q -f name=great_chat) ]; then
-                                docker rm -f great_chat
+                                docker rm -f great_chat && \\
+                                sudo sed -i 's|proxy_pass .*;|proxy_pass http://${clusterIP}:${nodePort};|' ${NGINX_CONF} && sudo nginx -s reload
                             fi
                             """
-
-                            // Update Nginx configuration
-                            // sh """
-                            // sudo sed -i 's|proxy_pass .*;|proxy_pass http://${clusterIP}:${nodePort};|' ${NGINX_CONF}
-                            // sudo nginx -s reload
-                            // """
                         } else {
                             error ".env file not found in the workspace."
                         }
@@ -2622,57 +2646,60 @@ pipeline {
         success {
             script {
                 if (currentBuild.description == 'DEPLOYMENT_EXECUTED') {
-                    sh '''
-                    curl -s -X POST --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET https://api.mailjet.com/v3.1/send -H "Content-Type:application/json" -d '{
+                    sh """curl -s \
+                    -X POST \
+                    --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
+                    https://api.mailjet.com/v3.1/send \
+                    -H "Content-Type:application/json" \
+                    -d '{
                         "Messages":[
-                            {
-                                "From": {
-                                    "Email": "$MAIL_JET_EMAIL_ADDRESS",
-                                    "Name": "ArpanSahuOne Jenkins Notification"
-                                },
-                                "To": [
-                                    {
-                                        "Email": "$MY_EMAIL_ADDRESS",
-                                        "Name": "Development Team"
-                                    }
-                                ],
-                                "Subject": "Jenkins Build Pipeline your project ${currentBuild.fullDisplayName} Ran Successfully",
-                                "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed",
-                                "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
-                            }
+                                {
+                                        "From": {
+                                                "Email": "$MAIL_JET_EMAIL_ADDRESS",
+                                                "Name": "ArpanSahuOne Jenkins Notification"
+                                        },
+                                        "To": [
+                                                {
+                                                        "Email": "$MY_EMAIL_ADDRESS",
+                                                        "Name": "Development Team"
+                                                }
+                                        ],
+                                        "Subject": "Jenkins Build Pipeline your project ${currentBuild.fullDisplayName} Ran Successfully",
+                                        "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed",
+                                        "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
+                                }
                         ]
-                    }'
-                    '''
+                    }'"""
                 }
                 // Trigger the common_readme job on success
-                // build job: 'common_readme', parameters: [string(name: 'project_git_url', value: 'https://github.com/arpansahu/great_chat'), string(name: 'environment', value: 'prod')], wait: false
+                build job: 'common_readme', parameters: [string(name: 'project_git_url', value: 'https://github.com/arpansahu/great_chat'), string(name: 'environment', value: 'prod')], wait: false
             }
         }
         failure {
-            script {
-                // Send deployment failure notification
-                sh '''
-                curl -s -X POST --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET https://api.mailjet.com/v3.1/send -H "Content-Type:application/json" -d '{
-                    "Messages":[
+            sh """curl -s \
+            -X POST \
+            --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
+            https://api.mailjet.com/v3.1/send \
+            -H "Content-Type:application/json" \
+            -d '{
+                "Messages":[
                         {
-                            "From": {
-                                "Email": "$MAIL_JET_EMAIL_ADDRESS",
-                                "Name": "ArpanSahuOne Jenkins Notification"
-                            },
-                            "To": [
-                                {
-                                    "Email": "$MY_EMAIL_ADDRESS",
-                                    "Name": "Development Team"
-                                }
-                            ],
+                                "From": {
+                                        "Email": "$MAIL_JET_EMAIL_ADDRESS",
+                                        "Name": "ArpanSahuOne Jenkins Notification"
+                                },
+                                "To": [
+                                        {
+                                                "Email": "$MY_EMAIL_ADDRESS",
+                                                "Name": "Developer Team"
+                                        }
+                                ],
                             "Subject": "Jenkins Build Pipeline your project ${currentBuild.fullDisplayName} Ran Failed",
                             "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} deployment failed",
                             "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is not deployed, Build Failed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
                         }
-                    ]
-                }'
-                '''
-            }
+                ]
+            }'"""
         }
     }
 }
