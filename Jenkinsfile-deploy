@@ -92,9 +92,12 @@ pipeline {
                             // Execute curl and scale down Kubernetes deployment if curl is successful
                             sh """
                                 curl -v http://0.0.0.0:8002 && \\
-                                if [ \$(kubectl get deployment great-chat -o=jsonpath='{.spec.replicas}') -gt 0 ]; then
-                                    kubectl scale deployment great-chat --replicas=0
+                                replicas=\$(kubectl get deployment great-chat-app -o=jsonpath='{.spec.replicas}') || true
+                                if [ "\$replicas" != "" ] && [ \$replicas -gt 0 ]; then
+                                    kubectl scale deployment great-chat-app --replicas=0
                                     echo 'Kubernetes deployment scaled down successfully.'
+                                else
+                                    echo 'No running Kubernetes deployment to scale down.'
                                 fi
                             """
                         }
