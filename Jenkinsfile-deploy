@@ -94,8 +94,8 @@ pipeline {
                                 curl -v http://0.0.0.0:8002 && \\
                                 replicas=\$(kubectl get deployment great-chat-app -o=jsonpath='{.spec.replicas}') || true
                                 if [ "\$replicas" != "" ] && [ \$replicas -gt 0 ]; then
-                                    kubectl scale deployment great-chat-app --replicas=0
-                                    echo 'Kubernetes deployment scaled down successfully.'
+                                    kubectl scale deployment great-chat-app --replicas=0 && \\
+                                    echo 'Kubernetes deployment scaled down successfully.' && \\
                                     sudo sed -i 's|proxy_pass .*;|proxy_pass http://0.0.0.0:8002;|' ${NGINX_CONF} && sudo nginx -s reload
                                 else
                                     echo 'No running Kubernetes deployment to scale down.'
