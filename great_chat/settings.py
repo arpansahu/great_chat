@@ -326,4 +326,4 @@ LOGGING = {
     },
 }
 
-CSRF_TRUSTED_ORIGINS = ['https://great-chat.arpansahu.me', 'https://great-chat-docker.arpansahu.me']
+CSRF_TRUSTED_ORIGINS = ['https://great-chat.arpansahu.me']
