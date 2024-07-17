@@ -435,7 +435,10 @@ include_files = {
     "SERVICES": "../readme_manager/partials/services.md",
     "JENKINS PROJECT NAME": "../readme_manager/partials/jenkins_project_name.md",
     "JENKINS BUILD PROJECT NAME": "../readme_manager/partials/jenkins_build_project_name.md",
-    "STATIC PROJECT NAME": "../readme_manager/partials/static_project_name.md"
+    "STATIC PROJECT NAME": "../readme_manager/partials/static_project_name.md",
+    "PROJECT_NAME_DASH" : "../readme_manager/partials/project_name_with_dash.md",
+    "PROJECT_DOCKER_PORT": "../readme_manager/partials/project_docker_port.md",
+    "PROJECT_NODE_PORT": "../readme_manager/partials/project_node_port.md",
 }
 ```
 
@@ -2281,6 +2284,99 @@ stage('Dependencies') {
             }
         }
 ```
+
+* Also we Need to modify the Nginx Configuration File
+
+1. Create a new configuration file: Create a new file in the Nginx configuration directory. The location of this directory varies depending on your  operating system and Nginx installation, but it’s usually found at /etc/nginx/sites-available/.
+
+  ```bash
+    touch /etc/nginx/sites-available/great-chat
+    vi /etc/nginx/sites-available/great-chat
+  ```
+
+2.	Add the server block configuration: Copy and paste your server block configuration into this new file.
+
+  We can have two configurations, one for docker and one for kubernetes deployment, out jenkins deployment file will handle it accordingly.
+
+  1. Nginx for Docker Deployment 
+
+    ```bash
+        server {
+            listen 80;
+            server_name great-chat.arpansahu.me;
+
+            # Force HTTPS redirects
+            if ($scheme = http) {
+                return 301 https://$server_name$request_uri;
+            }
+
+            location / {
+                proxy_pass http://0.0.0.0:8002;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-Proto $scheme;
+
+                # WebSocket support
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+            }
+
+            listen 443 ssl; # managed by Certbot
+            ssl_certificate /etc/letsencrypt/live/arpansahu.me/fullchain.pem; # managed by Certbot
+            ssl_certificate_key /etc/letsencrypt/live/arpansahu.me/privkey.pem; # managed by Certbot
+            include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+            ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+        }
+    ```
+
+  2. Nginx for Kubernetes Deployment 
+
+    ```bash
+        server {
+            listen 80;
+            server_name great-chat.arpansahu.me;
+
+            # Force HTTPS redirects
+            if ($scheme = http) {
+                return 301 https://$server_name$request_uri;
+            }
+
+            location / {
+                proxy_pass http://<CLUSTER_IP_ADDRESS>:32002;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-Proto $scheme;
+
+                # WebSocket support
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+            }
+
+            listen 443 ssl; # managed by Certbot
+            ssl_certificate /etc/letsencrypt/live/arpansahu.me/fullchain.pem; # managed by Certbot
+            ssl_certificate_key /etc/letsencrypt/live/arpansahu.me/privkey.pem; # managed by Certbot
+            include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+            ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+        }
+    ```
+
+3.	Enable the new configuration: Create a symbolic link from this file to the sites-enabled directory.
+
+    ```bash
+      sudo ln -s /etc/nginx/sites-available/great-chat/etc/nginx/sites-enabled/
+    ```
+
+4.	Test the Nginx configuration: Ensure that the new configuration doesn’t have any syntax errors.
+
+  ```bash
+    sudo nginx -t
+  ```
+  
+5.	Reload Nginx: Apply the new configuration by reloading Nginx.
+
+  ```bash
+    sudo systemctl reload nginx
+  ```
 
 in Jenkinsfile-build to copy .env file into build directory
 
