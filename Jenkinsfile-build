@@ -8,6 +8,7 @@ pipeline {
         REPOSITORY = "library/great_chat"
         IMAGE_TAG = "${env.BUILD_ID}"
         COMMIT_FILE = "${env.WORKSPACE}/last_commit.txt"
+        ENV_PROJECT_NAME = "great_chat"
     }
     stages {
         stage('Checkout') {
@@ -71,7 +72,7 @@ pipeline {
             steps {
                 script {
                     // Copy .env file to the workspace
-                    sh "sudo cp /root/projectenvs/great_chat/.env ${env.WORKSPACE}/"
+                    sh "sudo cp /root/projectenvs/${ENV_PROJECT_NAME}/.env ${env.WORKSPACE}/"
                 }
             }
         }
