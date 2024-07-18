@@ -11,7 +11,8 @@ This WhatsApp clone project provides a comprehensive chat application with vario
 5. **Autocomplete JS Library:** Implemented for enhanced user experience.
 6. **MailJet Integration:** Used for email services.
 7. **Dockerized Project:** Fully containerized for easy deployment.
-8. **CI/CD Pipeline:** Continuous integration and deployment included.
+8. **Kubernetes-native** Kubernetes support also available.
+9. **CI/CD Pipeline:** Continuous integration and deployment included using Jenkins.
 
 ## WhatsApp Clone Functionalities
 
