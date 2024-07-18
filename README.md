@@ -440,6 +440,7 @@ include_files = {
     "PROJECT_NAME_DASH" : "../readme_manager/partials/project_name_with_dash.md",
     "PROJECT_DOCKER_PORT": "../readme_manager/partials/project_docker_port.md",
     "PROJECT_NODE_PORT": "../readme_manager/partials/project_node_port.md",
+    "DOMAIN_NAME": "../readme_manager/partials/project_domain_name.md"
 }
 ```
 
@@ -2394,6 +2395,7 @@ pipeline {
         REPOSITORY = "library/great_chat"
         IMAGE_TAG = "${env.BUILD_ID}"
         COMMIT_FILE = "${env.WORKSPACE}/last_commit.txt"
+        ENV_PROJECT_NAME = "great_chat"
     }
     stages {
         stage('Checkout') {
@@ -2457,7 +2459,7 @@ pipeline {
             steps {
                 script {
                     // Copy .env file to the workspace
-                    sh "sudo cp /root/projectenvs/great_chat/.env ${env.WORKSPACE}/"
+                    sh "sudo cp /root/projectenvs/${ENV_PROJECT_NAME}/.env ${env.WORKSPACE}/"
                 }
             }
         }
@@ -2588,6 +2590,7 @@ pipeline {
         IMAGE_TAG = "latest"  // or use a specific tag if needed
         KUBECONFIG = "${env.WORKSPACE}/kubeconfig"  // Set the KUBECONFIG environment variable
         NGINX_CONF = "/etc/nginx/sites-available/great-chat"
+        ENV_PROJECT_NAME = "great_chat"
     }
     stages {
         stage('Initialize') {
@@ -2682,7 +2685,7 @@ pipeline {
                         }
                     } else if (params.DEPLOY_TYPE == 'kubernetes') {
                         // Copy the .env file to the workspace
-                        sh "sudo cp /root/projectenvs/great_chat/.env ${env.WORKSPACE}/"
+                        sh "sudo cp /root/projectenvs/${ENV_PROJECT_NAME}/.env ${env.WORKSPACE}/"
 
                         // Check if the file is copied successfully
                         if (fileExists("${env.WORKSPACE}/.env")) {
