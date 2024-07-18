@@ -125,8 +125,8 @@ pipeline {
                             // Deploy to Kubernetes
                             sh '''
                             kubectl create secret generic great-chat-secret --from-env-file=${WORKSPACE}/.env
-                            kubectl apply -f ${WORKSPACE}/deployment.yaml
                             kubectl apply -f ${WORKSPACE}/service.yaml
+                            kubectl apply -f ${WORKSPACE}/deployment.yaml
                             '''
                             
                             // Wait for a few seconds to let the app start
