@@ -45,7 +45,7 @@ pipeline {
             steps {
                 script {
                     // Get the ImageID of the currently running container
-                    def currentImageID = sh(script: "docker inspect -f '{{.Image}}' great_chat || echo 'none'", returnStdout: true).trim()
+                    def currentImageID = sh(script: "docker inspect -f '{{.Image}}' ${ENV_PROJECT_NAME} || echo 'none'", returnStdout: true).trim()
                     echo "Current image ID: ${currentImageID}"
 
                     // Pull the latest image to get its ImageID
@@ -85,11 +85,11 @@ pipeline {
                         sleep 10
 
                         // Verify the container is running
-                        def containerRunning = sh(script: "docker ps -q -f name=great_chat", returnStdout: true).trim()
+                        def containerRunning = sh(script: "docker ps -q -f name=${ENV_PROJECT_NAME}", returnStdout: true).trim()
                         if (!containerRunning) {
-                            error "Container great_chat is not running"
+                            error "Container ${ENV_PROJECT_NAME} is not running"
                         } else {
-                            echo "Container great_chat is running"
+                            echo "Container ${ENV_PROJECT_NAME} is running"
                             // Execute curl and scale down Kubernetes deployment if curl is successful
                             sh """
                                 curl -v http://0.0.0.0:8002 && \\
@@ -148,8 +148,8 @@ pipeline {
                             // Verify if the service is accessible and delete the Docker container if accessible and update nginx configuration
                             sh """
                             curl -v http://${clusterIP}:${nodePort} && \
-                            if [ \$(docker ps -q -f name=great_chat) ]; then
-                                docker rm -f great_chat && \\
+                            if [ \$(docker ps -q -f name=${ENV_PROJECT_NAME}) ]; then
+                                docker rm -f ${ENV_PROJECT_NAME} && \\
                                 sudo sed -i 's|proxy_pass .*;|proxy_pass http://${clusterIP}:${nodePort};|' ${NGINX_CONF} && sudo nginx -s reload
                             fi
                             """
@@ -192,7 +192,7 @@ pipeline {
                     }'"""
                 }
                 // Trigger the common_readme job on success
-                build job: 'common_readme', parameters: [string(name: 'project_git_url', value: 'https://github.com/arpansahu/great_chat'), string(name: 'environment', value: 'prod')], wait: false
+                build job: 'common_readme', parameters: [string(name: 'project_git_url', value: 'https://github.com/arpansahu/${ENV_PROJECT_NAME}'), string(name: 'environment', value: 'prod')], wait: false
             }
         }
         failure {
