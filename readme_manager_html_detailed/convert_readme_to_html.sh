@@ -61,8 +61,6 @@ main() {
     # Determine the environment
     ENVIRONMENT=${1:-prod}
     
-    setup_environment
-    
     download_files
     create_and_activate_env
     install_requirements
