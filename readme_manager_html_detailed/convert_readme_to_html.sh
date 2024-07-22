@@ -37,13 +37,6 @@ run_readme_to_html_generator() {
     python convert_readme_to_html.py
 }
 
-# Copy readme.html to the cloned repository
-copy_readme_to_repo() {
-    echo "Copying readme.html to local repo arpansahu_dot_me"
-    local repo_dir="arpansahu_dot_me"
-    cp readme.html "$repo_dir/templates/modules/project_detailed/project_partials/great_chat/"
-}
-
 # Deactivate and delete the environment
 cleanup_env() {
     echo "Cleaning up environment..."
@@ -72,7 +65,6 @@ main() {
     create_and_activate_env
     install_requirements
     run_readme_to_html_generator
-    copy_readme_to_repo
     cleanup_env
     delete_downloaded_and_extra_files
 }
