@@ -33,7 +33,7 @@ install_requirements() {
 
 # Run convert_readme_to_html.py
 run_readme_to_html_generator() {
-    echo "Running run_readme_to_html_generator"
+    echo "Running run_readme_to_html_generator python file"
     python convert_readme_to_html.py
 }
 
