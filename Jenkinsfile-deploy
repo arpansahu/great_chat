@@ -147,7 +147,7 @@ pipeline {
 
                             // Verify if the service is accessible and delete the Docker container if accessible and update nginx configuration
                             sh """
-                            curl -v http://${clusterIP}:${nodePort} && \
+                            curl -s -o /dev/null -w "%{http_code}" http://${clusterIP}:${nodePort} | grep -q "200" && \\
                             if [ \$(docker ps -q -f name=${ENV_PROJECT_NAME}) ]; then
                                 docker rm -f ${ENV_PROJECT_NAME} && \\
                                 sudo sed -i 's|proxy_pass .*;|proxy_pass http://${clusterIP}:${nodePort};|' ${NGINX_CONF} && sudo nginx -s reload
