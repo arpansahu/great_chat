@@ -147,11 +147,47 @@ pipeline {
 
                             // Verify if the service is accessible and delete the Docker container if accessible and update nginx configuration
                             sh """
-                            curl -s -o /dev/null -w "%{http_code}" http://${clusterIP}:${nodePort} | grep -q "200" && \\
-                            if [ \$(docker ps -q -f name=${ENV_PROJECT_NAME}) ]; then
-                                docker rm -f ${ENV_PROJECT_NAME} && \\
-                                sudo sed -i 's|proxy_pass .*;|proxy_pass http://${clusterIP}:${nodePort};|' ${NGINX_CONF} && sudo nginx -s reload
-                            fi
+                                HTTP_STATUS=\$(curl -s -o /dev/null -w "%{http_code}" http://${clusterIP}:${nodePort})
+                                echo "HTTP Status: \$HTTP_STATUS"
+                                
+                                if [ "\$HTTP_STATUS" -eq 200 ]; then
+                                    echo "Service is reachable at http://${clusterIP}:${nodePort}"
+                                    
+                                    DOCKER_CONTAINER=\$(docker ps -q -f name=${ENV_PROJECT_NAME})
+                                    
+                                    if [ "\$DOCKER_CONTAINER" ]; then
+                                        echo "Docker container ${ENV_PROJECT_NAME} is running. Removing it..."
+                                        docker rm -f ${ENV_PROJECT_NAME}
+                                        
+                                        if [ \$? -ne 0 ]; then
+                                            echo "Failed to remove Docker container ${ENV_PROJECT_NAME}"
+                                            exit 1
+                                        fi
+                                        
+                                        echo "Updating Nginx configuration at ${NGINX_CONF}..."
+                                        sudo sed -i 's|proxy_pass .*;|proxy_pass http://${clusterIP}:${nodePort};|' ${NGINX_CONF}
+                                        
+                                        if [ \$? -ne 0 ]; then
+                                            echo "Failed to update Nginx configuration"
+                                            exit 1
+                                        fi
+                                        
+                                        echo "Reloading Nginx..."
+                                        sudo nginx -s reload
+                                        
+                                        if [ \$? -ne 0 ]; then
+                                            echo "Failed to reload Nginx"
+                                            exit 1
+                                        fi
+                                        
+                                        echo "Nginx reloaded successfully"
+                                    else
+                                        echo "Docker container ${ENV_PROJECT_NAME} is not running. Skipping removal and Nginx update."
+                                    fi
+                                else
+                                    echo "Service is not reachable at http://${clusterIP}:${nodePort}. HTTP Status: \$HTTP_STATUS"
+                                    exit 1
+                                fi
                             """
                         } else {
                             error ".env file not found in the workspace."
