@@ -145,6 +145,8 @@ pipeline {
                             def clusterIP = sh(script: "kubectl get nodes -o=jsonpath='{.items[0].status.addresses[0].address}'", returnStdout: true).trim()
                             echo "Cluster IP: ${clusterIP}"
 
+                            sleep 60
+                            
                             // Verify if the service is accessible and delete the Docker container if accessible and update nginx configuration
                             sh """
                                 HTTP_STATUS=\$(curl -s -o /dev/null -w "%{http_code}" http://${clusterIP}:${nodePort})
