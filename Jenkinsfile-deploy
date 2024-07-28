@@ -122,6 +122,13 @@ pipeline {
                             kubectl delete secret great-chat-secret || true
                             '''
 
+                            // Delete the existing service and deployment
+                            sh '''
+                            kubectl delete service arpansahu-dot-me-service || true
+                            kubectl scale deployment arpansahu-dot-me-app --replicas=0 || true
+                            kubectl delete deployment arpansahu-dot-me-app || true
+                            '''
+
                             // Deploy to Kubernetes
                             sh '''
                             kubectl create secret generic great-chat-secret --from-env-file=${WORKSPACE}/.env
