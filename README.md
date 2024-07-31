@@ -2565,7 +2565,7 @@ pipeline {
                 }'"""
 
                 // Trigger great_chat job only if the build is stable
-                build job: 'great_chat', wait: false
+                build job: 'great_chat', parameters: [booleanParam(name: 'DEPLOY', value: true)], wait: false
             }
         }
         failure {
@@ -2607,7 +2607,7 @@ pipeline {
 pipeline {
     agent { label 'local' }
     parameters {
-        booleanParam(name: 'skip_checks', defaultValue: false, description: 'Skip the Check for Changes stage')
+        booleanParam(name: 'DEPLOY', defaultValue: false, description: 'Skip the Check for Changes stage')
         choice(name: 'DEPLOY_TYPE', choices: ['kubernetes', 'docker'], description: 'Select deployment type')
     }
     environment {
@@ -2644,37 +2644,21 @@ pipeline {
                 }
             }
         }
-        stage('Check for New Image') {
-            when {
-                expression { !params.skip_checks }
-            }
+        stage('Extract Port from Dockerfile') {
             steps {
                 script {
-                    // Get the ImageID of the currently running container
-                    def currentImageID = sh(script: "docker inspect -f '{{.Image}}' ${ENV_PROJECT_NAME} || echo 'none'", returnStdout: true).trim()
-                    echo "Current image ID: ${currentImageID}"
-
-                    // Pull the latest image to get its ImageID
-                    sh "docker pull ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
-                    def latestImageID = sh(script: "docker inspect -f '{{.Id}}' ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}", returnStdout: true).trim()
-                    echo "Latest image ID: ${latestImageID}"
-
-                    // Check if the ImageIDs are different
-                    if (currentImageID != latestImageID) {
-                        env.NEW_IMAGE_AVAILABLE = 'true'
-                        echo "New image available, proceeding with deployment."
+                    env.EXPOSED_PORT = sh(script: "grep '^EXPOSE' Dockerfile | awk '{print \$2}'", returnStdout: true).trim()
+                    if (!env.EXPOSED_PORT) {
+                        error "No EXPOSE directive found in Dockerfile"
                     } else {
-                        env.NEW_IMAGE_AVAILABLE = 'false'
-                        echo "No new image available, skipping deployment."
+                        echo "Exposed port found in Dockerfile: ${env.EXPOSED_PORT}"
                     }
                 }
             }
         }
         stage('Deploy') {
             when {
-                expression {
-                    return params.skip_checks || env.NEW_IMAGE_AVAILABLE == 'true'
-                }
+                expression { params.DEPLOY }
             }
             steps {
                 script {
@@ -2726,6 +2710,13 @@ pipeline {
                             // Delete existing secret if it exists
                             sh '''
                             kubectl delete secret great-chat-secret || true
+                            '''
+
+                            // Delete the existing service and deployment
+                            sh '''
+                            kubectl delete service arpansahu-dot-me-service || true
+                            kubectl scale deployment arpansahu-dot-me-app --replicas=0 || true
+                            kubectl delete deployment arpansahu-dot-me-app || true
                             '''
 
                             // Deploy to Kubernetes
