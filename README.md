@@ -2685,9 +2685,9 @@ pipeline {
                             // Execute curl and scale down Kubernetes deployment if curl is successful
                             sh """
                                 curl -v http://0.0.0.0:${DOCKER_PORT} && \\
-                                replicas=\$(kubectl get deployment great-chat-app -o=jsonpath='{.spec.replicas}') || true
+                                replicas=\$(kubectl get deployment ${PROJECT_NAME_WITH_DASH}-app -o=jsonpath='{.spec.replicas}') || true
                                 if [ "\$replicas" != "" ] && [ \$replicas -gt 0 ]; then
-                                    kubectl scale deployment great-chat-app --replicas=0 && \\
+                                    kubectl scale deployment ${PROJECT_NAME_WITH_DASH}-app --replicas=0 && \\
                                     echo 'Kubernetes deployment scaled down successfully.' && \\
                                     sudo sed -i 's|proxy_pass .*;|proxy_pass http://0.0.0.0:${DOCKER_PORT};|' ${NGINX_CONF} && sudo nginx -s reload
                                 else
@@ -2732,12 +2732,12 @@ pipeline {
                             sleep 10
 
                             // Check deployment status
-                            sh '''
-                            kubectl rollout status deployment/great-chat-app
-                            '''
+                            sh """
+                            kubectl rollout status deployment/${PROJECT_NAME_WITH_DASH}-app
+                            """
                             
                             // Verify service and get NodePort
-                            def nodePort = sh(script: "kubectl get service great-chat-service -o=jsonpath='{.spec.ports[0].nodePort}'", returnStdout: true).trim()
+                            def nodePort = sh(script: "kubectl get service ${PROJECT_NAME_WITH_DASH}-service -o=jsonpath='{.spec.ports[0].nodePort}'", returnStdout: true).trim()
                             echo "Service NodePort: ${nodePort}"
 
                             // Get cluster IP address
