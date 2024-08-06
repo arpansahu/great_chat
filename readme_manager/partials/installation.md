@@ -41,7 +41,7 @@ Run Server
 
   or 
 
-  daphne -p 8000 great_chat.asgi:application
+  daphne -b 0.0.0.0 -p [PROJECT_DOCKER_PORT] [JENKINS PROJECT NAME].asgi:application
 ```
 
 Use these CACHE settings
