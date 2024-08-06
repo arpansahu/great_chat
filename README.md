@@ -145,7 +145,7 @@ Run Server
 
   or 
 
-  daphne -p 8000 great_chat.asgi:application
+  daphne -b 0.0.0.0 -p 8002 great_chat.asgi:application
 ```
 
 Use these CACHE settings
