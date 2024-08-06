@@ -78,12 +78,11 @@ pipeline {
                             echo "Container ${ENV_PROJECT_NAME} is running"
                             // Execute curl and scale down Kubernetes deployment if curl is successful
                             sh """
-                                curl -v http://0.0.0.0:${DOCKER_PORT} && \\
+                                curl -v http://0.0.0.0:${DOCKER_PORT} && sudo sed -i 's|proxy_pass .*;|proxy_pass http://0.0.0.0:${DOCKER_PORT};|' ${NGINX_CONF} && sudo nginx -s reload \\
                                 replicas=\$(kubectl get deployment ${PROJECT_NAME_WITH_DASH}-app -o=jsonpath='{.spec.replicas}') || true
                                 if [ "\$replicas" != "" ] && [ \$replicas -gt 0 ]; then
                                     kubectl scale deployment ${PROJECT_NAME_WITH_DASH}-app --replicas=0 && \\
-                                    echo 'Kubernetes deployment scaled down successfully.' && \\
-                                    sudo sed -i 's|proxy_pass .*;|proxy_pass http://0.0.0.0:${DOCKER_PORT};|' ${NGINX_CONF} && sudo nginx -s reload
+                                    echo 'Kubernetes deployment scaled down successfully.'
                                 else
                                     echo 'No running Kubernetes deployment to scale down.'
                                 fi
@@ -145,6 +144,24 @@ pipeline {
                                 
                                 if [ "\$HTTP_STATUS" -eq 200 ]; then
                                     echo "Service is reachable at http://${clusterIP}:${nodePort}"
+
+                                    echo "Updating Nginx configuration at ${NGINX_CONF}..."
+                                    sudo sed -i 's|proxy_pass .*;|proxy_pass http://${clusterIP}:${nodePort};|' ${NGINX_CONF}
+                                    
+                                    if [ \$? -ne 0 ]; then
+                                        echo "Failed to update Nginx configuration"
+                                        exit 1
+                                    fi
+                                    
+                                    echo "Reloading Nginx..."
+                                    sudo nginx -s reload
+                                    
+                                    if [ \$? -ne 0 ]; then
+                                        echo "Failed to reload Nginx"
+                                        exit 1
+                                    fi
+                                    
+                                    echo "Nginx reloaded successfully"
                                     
                                     DOCKER_CONTAINER=\$(docker ps -q -f name=${ENV_PROJECT_NAME})
                                     
@@ -157,26 +174,10 @@ pipeline {
                                             exit 1
                                         fi
                                         
-                                        echo "Updating Nginx configuration at ${NGINX_CONF}..."
-                                        sudo sed -i 's|proxy_pass .*;|proxy_pass http://${clusterIP}:${nodePort};|' ${NGINX_CONF}
-                                        
-                                        if [ \$? -ne 0 ]; then
-                                            echo "Failed to update Nginx configuration"
-                                            exit 1
-                                        fi
-                                        
-                                        echo "Reloading Nginx..."
-                                        sudo nginx -s reload
-                                        
-                                        if [ \$? -ne 0 ]; then
-                                            echo "Failed to reload Nginx"
-                                            exit 1
-                                        fi
-                                        
-                                        echo "Nginx reloaded successfully"
                                     else
-                                        echo "Docker container ${ENV_PROJECT_NAME} is not running. Skipping removal and Nginx update."
+                                        echo "Docker container ${ENV_PROJECT_NAME} is not running. Skipping removal"
                                     fi
+
                                 else
                                     echo "Service is not reachable at http://${clusterIP}:${nodePort}. HTTP Status: \$HTTP_STATUS"
                                     exit 1
