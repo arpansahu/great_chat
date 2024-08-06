@@ -2828,7 +2828,7 @@ pipeline {
                         ]
                     }'"""
                 }
-                // Trigger the common_readme job on success
+                // Trigger the common_readme job on success when not Automatic Update
                 def commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
                 if (!commitMessage.contains("Automatic Update")) {
                     def expandedProjectUrl = "https://github.com/arpansahu/${ENV_PROJECT_NAME}"
@@ -2838,7 +2838,7 @@ pipeline {
                     ], wait: false
                 } else {
                     echo "Skipping common_readme job trigger due to commit message: ${commitMessage}"
-                }            
+                }
             }
         }
         failure {
