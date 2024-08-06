@@ -4272,6 +4272,7 @@ DATABASE_URL=
 
 REDISCLOUD_URL=
 
+# deploy_kube.sh requiurements
 HARBOR_USERNAME=
 
 HARBOR_PASSWORD=
