@@ -2666,6 +2666,10 @@ pipeline {
             steps {
                 script {
                     if (params.DEPLOY_TYPE == 'docker') {
+                                                
+                        // Copy the .env file to the workspace
+                        sh "sudo cp /root/projectenvs/${ENV_PROJECT_NAME}/.env ${env.WORKSPACE}/"
+                        
                         // Ensure the correct image tag is used in the docker-compose.yml
                         sh '''
                         sed -i "s|image: .*|image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}|" docker-compose.yml
