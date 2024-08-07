@@ -16,10 +16,10 @@ fi
 
 # Default Variables
 HARBOR_URL="harbor.arpansahu.me/library"
-LOCAL_IMAGE="arpansahu_dot_me"
+LOCAL_IMAGE="great_chat"
 TAG="latest"
 NAMESPACE="default"
-SECRET_NAME="arpansahu-dot-me-secret"
+SECRET_NAME="great-chat-secret"
 ENV_FILE=".env"
 SERVICE_FILE="service.yaml"
 
@@ -80,15 +80,15 @@ function verify_rollout {
 
 # Function to set default specific variables
 function set_default_variables {
-    IMAGE_NAME="arpansahu_dot_me"
-    KUBE_DEPLOYMENT="arpansahu-dot-me-app"
+    IMAGE_NAME="great_chat"
+    KUBE_DEPLOYMENT="great-chat-app"
     DEPLOYMENT_FILE="deployment.yaml"
 }
 
 # Function to set mac specific variables
 function set_mac_variables {
-    IMAGE_NAME="arpansahu_dot_me_mac"
-    KUBE_DEPLOYMENT="arpansahu-dot-me-app-mac"
+    IMAGE_NAME="great_chat_mac"
+    KUBE_DEPLOYMENT="great-chat-app-mac"
     DEPLOYMENT_FILE="deployment-mac.yaml"
 }
 
