@@ -82,13 +82,23 @@ pipeline {
                             echo "Container ${ENV_PROJECT_NAME} is running"
                             // Execute curl and scale down Kubernetes deployment if curl is successful
                             sh """
-                                curl -v http://0.0.0.0:${DOCKER_PORT} && \
-                                sudo sed -i 's|proxy_pass .*;|proxy_pass http://0.0.0.0:${DOCKER_PORT};|' ${NGINX_CONF} && \
-                                sudo nginx -s reload
+                                # Fetch HTTP status code
+                                HTTP_STATUS=\$(curl -s -o /dev/null -w "%{http_code}" http://0.0.0.0:${DOCKER_PORT})
+                                echo "HTTP Status: \$HTTP_STATUS"
+                                
+                                # Update Nginx configuration if status code is 200 (OK)
+                                if [ "\$HTTP_STATUS" -eq 200 ]; then
+                                    sudo sed -i 's|proxy_pass .*;|proxy_pass http://0.0.0.0:${DOCKER_PORT};|' ${NGINX_CONF}
+                                    sudo nginx -s reload
+                                    echo 'Nginx configuration updated and reloaded successfully.'
+                                else
+                                    echo 'Service not available. Nginx configuration not updated.'
+                                fi
 
+                                # Scale down Kubernetes deployment if it exists and is running
                                 replicas=\$(kubectl get deployment ${PROJECT_NAME_WITH_DASH}-app -o=jsonpath='{.spec.replicas}') || true
                                 if [ "\$replicas" != "" ] && [ \$replicas -gt 0 ]; then
-                                    kubectl scale deployment ${PROJECT_NAME_WITH_DASH}-app --replicas=0 && \
+                                    kubectl scale deployment ${PROJECT_NAME_WITH_DASH}-app --replicas=0
                                     echo 'Kubernetes deployment scaled down successfully.'
                                 else
                                     echo 'No running Kubernetes deployment to scale down.'
