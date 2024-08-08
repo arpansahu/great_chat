@@ -1521,7 +1521,7 @@ spec:
         - name: harbor-registry-secret
       containers:
         - image: harbor.arpansahu.me/library/great_chat:latest
-          name: great-chat
+          name: great_chat
           env:
             - name: SECRET_KEY
               valueFrom:
