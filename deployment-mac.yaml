@@ -87,4 +87,4 @@ spec:
                   key: MY_EMAIL_ADDRESS
           ports:
             - containerPort: 8000
-              name: gunicorn
+              name: daphne
