@@ -86,5 +86,5 @@ spec:
                   name: great-chat-secret
                   key: MY_EMAIL_ADDRESS
           ports:
-            - containerPort: 8000
+            - containerPort: 8002
               name: daphne
