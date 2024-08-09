@@ -86,7 +86,7 @@ Ajax is a set of web development techniques that uses various web technologies o
 [![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)](https://nginx.org/en/)
 [![MINIIO](https://img.shields.io/badge/MINIO-TEXT?style=for-the-badge&logo=minio&logoColor=white&color=%23C72E49)](https://min.io/)
 [![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://ubuntu.com/)
-<!-- [![Mail Jet](https://img.shields.io/badge/MAILJET-TEXT?style=for-the-badge&logo=minutemailer&logoColor=white)](https://mailjet.com/) -->
+[![Mail Jet](https://img.shields.io/badge/MAILJET-TEXT?style=for-the-badge&logo=minutemailer&logoColor=white)](https://mailjet.com/)
 [![Django Channels](https://img.shields.io/badge/CHANNELS-TEXT?style=for-the-badge&logo=channel4&logoColor=white)](https://channels.readthedocs.io)
 [![Web Sockets](https://img.shields.io/badge/WEBSOCKETS-TEXT?style=for-the-badge&logo=socketdotio&logoColor=white)](https://websocket.org/)
 
@@ -4261,7 +4261,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 [![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)](https://nginx.org/en/)
 [![MINIIO](https://img.shields.io/badge/MINIO-TEXT?style=for-the-badge&logo=minio&logoColor=white&color=%23C72E49)](https://min.io/)
 [![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://ubuntu.com/)
-<!-- [![Mail Jet](https://img.shields.io/badge/MAILJET-TEXT?style=for-the-badge&logo=minutemailer&logoColor=white)](https://mailjet.com/) -->
+[![Mail Jet](https://img.shields.io/badge/MAILJET-TEXT?style=for-the-badge&logo=minutemailer&logoColor=white)](https://mailjet.com/)
 [![Django Channels](https://img.shields.io/badge/CHANNELS-TEXT?style=for-the-badge&logo=channel4&logoColor=white)](https://channels.readthedocs.io)
 [![Web Sockets](https://img.shields.io/badge/WEBSOCKETS-TEXT?style=for-the-badge&logo=socketdotio&logoColor=white)](https://websocket.org/)
 
