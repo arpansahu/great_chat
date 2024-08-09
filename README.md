@@ -84,9 +84,9 @@ Ajax is a set of web development techniques that uses various web technologies o
 [![Kubernetes](https://img.shields.io/badge/kubernetes-326ce5.svg?&style=for-the-badge&logo=kubernetes&logoColor=white)](https://kubernetes.io/)
 [![Jenkins](https://img.shields.io/badge/Jenkins-D24939?style=for-the-badge&logo=Jenkins&logoColor=white)](https://www.jenkins.io/)
 [![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)](https://nginx.org/en/)
-[![Minio](https://img.shields.io/badge/MINIO-TEXT?style=for-the-badge&logo=minio&logoColor=white&color=%23C72E49)](https://min.io/)
+[![Minio](https://img.shields.io/badge/MINIO?style=for-the-badge&logo=minio&logoColor=white&color=%23C72E49)](https://min.io/)
 [![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://ubuntu.com/)
-[![Mail Jet](https://img.shields.io/badge/MAIL-JET?style=for-the-badge&logo=minutemailer&logoColor=white)](https://ubuntu.com/)
+[![Mail Jet](https://img.shields.io/badge/MAILJET-CCCCFF?style=for-the-badge&logo=minutemailer&logoColor=white)](https://ubuntu.com/)
 <!-- <span class="badge badge-lg rounded bg-soft-alt-info fw-normal fs-12 text-uppercase">Channels</span>
 <span class="badge badge-lg rounded bg-soft-alt-info fw-normal fs-12 text-uppercase">Web Sockets</span> -->
 
@@ -4259,9 +4259,9 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 [![Kubernetes](https://img.shields.io/badge/kubernetes-326ce5.svg?&style=for-the-badge&logo=kubernetes&logoColor=white)](https://kubernetes.io/)
 [![Jenkins](https://img.shields.io/badge/Jenkins-D24939?style=for-the-badge&logo=Jenkins&logoColor=white)](https://www.jenkins.io/)
 [![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)](https://nginx.org/en/)
-[![Minio](https://img.shields.io/badge/MINIO-TEXT?style=for-the-badge&logo=minio&logoColor=white&color=%23C72E49)](https://min.io/)
+[![Minio](https://img.shields.io/badge/MINIO?style=for-the-badge&logo=minio&logoColor=white&color=%23C72E49)](https://min.io/)
 [![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://ubuntu.com/)
-[![Mail Jet](https://img.shields.io/badge/MAIL-JET?style=for-the-badge&logo=minutemailer&logoColor=white)](https://ubuntu.com/)
+[![Mail Jet](https://img.shields.io/badge/MAILJET-CCCCFF?style=for-the-badge&logo=minutemailer&logoColor=white)](https://ubuntu.com/)
 <!-- <span class="badge badge-lg rounded bg-soft-alt-info fw-normal fs-12 text-uppercase">Channels</span>
 <span class="badge badge-lg rounded bg-soft-alt-info fw-normal fs-12 text-uppercase">Web Sockets</span> -->
 
