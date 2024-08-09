@@ -87,12 +87,8 @@ Ajax is a set of web development techniques that uses various web technologies o
 [![MINIIO](https://img.shields.io/badge/MINIO-TEXT?style=for-the-badge&logo=minio&logoColor=white&color=%23C72E49)](https://min.io/)
 [![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://ubuntu.com/)
 [![Mail Jet](https://img.shields.io/badge/MAILJET-TEXT?style=for-the-badge&logo=minutemailer&logoColor=white)](https://mailjet.com/)
-[![Django Channels](https://img.shields.io/badge/CHANNELS-TEXT?style=for-the-badge&logo=channel4&logoColor=white)](https://channels.readthedocs.io)
+[![Django Channels](https://img.shields.io/badge/CHANNELS-TEXT?style=for-the-badge&logo=python&logoColor=white)](https://channels.readthedocs.io)
 [![Web Sockets](https://img.shields.io/badge/WEBSOCKETS-TEXT?style=for-the-badge&logo=socketdotio&logoColor=white)](https://websocket.org/)
-
-
-<!-- <span class="badge badge-lg rounded bg-soft-alt-info fw-normal fs-12 text-uppercase">Channels</span>
-<span class="badge badge-lg rounded bg-soft-alt-info fw-normal fs-12 text-uppercase">Web Sockets</span> -->x
 
 ## Demo
 
@@ -4266,12 +4262,8 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 [![MINIIO](https://img.shields.io/badge/MINIO-TEXT?style=for-the-badge&logo=minio&logoColor=white&color=%23C72E49)](https://min.io/)
 [![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://ubuntu.com/)
 [![Mail Jet](https://img.shields.io/badge/MAILJET-TEXT?style=for-the-badge&logo=minutemailer&logoColor=white)](https://mailjet.com/)
-[![Django Channels](https://img.shields.io/badge/CHANNELS-TEXT?style=for-the-badge&logo=channel4&logoColor=white)](https://channels.readthedocs.io)
+[![Django Channels](https://img.shields.io/badge/CHANNELS-TEXT?style=for-the-badge&logo=python&logoColor=white)](https://channels.readthedocs.io)
 [![Web Sockets](https://img.shields.io/badge/WEBSOCKETS-TEXT?style=for-the-badge&logo=socketdotio&logoColor=white)](https://websocket.org/)
-
-
-<!-- <span class="badge badge-lg rounded bg-soft-alt-info fw-normal fs-12 text-uppercase">Channels</span>
-<span class="badge badge-lg rounded bg-soft-alt-info fw-normal fs-12 text-uppercase">Web Sockets</span> -->x
 
 ## Environment Variables
 
