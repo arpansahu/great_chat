@@ -88,7 +88,7 @@ function set_default_variables {
 # Function to set mac specific variables
 function set_mac_variables {
     IMAGE_NAME="great_chat_mac"
-    KUBE_DEPLOYMENT="great-chat-app-mac"
+    KUBE_DEPLOYMENT="great-chat-mac-app"
     DEPLOYMENT_FILE="deployment-mac.yaml"
 }
 
