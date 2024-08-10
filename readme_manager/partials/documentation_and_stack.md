@@ -16,4 +16,4 @@
 [![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://ubuntu.com/)
 [![Mail Jet](https://img.shields.io/badge/MAILJET-TEXT?style=for-the-badge&logo=minutemailer&logoColor=white)](https://mailjet.com/)
 [![Django Channels](https://img.shields.io/badge/CHANNELS-TEXT?style=for-the-badge&logo=channel4&logoColor=white)](https://channels.readthedocs.io)
-[![Web Sockets](https://img.shields.io/badge/WEBSOCKETS-TEXT?style=for-the-badge&logo=socketdotio&logoColor=white)](https://websocket.org/)
+[![Web Sockets](https://img.shields.io/badge/WEBSOCKETS-1C47CB?style=for-the-badge&logo=socketdotio&logoColor=white)](https://websocket.org/)
