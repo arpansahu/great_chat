@@ -1078,16 +1078,13 @@ After adding rule schedule it as per requirement as below
 ![Add Retention Rule S](https://github.com/arpansahu/common_readme/blob/main/AWS%20Deployment/harbor/retention_rule_schedule.png)
 
 ```bash
-FROM python:3.10.7
+FROM python:3.10.7-slim
 
 WORKDIR /app
 
-# Copy the requirements file and install dependencies
-COPY requirements.txt requirements.txt
-RUN pip3 install -r requirements.txt
-
-# Copy the rest of the application code
 COPY . .
+
+RUN pip3 install -r requirements.txt
 
 # Expose the application port
 EXPOSE 8002
