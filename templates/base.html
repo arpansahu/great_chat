@@ -11,20 +11,25 @@
   </title>
 
   <!--     Fonts and icons     -->
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+  {% comment %} <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" /> {% endcomment %}
+  <link href="{% static 'css/google-font.css' %}" rel="stylesheet" />
   <!-- Nucleo Icons -->
   <link href="{% static 'assets/css/nucleo-icons.css' %}" rel="stylesheet" />
   <link href="{% static 'assets/css/nucleo-svg.css' %}" rel="stylesheet" />
   <!-- Font Awesome Icons -->
-  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <script src="{% static 'js/fontawesome/all.js' %}"></script>
+
   <link href="{% static 'assets/css/nucleo-svg.css' %}" rel="stylesheet" />
   <!-- CSS Files -->
   <link id="pagestyle" href="{% static 'assets/css/soft-ui-dashboard.css' %}" rel="stylesheet" />
-  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script src="{% static 'js/sweetalert2.js' %}"></script>
   <!-- Jquery/AJAX -->
   <script src="{% static 'js/jquery.js' %}"></script>
-  <script src="https://unpkg.com/htmx.org/dist/htmx.js"></script>
-  <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
+  <script src="{% static 'js/htmx.js' %}"></script>
+  <script src="{% static 'js/ws.js' %}"></script>
+  {% comment %} <script src="https://unpkg.com/htmx.org/dist/htmx.js"></script> {% endcomment %}
+  {% comment %} <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script> {% endcomment %}
 
   <!-- Specific CSS goes HERE -->
     <link rel="stylesheet" href="https://unpkg.com/@trevoreyre/autocomplete-js/dist/style.css"/>
