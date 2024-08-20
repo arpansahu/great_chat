@@ -1,4 +1,4 @@
-Available at: https://great-chat.arpansahu.me
+Available at: https://[DOMAIN_NAME]
 
 admin login details:--
 username: admin@arpansahu.me

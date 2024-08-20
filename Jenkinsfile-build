@@ -8,6 +8,7 @@ pipeline {
         REPOSITORY = "library/great_chat"
         IMAGE_TAG = "${env.BUILD_ID}"
         COMMIT_FILE = "${env.WORKSPACE}/last_commit.txt"
+        ENV_PROJECT_NAME = "great_chat"
     }
     stages {
         stage('Checkout') {
@@ -16,76 +17,77 @@ pipeline {
             }
         }
         stage('Check for Changes') {
-            when {
-                expression { return !params.skip_checks }
-            }
             steps {
                 script {
-                    // Get the current commit hash
-                    def currentCommit = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
-                    echo "Current commit: ${currentCommit}"
-
-                    // Check if the last commit file exists
-                    if (fileExists(COMMIT_FILE)) {
-                        def lastCommit = readFile(COMMIT_FILE).trim()
-                        echo "Last commit: ${lastCommit}"
-
-                        // Compare the current commit with the last commit
-                        if (currentCommit == lastCommit) {
-                            echo "No changes detected. Skipping build."
-                            currentBuild.result = 'NOT_BUILT'
-                            error("No changes detected. Skipping build.")
-                        } else {
-                            // Check for changes in relevant files
-                            def changes = sh(script: "git diff --name-only ${lastCommit} ${currentCommit}", returnStdout: true).trim().split("\n")
-                            def relevantChanges = changes.findAll { 
-                                !(it in ['README.md', 'SECURITY.md', 'CHANGELOG.md', '.github/dependabot.yml'])
-                            }
-                            
-                            if (relevantChanges.isEmpty()) {
-                                echo "No relevant changes detected. Skipping build."
-                                currentBuild.result = 'NOT_BUILT'
-                                error("No relevant changes detected. Skipping build.")
-                            } else {
-                                echo "Relevant changes detected. Proceeding with build."
-                            }
-                        }
+                    if (params.skip_checks) {
+                        echo "Skipping Checks is True. Proceeding with build."
+                        BUILD_STATUS = 'BUILT'
+                        currentBuild.description = "${currentBuild.fullDisplayName} Skipping Checks is True. Proceeding with build."
                     } else {
-                        echo "No last commit file found. Proceeding with initial build."
-                    }
+                        // Get the current commit hash
+                        def currentCommit = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
+                        echo "Current commit: ${currentCommit}"
 
-                    // Save the current commit hash to the file
-                    writeFile(file: COMMIT_FILE, text: currentCommit)
+                        // Check if the last commit file exists
+                        if (fileExists(COMMIT_FILE)) {
+                            def lastCommit = readFile(COMMIT_FILE).trim()
+                            echo "Last commit: ${lastCommit}"
+
+                            // Compare the current commit with the last commit
+                            if (currentCommit == lastCommit) {
+                                echo "No changes detected. Skipping build."
+                                currentBuild.description = "${currentBuild.fullDisplayName} build skipped due to no changes detected"
+                                return
+                            } else {
+                                // Check for changes in relevant files
+                                def changes = sh(script: "git diff --name-only ${lastCommit} ${currentCommit}", returnStdout: true).trim().split("\n")
+                                def relevantChanges = changes.findAll { 
+                                    !(it in ['README.md', 'SECURITY.md', 'CHANGELOG.md', '.github/dependabot.yml'])
+                                }
+                                
+                                if (relevantChanges.isEmpty()) {
+                                    echo "No relevant changes detected. Skipping build."
+                                    currentBuild.description = "${currentBuild.fullDisplayName} build skipped due to no relevant changes"
+                                    return
+                                } else {
+                                    echo "Relevant changes detected. Proceeding with build."
+                                    BUILD_STATUS = 'BUILT'
+                                }
+                            }
+                        } else {
+                            echo "No last commit file found. Proceeding with initial build."
+                            BUILD_STATUS = 'BUILT'
+                        }
+
+                        // Save the current commit hash to the file
+                        writeFile(file: COMMIT_FILE, text: currentCommit)
+                    }
                 }
             }
         }
         stage('Dependencies') {
             when {
-                not {
-                    environment name: 'BUILD_STATUS', value: 'NOT_BUILT'
-                }
+                expression { return BUILD_STATUS != 'NOT_BUILT' }
             }
             steps {
                 script {
                     // Copy .env file to the workspace
-                    sh "sudo cp /root/projectenvs/great_chat/.env ${env.WORKSPACE}/"
+                    sh "sudo cp /root/projectenvs/${ENV_PROJECT_NAME}/.env ${env.WORKSPACE}/"
                 }
             }
         }
         stage('Build Image') {
             when {
-                not {
-                    environment name: 'BUILD_STATUS', value: 'NOT_BUILT'
-                }
+                expression { return BUILD_STATUS != 'NOT_BUILT' }
             }
             steps {
                 script {
                     // Ensure Docker is running and can be accessed
                     sh 'docker --version'
-                    
+
                     // Log the image details
                     echo "Building Docker image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
-                    
+
                     // Build the Docker image
                     sh """
                     docker build -t ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG} .
@@ -96,9 +98,7 @@ pipeline {
         }
         stage('Push Image') {
             when {
-                not {
-                    environment name: 'BUILD_STATUS', value: 'NOT_BUILT'
-                }
+                expression { return BUILD_STATUS != 'NOT_BUILT' }
             }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'harbor-credentials', passwordVariable: 'DOCKER_REGISTRY_PASSWORD', usernameVariable: 'DOCKER_REGISTRY_USERNAME')]) {
@@ -107,7 +107,7 @@ pipeline {
                         sh '''
                         echo $DOCKER_REGISTRY_PASSWORD | docker login ${REGISTRY} -u $DOCKER_REGISTRY_USERNAME --password-stdin
                         '''
-                        
+
                         // Push the Docker image to the registry
                         sh '''
                         docker push ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}
@@ -121,7 +121,9 @@ pipeline {
     post {
         success {
             script {
-                currentBuild.description = "Image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
+                if (!currentBuild.description) {
+                    currentBuild.description = "Image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG} built and pushed successfully"
+                }
                 
                 // Send success notification email
                 sh """curl -s \
@@ -142,15 +144,15 @@ pipeline {
                                                     "Name": "Development Team"
                                             }
                                     ],
-                                    "Subject": "${currentBuild.fullDisplayName} built successfully",
-                                    "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} is now built and pushed to the registry",
-                                    "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is now built and pushed to the registry </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
+                                    "Subject": "${currentBuild.description}",
+                                    "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} : ${currentBuild.description}",
+                                    "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} : ${currentBuild.description} </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
                             }
                     ]
                 }'"""
 
                 // Trigger great_chat job only if the build is stable
-                build job: 'great_chat', wait: false
+                build job: 'great_chat', parameters: [booleanParam(name: 'DEPLOY', value: true)], wait: false
             }
         }
         failure {
@@ -175,8 +177,8 @@ pipeline {
                                             }
                                     ],
                                     "Subject": "${currentBuild.fullDisplayName} build failed",
-                                    "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} build failed",
-                                    "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} build failed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
+                                    "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} build failed ${currentBuild.description} ",
+                                    "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} build failed </h3> <br> <p> ${currentBuild.description}  </p>"
                             }
                     ]
                 }'"""

@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: great-chat-app
+  name: great-chat-mac-app
   labels:
-    app: great-chat
+    app: great-chat-mac
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: great-chat
+      app: great-chat-mac
   template:
     metadata:
       labels:
-        app: great-chat
+        app: great-chat-mac
     spec:
       imagePullSecrets:
         - name: harbor-registry-secret
       containers:
-        - image: harbor.arpansahu.me/library/great_chat:latest
-          name: great-chat
+        - image: harbor.arpansahu.me/library/great_chat_mac:latest
+          name: great-chat-mac
           envFrom:
             - secretRef:
                 name: great-chat-secret

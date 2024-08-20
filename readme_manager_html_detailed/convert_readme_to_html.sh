@@ -7,6 +7,7 @@ EXTRA_FILES=("Readme_converted.md") # Add any extra files here
 
 # Function to download files
 download_files() {
+    echo "Downloading Required files..."
     for file in "${FILES[@]}"; do
         curl -O "$REPO_URL/readme_manager_html_detailed/$file"
         # Check if the file was downloaded successfully
@@ -19,34 +20,33 @@ download_files() {
 
 # Create and activate virtual environment
 create_and_activate_env() {
+    echo "Creating and activating virtual environment"
     python3 -m venv env
     source env/bin/activate
 }
 
 # Install requirements
 install_requirements() {
+    echo "Installing python requirements"
     pip install -r requirements.txt
 }
 
 # Run convert_readme_to_html.py
 run_readme_to_html_generator() {
+    echo "Running run_readme_to_html_generator python file"
     python convert_readme_to_html.py
-}
-
-# Copy readme.html to the cloned repository
-copy_readme_to_repo() {
-    local repo_dir="arpansahu.me"
-    cp readme.html "$repo_dir/templates/modules/project_detailed/project_partials/great_chat/"
 }
 
 # Deactivate and delete the environment
 cleanup_env() {
+    echo "Cleaning up environment..."
     deactivate
     rm -rf env
 }
 
 # Delete downloaded files
 delete_downloaded_and_extra_files() {
+    echo "Deleting downloaded and extra files..."
     local all_files=("${FILES[@]}" "${EXTRA_FILES[@]}")
     for file in "${all_files[@]}"; do
         rm -f "$file"
@@ -61,13 +61,10 @@ main() {
     # Determine the environment
     ENVIRONMENT=${1:-prod}
     
-    setup_environment
-    
     download_files
     create_and_activate_env
     install_requirements
     run_readme_to_html_generator
-    copy_readme_to_repo
     cleanup_env
     delete_downloaded_and_extra_files
 }

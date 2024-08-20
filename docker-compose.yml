@@ -1,11 +1,14 @@
 services:
   web:
-    image: harbor.arpansahu.me/library/great_chat:latest
+    build:  # This section will be used when running locally
+      context: .
+      dockerfile: Dockerfile
+    image: harbor.arpansahu.me/library/great_chat:latest  # This will be used when the image is not built locally
     env_file: ./.env
     command: bash -c "python manage.py makemigrations && python manage.py migrate && daphne -b 0.0.0.0 -p 8002 great_chat.asgi:application"
     container_name: great_chat
     volumes:
-      - .:/great_chat
+      - .:/app  # Ensure this matches the WORKDIR in your Dockerfile
     ports:
       - "8002:8002"
     restart: unless-stopped

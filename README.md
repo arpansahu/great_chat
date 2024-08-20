@@ -5,13 +5,14 @@ This WhatsApp clone project provides a comprehensive chat application with vario
 ## Project Features
 
 1. **Account Functionality:** Complete account management.
-3. **PostgreSql Integration:** Utilized as a database.
-2. **AWS S3/MinIO Integration:** For file storage.
-3. **Redis Integration:** Utilized for caching and message pub/sub.
-4. **Autocomplete JS Library:** Implemented for enhanced user experience.
-5. **MailJet Integration:** Used for email services.
-6. **Dockerized Project:** Fully containerized for easy deployment.
-7. **CI/CD Pipeline:** Continuous integration and deployment included.
+2. **PostgreSql Integration:** Utilized as a database.
+3. **AWS S3/MinIO Integration:** For file storage.
+4. **Redis Integration:** Utilized for caching and message pub/sub.
+5. **Autocomplete JS Library:** Implemented for enhanced user experience.
+6. **MailJet Integration:** Used for email services.
+7. **Dockerized Project:** Fully containerized for easy deployment.
+8. **Kubernetes-native** Kubernetes support also available.
+9. **CI/CD Pipeline:** Continuous integration and deployment included using Jenkins.
 
 ## WhatsApp Clone Functionalities
 
@@ -66,6 +67,13 @@ The most common Redis use cases are session cache, full-page cache, queues, lead
 ## What is Ajax?
 Ajax is a set of web development techniques that uses various web technologies on the client-side to create asynchronous web applications. With Ajax, web applications can send and retrieve data from a server asynchronously without interfering with the display and behavior of the existing page.
 
+## What is Web Sockets ?
+
+WebSocket is bidirectional, a full-duplex protocol that is used in the same scenario of client-server communication, unlike HTTP it starts from ws:// or wss://. It is a stateful protocol, which means the connection between client and server will keep alive until it is terminated by either party (client or server). After closing the connection by either of the client and server, the connection is terminated from both ends. 
+
+## What is Channels?
+Channels preserve the synchronous behavior of Django and add a layer of asynchronous protocols allowing users to write the views that are entirely synchronous, asynchronous, or a mixture of both. Channels basically allow the application to support “long-running connections”. It replaces Django’s default WSGI with its ASGI.
+
 
 ## Tech Stack
 
@@ -77,13 +85,17 @@ Ajax is a set of web development techniques that uses various web technologies o
 [![Javascript](https://img.shields.io/badge/JavaScript-323330?style=for-the-badge&logo=javascript&logoColor=F7DF1E)](https://www.javascript.com/)
 [![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/docs/)
 [![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/docs/)
-[![Heroku](https://img.shields.io/badge/-Heroku-430098?style=for-the-badge&logo=heroku&logoColor=white)](https://heroku.com/)
 [![Github](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://www.github.com/)
 [![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Harbor](https://img.shields.io/badge/HARBOR-TEXT?style=for-the-badge&logo=harbor&logoColor=white&color=blue)](https://goharbor.io/)
+[![Kubernetes](https://img.shields.io/badge/kubernetes-326ce5.svg?&style=for-the-badge&logo=kubernetes&logoColor=white)](https://kubernetes.io/)
 [![Jenkins](https://img.shields.io/badge/Jenkins-D24939?style=for-the-badge&logo=Jenkins&logoColor=white)](https://www.jenkins.io/)
-[![AWS](https://img.shields.io/badge/Amazon_AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)](https://aws.amazon.com/)
 [![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)](https://nginx.org/en/)
+[![MINIIO](https://img.shields.io/badge/MINIO-TEXT?style=for-the-badge&logo=minio&logoColor=white&color=%23C72E49)](https://min.io/)
 [![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://ubuntu.com/)
+[![Mail Jet](https://img.shields.io/badge/MAILJET-9933CC?style=for-the-badge&logo=minutemailer&logoColor=white)](https://mailjet.com/)
+[![Django Channels](https://img.shields.io/badge/CHANNELS-092E20?style=for-the-badge&logo=channel4&logoColor=white)](https://channels.readthedocs.io)
+[![Web Sockets](https://img.shields.io/badge/WEBSOCKETS-1C47CB?style=for-the-badge&logo=socketdotio&logoColor=white)](https://websocket.org/)
 
 ## Demo
 
@@ -143,7 +155,7 @@ Run Server
 
   or 
 
-  daphne -p 8000 great_chat.asgi:application
+  daphne -b 0.0.0.0 -p 8002 great_chat.asgi:application
 ```
 
 Use these CACHE settings
@@ -152,7 +164,7 @@ Use these CACHE settings
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': config('REDISCLOUD_URL'),
+        'LOCATION': config('REDIS_CLOUD_URL'),
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }
@@ -174,7 +186,7 @@ else:
         "default": {
             "BACKEND": "channels_redis.core.RedisChannelLayer",
             "CONFIG": {
-                "hosts": [(config('REDISCLOUD_URL'))],
+                "hosts": [(config('REDIS_CLOUD_URL'))],
             },
         },
     }
@@ -184,13 +196,9 @@ Change settings.py static files and media files settings | Now I have added supp
 
 ```python
 if not DEBUG:
-    BUCKET_TYPE = config('BUCKET_TYPE')
+    BUCKET_TYPE = BUCKET_TYPE
 
     if BUCKET_TYPE == 'AWS':
-
-        AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
-        AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
-        AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
         AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
         AWS_DEFAULT_ACL = 'public-read'
         AWS_S3_OBJECT_PARAMETERS = {
@@ -202,22 +210,18 @@ if not DEBUG:
             'Access-Control-Allow-Origin': '*',
         }
         # s3 static settings
-        AWS_STATIC_LOCATION = 'portfolio/great_chat/static'
+        AWS_STATIC_LOCATION = f'portfolio/{PROJECT_NAME}/static'
         STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_STATIC_LOCATION}/'
-        STATICFILES_STORAGE = 'great_chat.storage_backends.StaticStorage'
+        STATICFILES_STORAGE = f'{PROJECT_NAME}.storage_backends.StaticStorage'
         # s3 public media settings
-        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/great_chat/media'
+        AWS_PUBLIC_MEDIA_LOCATION = f'portfolio/{PROJECT_NAME}/media'
         MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_PUBLIC_MEDIA_LOCATION}/'
-        DEFAULT_FILE_STORAGE = 'great_chat.storage_backends.PublicMediaStorage'
+        DEFAULT_FILE_STORAGE = f'{PROJECT_NAME}.storage_backends.PublicMediaStorage'
         # s3 private media settings
-        PRIVATE_MEDIA_LOCATION = 'portfolio/great_chat/private'
-        PRIVATE_FILE_STORAGE = 'great_chat.storage_backends.PrivateMediaStorage'
+        PRIVATE_MEDIA_LOCATION = f'portfolio/{PROJECT_NAME}/private'
+        PRIVATE_FILE_STORAGE = f'{PROJECT_NAME}.storage_backends.PrivateMediaStorage'
 
     elif BUCKET_TYPE == 'BLACKBLAZE':
-
-        AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
-        AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
-        AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
         AWS_S3_REGION_NAME = 'us-east-005'
 
         AWS_S3_ENDPOINT = f's3.{AWS_S3_REGION_NAME}.backblazeb2.com'
@@ -234,21 +238,18 @@ if not DEBUG:
             'Access-Control-Allow-Origin': '*',
         }
         # s3 static settings
-        AWS_STATIC_LOCATION = 'portfolio/great_chat/static'
+        AWS_STATIC_LOCATION = f'portfolio/{PROJECT_NAME}/static'
         STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.{AWS_STATIC_LOCATION}/'
-        STATICFILES_STORAGE = 'great_chat.storage_backends.StaticStorage'
+        STATICFILES_STORAGE = f'{PROJECT_NAME}.storage_backends.StaticStorage'
         # s3 public media settings
-        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/great_chat/media'
+        AWS_PUBLIC_MEDIA_LOCATION = f'portfolio/{PROJECT_NAME}/media'
         MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.{AWS_PUBLIC_MEDIA_LOCATION}/'
-        DEFAULT_FILE_STORAGE = 'great_chat.storage_backends.PublicMediaStorage'
+        DEFAULT_FILE_STORAGE = f'{PROJECT_NAME}.storage_backends.PublicMediaStorage'
         # s3 private media settings
-        PRIVATE_MEDIA_LOCATION = 'portfolio/great_chat/private'
-        PRIVATE_FILE_STORAGE = 'great_chat.storage_backends.PrivateMediaStorage'
+        PRIVATE_MEDIA_LOCATION = f'portfolio/{PROJECT_NAME}/private'
+        PRIVATE_FILE_STORAGE = f'{PROJECT_NAME}.storage_backends.PrivateMediaStorage'
 
     elif BUCKET_TYPE == 'MINIO':
-        AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
-        AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
-        AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
         AWS_S3_REGION_NAME = 'us-east-1'  # MinIO doesn't require this, but boto3 does
         AWS_S3_ENDPOINT_URL = 'https://minio.arpansahu.me'
         AWS_DEFAULT_ACL = 'public-read'
@@ -262,21 +263,18 @@ if not DEBUG:
         }
 
         # s3 static settings
-        AWS_STATIC_LOCATION = 'portfolio/great_chat/static'
+        AWS_STATIC_LOCATION = f'portfolio/{PROJECT_NAME}/static'
         STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}/{AWS_STATIC_LOCATION}/'
-        STATICFILES_STORAGE = 'great_chat.storage_backends.StaticStorage'
+        STATICFILES_STORAGE = f'{PROJECT_NAME}.storage_backends.StaticStorage'
 
         # s3 public media settings
-        AWS_PUBLIC_MEDIA_LOCATION = 'portfolio/great_chat/media'
+        AWS_PUBLIC_MEDIA_LOCATION = f'portfolio/{PROJECT_NAME}/media'
         MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}/{AWS_PUBLIC_MEDIA_LOCATION}/'
-        DEFAULT_FILE_STORAGE = 'great_chat.storage_backends.PublicMediaStorage'
+        DEFAULT_FILE_STORAGE = f'{PROJECT_NAME}.storage_backends.PublicMediaStorage'
 
         # s3 private media settings
-        PRIVATE_MEDIA_LOCATION = 'portfolio/great_chat/private'
-        PRIVATE_FILE_STORAGE = 'great_chat.storage_backends.PrivateMediaStorage'
-
-    
-
+        PRIVATE_MEDIA_LOCATION = 'portfolio/borcelle_crm/private'
+        PRIVATE_FILE_STORAGE = 'borcelle_crm.storage_backends.PrivateMediaStorage'
 else:
     # Static files (CSS, JavaScript, Images)
     # https://docs.djangoproject.com/en/3.2/howto/static-files/
@@ -393,6 +391,7 @@ include_files = {
     "README of Redis Server Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Redis.md",
     "README of Redis Commander Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/RedisComander.md",
     "README of Minio Server Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Minio.md",
+    "README of RabbitMQ Server Setup": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Rabbitmq.md",
     "README of Intro": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/Intro.md",
     "README of Readme Manager": "https://raw.githubusercontent.com/arpansahu/common_readme/main/Readme%20manager/readme_manager.md",
     "AWS DEPLOYMENT INTRODUCTION": "https://raw.githubusercontent.com/arpansahu/common_readme/main/Introduction/aws_desployment_introduction.md",
@@ -400,6 +399,19 @@ include_files = {
     "README of Harbor" : "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/harbor/harbor.md",
     "HARBOR DOCKER COMPOSE": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/harbor/docker-compose.md",
     "INCLUDE FILES": "https://raw.githubusercontent.com/arpansahu/common_readme/main/include_files.py",
+    "MONITORING": "https://raw.githubusercontent.com/arpansahu/arpansahu-one-scripts/main/README.md?token=GHSAT0AAAAAACTHOPGXTRCHN6GJQNHQ43QKZUKVMPA",
+
+    #kubernetes
+    "KIND CONFIG MD": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/kubernetes/yaml_md_files/kind-config.md",
+    "KUBELET CONFIG MD": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/kubernetes/yaml_md_files/kubelet-config.md",
+    "DASHBOARD ADMIN USER MD": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/kubernetes/yaml_md_files/dashboard-adminuser.md",
+    "DASHBOARD ADMIN USER ROLE BIND MD": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/kubernetes/yaml_md_files/dashboard-adminuser-rolebinding.md",
+    "DASHBOARD SERVICE": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/kubernetes/yaml_md_files/dashbord-service.md",
+    "DASHBOARD ADMIN SA MD": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/kubernetes/yaml_md_files/dashboard-admin-sa.md",
+    "DASHBOARD ADMIN SA BINDING": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/kubernetes/yaml_md_files/dashboard-admin-sa-binding.md",
+    "DASHBOARD ADMIN SA SECRET": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/kubernetes/yaml_md_files/dashboard-admin-sa-secret.md",
+    "KUBE WITH DASHBOARD" : "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/kubernetes/kube_with_dashboard.md", 
+    "KUBE DEPLOYMENT": "https://raw.githubusercontent.com/arpansahu/common_readme/main/AWS%20Deployment/kubernetes/deployment.md",
 
     # project files
     "env.example": "../env.example",
@@ -407,6 +419,9 @@ include_files = {
     "Dockerfile": "../Dockerfile",
     "Jenkinsfile-deploy": "../Jenkinsfile-deploy",
     "Jenkinsfile-build": "../Jenkinsfile-build",
+    "DEPLOYMENT YAML": "../deployment.yaml",
+    "SERVICE YAML": "../service.yaml",
+    
     
     # project partials files
     "INTRODUCTION": "../readme_manager/partials/introduction.md",
@@ -420,7 +435,11 @@ include_files = {
     "SERVICES": "../readme_manager/partials/services.md",
     "JENKINS PROJECT NAME": "../readme_manager/partials/jenkins_project_name.md",
     "JENKINS BUILD PROJECT NAME": "../readme_manager/partials/jenkins_build_project_name.md",
-    "STATIC PROJECT NAME": "../readme_manager/partials/static_project_name.md"
+    "STATIC PROJECT NAME": "../readme_manager/partials/static_project_name.md",
+    "PROJECT_NAME_DASH" : "../readme_manager/partials/project_name_with_dash.md",
+    "PROJECT_DOCKER_PORT": "../readme_manager/partials/project_docker_port.md",
+    "PROJECT_NODE_PORT": "../readme_manager/partials/project_node_port.md",
+    "DOMAIN_NAME": "../readme_manager/partials/project_domain_name.md"
 }
 ```
 
@@ -461,7 +480,6 @@ Note: Update as of Aug 2023, I have decided to make some changes to my lifestyle
 Now My project arrangements look something similar to this
 
 ![EC2 Sever along with Nginx, Docker and Jenkins Arrangement](https://github.com/arpansahu/common_readme/blob/main/Images/One%20Server%20Configuration%20for%20arpanahuone.png)
-
 
 ### Step 1: Dockerize
 
@@ -590,11 +608,11 @@ Harbor is an open-source container image registry that secures images with role-
         # http related config
         http:
         # port for http, default is 80. If https enabled, this port will redirect to https port
-        port: 8081
+        port: 8601
         # https related config
         https:
         # https port for harbor, default is 443
-        port: 8443
+        port: 8602
         # The path of cert and key files for nginx
         certificate: /etc/letsencrypt/live/arpansahu.me/fullchain.pem 
         private_key: /etc/letsencrypt/live/arpansahu.me/privkey.pem
@@ -895,8 +913,8 @@ Harbor is an open-source container image registry that secures images with role-
             - harbor
             - harbor-notary
             ports:
-            - 8081:8080
-            - 8443:8443
+            - 8601:8080
+            - 8602:8443
             - 4443:4443
             depends_on:
             - registry
@@ -924,8 +942,8 @@ Harbor is an open-source container image registry that secures images with role-
 
         As you can see the ports we used in harbor.yml are configured here and nginx service have been removed.
         ports:
-          - 8081:8080
-          - 8443:8443
+          - 8601:8080
+          - 8602:8443
           - 4443:4443
 
 4. **Run the Harbor install script:**
@@ -947,8 +965,17 @@ Keep in mind that the instructions provided here assume a basic setup. For produ
 1. Edit Nginx Configuration
 
     ```bash
-    sudo vi /etc/nginx/sites-available/arpansahu
+    sudo vi /etc/nginx/sites-available/services
     ```
+
+    if /etc/nginx/sites-available/services does not exists
+
+        1. Create a new configuration file: Create a new file in the Nginx configuration directory. The location of this directory varies depending on your  operating system and Nginx installation, but it’s usually found at /etc/nginx/sites-available/.
+
+        ```bash
+            touch /etc/nginx/sites-available/services
+            vi /etc/nginx/sites-available/services
+        ```
 
 2. Add this server configuration
 
@@ -1015,23 +1042,43 @@ You can connect to my Docker Registry
     docker push harbor.arpansahu.me/library/image_name:latest
 ```
 
+### Create Image Retention Policy
+
+Inside project, default project is library 
+ 
+Go to >>> Library project
+Go to >>> Policy
+Click on >>> Add Policy
+
+For the repositories == matching **
+By artifact count or number of days == retain the most recently pulled # artifacts  Count = 2/3 no of last no of images 
+tags == matching      Untagged artifacts = ticketed
+
+This is one time task for entire project 
+
+Same as below
+
+![Add Retention Rule](https://github.com/arpansahu/common_readme/blob/main/AWS%20Deployment/harbor/retention_rule_add.png)
+
+After adding rule schedule it as per requirement as below
+
+![Add Retention Rule S](https://github.com/arpansahu/common_readme/blob/main/AWS%20Deployment/harbor/retention_rule_schedule.png)
+
 ```bash
 FROM python:3.10.7
 
 WORKDIR /app
 
-# Copy the requirements file and install dependencies
-COPY requirements.txt requirements.txt
-RUN pip3 install -r requirements.txt
-
-# Copy the rest of the application code
 COPY . .
+
+RUN pip3 install -r requirements.txt
 
 # Expose the application port
 EXPOSE 8002
 
 # Run collectstatic and daphne in a single command
-CMD ["bash", "-c", "python manage.py collectstatic --noinput && daphne -b 0.0.0.0 -p 8002 great_chat.asgi:application"]
+
+CMD bash -c "python manage.py collectstatic --noinput && daphne -b 0.0.0.0 -p 8002 great_chat.asgi:application"
 ```
 
 Create a file named docker-compose.yml and add following lines in it
@@ -1039,12 +1086,15 @@ Create a file named docker-compose.yml and add following lines in it
 ```bash
 services:
   web:
-    image: harbor.arpansahu.me/library/great_chat:latest
+    build:  # This section will be used when running locally
+      context: .
+      dockerfile: Dockerfile
+    image: harbor.arpansahu.me/library/great_chat:latest  # This will be used when the image is not built locally
     env_file: ./.env
     command: bash -c "python manage.py makemigrations && python manage.py migrate && daphne -b 0.0.0.0 -p 8002 great_chat.asgi:application"
     container_name: great_chat
     volumes:
-      - .:/great_chat
+      - .:/app  # Ensure this matches the WORKDIR in your Dockerfile
     ports:
       - "8002:8002"
     restart: unless-stopped
@@ -1067,7 +1117,469 @@ if you remove this tag it will be attached to terminal, and you will be able to 
 
 --build tag with docker compose up will force image to be rebuild every time before starting the container
 
-### Step 3: Serving the requests from Nginx
+### Step 3: Containerizing with Kubernetes
+
+## Installing Kubernetes cluster and Setting A Dashboard
+
+### Install Kind and Kubernetes CLI (kubectl)
+
+1.	Install Kind:
+
+    ```bash
+        curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.14.0/kind-linux-amd64
+        chmod +x ./kind
+        sudo mv ./kind /usr/local/bin/kind
+    ```
+
+2. Install kubectl:
+
+    ```bash
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+        chmod +x kubectl
+        sudo mv kubectl /usr/local/bin/
+    ```
+
+### Create a Kind Cluster with Port Mappings
+
+1. 	Create a configuration file for Kind:
+
+    ```bash
+        touch kind-config.yaml
+        vi kind-config.yaml
+    ```
+
+    paste the below code into the file
+
+    ```yaml
+    kind: Cluster
+    apiVersion: kind.x-k8s.io/v1alpha4
+    nodes:
+    - role: control-plane
+      extraPortMappings:
+      - containerPort: 80
+        hostPort: 7800
+      - containerPort: 443
+        hostPort: 7801
+      extraMounts:
+      - hostPath: /etc/kubernetes/kubelet-config.yaml
+        containerPath: /var/lib/kubelet/config.yaml
+    ```
+
+2. 	Create a kubelet configuration file for Kind:
+
+    ```bash
+        touch kubelet-config.yaml
+        vi kubelet-config.yaml
+    ```
+
+    paste the below code into the file
+
+    ```yaml
+    kind: Cluster
+    apiVersion: kind.x-k8s.io/v1alpha4
+    nodes:
+    - role: control-plane
+      extraPortMappings:
+      - containerPort: 80
+        hostPort: 7800
+      - containerPort: 443
+        hostPort: 7801
+      extraMounts:
+      - hostPath: /etc/kubernetes/kubelet-config.yaml
+        containerPath: /var/lib/kubelet/config.yaml
+    ```
+
+3. Create the Kind cluster:
+
+    ```bash
+        kind create cluster --config kind-config.yaml
+    ```
+
+###  Label the Node
+
+1. Label the node to match the required node selectors:
+
+    ```bash
+        kubectl label node kind-control-plane ingress-ready=true
+        kubectl label node kind-control-plane kubernetes.io/os=linux
+    ```
+
+### Deploy the Kubernetes Dashboard
+
+1. Create the kubernetes-dashboard namespace:
+
+    ```bash
+        kubectl create namespace kubernetes-dashboard
+    ```
+
+2. Deploy the Kubernetes Dashboard:
+
+    ```bash
+        kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+    ```
+
+3. Create an admin user:
+
+    Create a file named dashboard-adminuser.yaml
+
+    ```bash
+        touch dashboard-adminuser.yaml
+        vi dashboard-adminuser.yaml
+    ```
+
+    copy and paste below content into it
+
+    ```yaml
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: admin-user
+      namespace: kubernetes-dashboard
+    ```
+
+4. Create ClusterRoleBinding:
+
+    Create a file named dashboard-adminuser-rolebinding.yaml
+
+    ```bash
+        touch dashboard-adminuser-rolebinding.yaml
+        vi dashboard-adminuser-rolebinding.yaml
+    ```
+
+    copy and paste below content into it
+
+    ```yaml
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRoleBinding
+    metadata:
+      name: admin-user
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: cluster-admin
+    subjects:
+    - kind: ServiceAccount
+      name: admin-user
+      namespace: kubernetes-dashboar
+    ```
+5. Apply both the files
+
+    ```bash
+        kubectl apply -f dashboard-adminuser.yaml
+        kubectl apply -f dashboard-adminuser-rolebinding.yaml
+    ```
+
+6. Get the admin user token:
+
+    ```bash
+        kubectl -n kubernetes-dashboard create token admin-user
+    ```
+
+### Expose the Kubernetes Dashboard Service using NodePort
+
+1. Edit the Kubernetes Dashboard service:
+
+    ```bash
+        kubectl -n kubernetes-dashboard edit service kubernetes-dashboard
+    ```
+
+2. Modify the service to use NodePort (do not copy blindly just make the mentioned changes):
+
+    ```yaml
+    # Please edit the object below. Lines beginning with a '#' will be ignored,
+    # and an empty file will abort the edit. If an error occurs while saving this file will be
+    # reopened with the relevant failures.
+    #
+    apiVersion: v1
+    kind: Service
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/last-applied-configuration: |
+          {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"k8s-app":"kubernetes-dashboard"},"name":"kubernetes-dashboard","namespace":"kubernetes-dashboard"},"spec":{"ports":[{"port":443,"targetPort":8443}],"selector":{"k8s-app":"kubernetes-dashboard"}}}
+      creationTimestamp: "2024-07-06T11:14:04Z"
+      labels:
+        k8s-app: kubernetes-dashboard
+      name: kubernetes-dashboard
+      namespace: kubernetes-dashboard
+      resourceVersion: "1668"
+      uid: e4211a82-97a1-4a65-b52e-be3bcb3b5150
+    spec:
+      clusterIP: 10.96.128.226
+      clusterIPs:
+      - 10.96.128.226
+      externalTrafficPolicy: Cluster
+      internalTrafficPolicy: Cluster
+      ipFamilies:
+      - IPv4
+      ipFamilyPolicy: SingleStack
+      ports:
+      - nodePort: 31000
+        port: 443
+        protocol: TCP
+        targetPort: 8443
+      selector:
+        k8s-app: kubernetes-dashboard
+      sessionAffinity: None
+      type: NodePort
+    status:
+      loadBalancer: {}
+    ```
+
+
+### Configure On-Premises Nginx as a Reverse Proxy
+
+1. Edit Nginx Configuration
+
+    ```bash
+    sudo vi /etc/nginx/sites-available/services
+    ```
+
+    if /etc/nginx/sites-available/services does not exists
+
+        1. Create a new configuration file: Create a new file in the Nginx configuration directory. The location of this directory varies depending on your  operating system and Nginx installation, but it’s usually found at /etc/nginx/sites-available/.
+
+        ```bash
+            touch /etc/nginx/sites-available/services
+            vi /etc/nginx/sites-available/services
+        ```
+
+
+2. To know Internal ip of kind cluster
+
+    ```bash
+        kubectl get nodes -o wide
+    ```
+
+3. Add this server configuration
+
+    ```bash
+    server {
+        listen         80;
+        server_name    kube.arpansahu.me;
+        # force https-redirects
+        if ($scheme = http) {
+            return 301 https://$server_name$request_uri;
+            }
+
+        location / {
+            proxy_pass              proxy_pass https://<INTERNAL-IP>:31000;
+            proxy_set_header        Host $host;
+            proxy_set_header    X-Forwarded-Proto $scheme;
+        }
+
+        listen 443 ssl; # managed by Certbot
+        ssl_certificate /etc/letsencrypt/live/arpansahu.me/fullchain.pem; # managed by Certbot
+        ssl_certificate_key /etc/letsencrypt/live/arpansahu.me/privkey.pem; # managed by Certbot
+        include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+        ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+    }
+    ```
+
+
+4. Test the Nginx Configuration
+
+    ```bas
+    sudo nginx -t
+    ```
+
+5. Reload Nginx to apply the new configuration
+
+    ```bash
+    sudo systemctl reload nginx
+    ```
+
+### Get the admin user token for login:
+
+    Access:  https://kube.arpansahu.me
+
+    then generate token from host server by running the following command
+
+    ```bash
+        kubectl -n kubernetes-dashboard create token admin-user
+    ```
+
+    Note: The token generated by this command will have expiry and you may need to generate token again and again
+
+### Generate token without expiry
+
+1.	Delete the old ServiceAccount and ClusterRoleBinding:
+
+    ```bash
+        kubectl -n kubernetes-dashboard delete serviceaccount admin-user
+        kubectl delete clusterrolebinding admin-user
+    ```
+
+2. Create and apply the ServiceAccount:
+
+    ```bash
+        touch dashboard-admin-sa.yaml
+        vi dashboard-admin-sa.yaml
+    ```
+
+    copy this and past it in the file
+
+    ```yaml
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: dashboard-admin-sa
+      namespace: kubernetes-dashboard
+    ```
+
+3. Create and apply the ClusterRoleBinding:
+
+    ```bash
+        touch dashboard-admin-sa-binding.yaml
+        vi dashboard-admin-sa-binding.yaml
+    ```
+
+    copy this and past it in the file
+
+    ```yaml
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRoleBinding
+    metadata:
+      name: dashboard-admin-sa-binding
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: cluster-admin
+    subjects:
+    - kind: ServiceAccount
+      name: dashboard-admin-sa
+      namespace: kubernetes-dashboard
+    ``` 
+
+4. Create the secret for the ServiceAccount:
+
+    ```bash
+        touch dashboard-admin-sa-secret.yaml
+        vi dashboard-admin-sa-secret.yaml
+    ```
+
+    copy this and past it in the file
+
+    ```yaml
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: dashboard-admin-sa-token
+      namespace: kubernetes-dashboard
+      annotations:
+        kubernetes.io/service-account.name: dashboard-admin-sa
+    type: kubernetes.io/service-account-token
+    ``` 
+
+
+5. Apply all the files
+
+    ```bash
+        kubectl apply -f dashboard-admin-sa.yaml
+        kubectl apply -f dashboard-admin-sa-binding.yaml
+        kubectl apply -f dashboard-admin-sa-secret.yaml
+    ```
+
+6. Check the Secret
+
+    ```bash
+        kubectl -n kubernetes-dashboard get secret dashboard-admin-sa-token
+    ```
+
+7. Patch the ServiceAccount:
+
+    ```bash
+        kubectl -n kubernetes-dashboard patch serviceaccount dashboard-admin-sa -p '{"secrets":[{"name":"dashboard-admin-sa-token"}]}'
+    ```
+
+8. Retrieve the token:
+
+    ```bash
+        SECRET_NAME=$(kubectl -n kubernetes-dashboard get sa dashboard-admin-sa -o jsonpath="{.secrets[0].name}")
+        kubectl -n kubernetes-dashboard get secret $SECRET_NAME -o jsonpath="{.data.token}" | base64 --decode
+    ```
+
+### Accessing 
+
+Access the Dashboard
+
+https://kube.arpansahu.me
+
+you will be required to fill token for login
+
+Access the cluster via Cli using kubectl
+
+```bash
+    kubectl get nodes
+```
+### Deployment
+
+1. Create Harbor Secret
+
+```yaml
+kubectl create secret docker-registry harbor-registry-secret \
+  --docker-server=harbor.arpansahu.me \
+  --docker-username=HARBOR_USERNAME \
+  --docker-password=HARBOR_PASSWORD \
+  --docker-email=YOUR_EMAIL_ID
+```
+
+2. Create deployment.yaml file and fill it with the below contents.
+
+```yaml
+  apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: great-chat-app
+  labels:
+    app: great-chat
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: great-chat
+  template:
+    metadata:
+      labels:
+        app: great-chat
+    spec:
+      imagePullSecrets:
+        - name: harbor-registry-secret
+      containers:
+        - image: harbor.arpansahu.me/library/great_chat:latest
+          name: great-chat
+          envFrom:
+            - secretRef:
+                name: great-chat-secret
+          ports:
+            - containerPort: 8002
+              name: daphne
+```
+
+3. Create a service.yaml file and fill it with the below contents.
+
+```yaml
+  apiVersion: v1
+kind: Service
+metadata:
+  name: great-chat-service
+spec:
+  selector:
+    app: great-chat
+  ports:
+    - protocol: TCP
+      port: 8002
+      targetPort: 8002
+      nodePort: 32002
+  type: NodePort
+```
+
+4. Create Env Secret for the project
+
+```
+  kubectl create secret generic <SECRET_NAME> --from-env-file=/root/projectenvs/<PROJECT_NAME>/.env
+```
+
+### Step 4: Serving the requests from Nginx
 
 #### Installing the Nginx server
 
@@ -1145,7 +1657,7 @@ sudo systemctl restart nginx
 
 Now it's time to enable HTTPS for this server
 
-### Step 4: Enabling HTTPS 
+### Step 5: Enabling HTTPS 
 
 
 1. Base Domain:  Enabling HTTPS for base domain only or a single subdomain
@@ -1629,7 +2141,7 @@ server {
         }
 
     location / {
-         proxy_pass              http://{ip_of_home_server}:8014;
+         proxy_pass              http://{ip_of_home_server}:8002;
          proxy_set_header        Host $host;
          proxy_set_header        X-Forwarded-Proto $scheme;
 
@@ -1647,7 +2159,7 @@ server {
 }
 ```
 
-### Step 5: CI/CD using Jenkins
+### Step 6: CI/CD using Jenkins
 
 ### Installing Jenkins
 
@@ -1701,11 +2213,23 @@ sudo systemctl status jenkins
 ```
 
 Now for serving the Jenkins UI from Nginx add the following lines to the Nginx file located at 
-/etc/nginx/sites-available/arpansahu by running the following command
+/etc/nginx/sites-available/service by running the following command
+
+Edit Nginx Configuration
 
 ```bash
-sudo vi /etc/nginx/sites-available/arpansahu
+sudo vi /etc/nginx/sites-available/services
 ```
+
+if /etc/nginx/sites-available/services does not exists
+
+    1. Create a new configuration file: Create a new file in the Nginx configuration directory. The location of this directory varies depending on your  operating system and Nginx installation, but it’s usually found at /etc/nginx/sites-available/.
+
+    ```bash
+        touch /etc/nginx/sites-available/services
+        vi /etc/nginx/sites-available/services
+    ```
+
 
 * Add these lines to it.
 
@@ -1752,6 +2276,99 @@ stage('Dependencies') {
         }
 ```
 
+* Also we Need to modify the Nginx Configuration File
+
+1. Create a new configuration file: Create a new file in the Nginx configuration directory. The location of this directory varies depending on your  operating system and Nginx installation, but it’s usually found at /etc/nginx/sites-available/.
+
+  ```bash
+    touch /etc/nginx/sites-available/great-chat
+    vi /etc/nginx/sites-available/great-chat
+  ```
+
+2.	Add the server block configuration: Copy and paste your server block configuration into this new file.
+
+  We can have two configurations, one for docker and one for kubernetes deployment, out jenkins deployment file will handle it accordingly.
+
+  1. Nginx for Docker Deployment 
+
+    ```bash
+        server {
+            listen 80;
+            server_name great-chat.arpansahu.me;
+
+            # Force HTTPS redirects
+            if ($scheme = http) {
+                return 301 https://$server_name$request_uri;
+            }
+
+            location / {
+                proxy_pass http://0.0.0.0:8002;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-Proto $scheme;
+
+                # WebSocket support
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+            }
+
+            listen 443 ssl; # managed by Certbot
+            ssl_certificate /etc/letsencrypt/live/arpansahu.me/fullchain.pem; # managed by Certbot
+            ssl_certificate_key /etc/letsencrypt/live/arpansahu.me/privkey.pem; # managed by Certbot
+            include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+            ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+        }
+    ```
+
+  2. Nginx for Kubernetes Deployment 
+
+    ```bash
+        server {
+            listen 80;
+            server_name great-chat.arpansahu.me;
+
+            # Force HTTPS redirects
+            if ($scheme = http) {
+                return 301 https://$server_name$request_uri;
+            }
+
+            location / {
+                proxy_pass http://<CLUSTER_IP_ADDRESS>:32002;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-Proto $scheme;
+
+                # WebSocket support
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+            }
+
+            listen 443 ssl; # managed by Certbot
+            ssl_certificate /etc/letsencrypt/live/arpansahu.me/fullchain.pem; # managed by Certbot
+            ssl_certificate_key /etc/letsencrypt/live/arpansahu.me/privkey.pem; # managed by Certbot
+            include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+            ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+        }
+    ```
+
+3.	Enable the new configuration: Create a symbolic link from this file to the sites-enabled directory.
+
+    ```bash
+      sudo ln -s /etc/nginx/sites-available/great-chat /etc/nginx/sites-enabled/
+    ```
+
+4.	Test the Nginx configuration: Ensure that the new configuration doesn’t have any syntax errors.
+
+  ```bash
+    sudo nginx -t
+  ```
+  
+5.	Reload Nginx: Apply the new configuration by reloading Nginx.
+
+  ```bash
+    sudo systemctl reload nginx
+  ```
+
 in Jenkinsfile-build to copy .env file into build directory
 
 * Now Create a file named Jenkinsfile-build at the root of Git Repo and add following lines to file
@@ -1767,6 +2384,7 @@ pipeline {
         REPOSITORY = "library/great_chat"
         IMAGE_TAG = "${env.BUILD_ID}"
         COMMIT_FILE = "${env.WORKSPACE}/last_commit.txt"
+        ENV_PROJECT_NAME = "great_chat"
     }
     stages {
         stage('Checkout') {
@@ -1775,76 +2393,77 @@ pipeline {
             }
         }
         stage('Check for Changes') {
-            when {
-                expression { return !params.skip_checks }
-            }
             steps {
                 script {
-                    // Get the current commit hash
-                    def currentCommit = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
-                    echo "Current commit: ${currentCommit}"
-
-                    // Check if the last commit file exists
-                    if (fileExists(COMMIT_FILE)) {
-                        def lastCommit = readFile(COMMIT_FILE).trim()
-                        echo "Last commit: ${lastCommit}"
-
-                        // Compare the current commit with the last commit
-                        if (currentCommit == lastCommit) {
-                            echo "No changes detected. Skipping build."
-                            currentBuild.result = 'NOT_BUILT'
-                            error("No changes detected. Skipping build.")
-                        } else {
-                            // Check for changes in relevant files
-                            def changes = sh(script: "git diff --name-only ${lastCommit} ${currentCommit}", returnStdout: true).trim().split("\n")
-                            def relevantChanges = changes.findAll { 
-                                !(it in ['README.md', 'SECURITY.md', 'CHANGELOG.md', '.github/dependabot.yml'])
-                            }
-                            
-                            if (relevantChanges.isEmpty()) {
-                                echo "No relevant changes detected. Skipping build."
-                                currentBuild.result = 'NOT_BUILT'
-                                error("No relevant changes detected. Skipping build.")
-                            } else {
-                                echo "Relevant changes detected. Proceeding with build."
-                            }
-                        }
+                    if (params.skip_checks) {
+                        echo "Skipping Checks is True. Proceeding with build."
+                        BUILD_STATUS = 'BUILT'
+                        currentBuild.description = "${currentBuild.fullDisplayName} Skipping Checks is True. Proceeding with build."
                     } else {
-                        echo "No last commit file found. Proceeding with initial build."
-                    }
+                        // Get the current commit hash
+                        def currentCommit = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
+                        echo "Current commit: ${currentCommit}"
 
-                    // Save the current commit hash to the file
-                    writeFile(file: COMMIT_FILE, text: currentCommit)
+                        // Check if the last commit file exists
+                        if (fileExists(COMMIT_FILE)) {
+                            def lastCommit = readFile(COMMIT_FILE).trim()
+                            echo "Last commit: ${lastCommit}"
+
+                            // Compare the current commit with the last commit
+                            if (currentCommit == lastCommit) {
+                                echo "No changes detected. Skipping build."
+                                currentBuild.description = "${currentBuild.fullDisplayName} build skipped due to no changes detected"
+                                return
+                            } else {
+                                // Check for changes in relevant files
+                                def changes = sh(script: "git diff --name-only ${lastCommit} ${currentCommit}", returnStdout: true).trim().split("\n")
+                                def relevantChanges = changes.findAll { 
+                                    !(it in ['README.md', 'SECURITY.md', 'CHANGELOG.md', '.github/dependabot.yml'])
+                                }
+                                
+                                if (relevantChanges.isEmpty()) {
+                                    echo "No relevant changes detected. Skipping build."
+                                    currentBuild.description = "${currentBuild.fullDisplayName} build skipped due to no relevant changes"
+                                    return
+                                } else {
+                                    echo "Relevant changes detected. Proceeding with build."
+                                    BUILD_STATUS = 'BUILT'
+                                }
+                            }
+                        } else {
+                            echo "No last commit file found. Proceeding with initial build."
+                            BUILD_STATUS = 'BUILT'
+                        }
+
+                        // Save the current commit hash to the file
+                        writeFile(file: COMMIT_FILE, text: currentCommit)
+                    }
                 }
             }
         }
         stage('Dependencies') {
             when {
-                not {
-                    environment name: 'BUILD_STATUS', value: 'NOT_BUILT'
-                }
+                expression { return BUILD_STATUS != 'NOT_BUILT' }
             }
             steps {
                 script {
                     // Copy .env file to the workspace
-                    sh "sudo cp /root/projectenvs/great_chat/.env ${env.WORKSPACE}/"
+                    sh "sudo cp /root/projectenvs/${ENV_PROJECT_NAME}/.env ${env.WORKSPACE}/"
                 }
             }
         }
         stage('Build Image') {
             when {
-                not {
-                    environment name: 'BUILD_STATUS', value: 'NOT_BUILT'
-                }
+                expression { return BUILD_STATUS != 'NOT_BUILT' }
             }
             steps {
                 script {
                     // Ensure Docker is running and can be accessed
                     sh 'docker --version'
-                    
+
                     // Log the image details
                     echo "Building Docker image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
-                    
+
                     // Build the Docker image
                     sh """
                     docker build -t ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG} .
@@ -1855,9 +2474,7 @@ pipeline {
         }
         stage('Push Image') {
             when {
-                not {
-                    environment name: 'BUILD_STATUS', value: 'NOT_BUILT'
-                }
+                expression { return BUILD_STATUS != 'NOT_BUILT' }
             }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'harbor-credentials', passwordVariable: 'DOCKER_REGISTRY_PASSWORD', usernameVariable: 'DOCKER_REGISTRY_USERNAME')]) {
@@ -1866,7 +2483,7 @@ pipeline {
                         sh '''
                         echo $DOCKER_REGISTRY_PASSWORD | docker login ${REGISTRY} -u $DOCKER_REGISTRY_USERNAME --password-stdin
                         '''
-                        
+
                         // Push the Docker image to the registry
                         sh '''
                         docker push ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}
@@ -1880,7 +2497,9 @@ pipeline {
     post {
         success {
             script {
-                currentBuild.description = "Image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
+                if (!currentBuild.description) {
+                    currentBuild.description = "Image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG} built and pushed successfully"
+                }
                 
                 // Send success notification email
                 sh """curl -s \
@@ -1901,15 +2520,15 @@ pipeline {
                                                     "Name": "Development Team"
                                             }
                                     ],
-                                    "Subject": "${currentBuild.fullDisplayName} built successfully",
-                                    "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} is now built and pushed to the registry",
-                                    "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is now built and pushed to the registry </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
+                                    "Subject": "${currentBuild.description}",
+                                    "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} : ${currentBuild.description}",
+                                    "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} : ${currentBuild.description} </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
                             }
                     ]
                 }'"""
 
                 // Trigger great_chat job only if the build is stable
-                build job: 'great_chat', wait: false
+                build job: 'great_chat', parameters: [booleanParam(name: 'DEPLOY', value: true)], wait: false
             }
         }
         failure {
@@ -1934,8 +2553,8 @@ pipeline {
                                             }
                                     ],
                                     "Subject": "${currentBuild.fullDisplayName} build failed",
-                                    "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} build failed",
-                                    "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} build failed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
+                                    "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} build failed ${currentBuild.description} ",
+                                    "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} build failed </h3> <br> <p> ${currentBuild.description}  </p>"
                             }
                     ]
                 }'"""
@@ -1950,10 +2569,24 @@ pipeline {
 ```bash
 pipeline {
     agent { label 'local' }
+    parameters {
+        booleanParam(name: 'DEPLOY', defaultValue: false, description: 'Skip the Check for Changes stage')
+        choice(name: 'DEPLOY_TYPE', choices: ['kubernetes', 'docker'], description: 'Select deployment type')
+    }
     environment {
         REGISTRY = "harbor.arpansahu.me"
         REPOSITORY = "library/great_chat"
         IMAGE_TAG = "latest"  // or use a specific tag if needed
+        KUBECONFIG = "${env.WORKSPACE}/kubeconfig"  // Set the KUBECONFIG environment variable
+        NGINX_CONF = "/etc/nginx/sites-available/great-chat"
+        ENV_PROJECT_NAME = "great_chat"
+        DOCKER_PORT = "8002"
+        PROJECT_NAME_WITH_DASH = "great-chat"
+        SERVER_NAME= "great-chat.arpansahu.me"
+        BUILD_PROJECT_NAME = "great_chat_build"
+        JENKINS_DOMAIN = "jenkins.arpansahu.me"
+        SENTRY_ORG="arpansahu"
+        SENTRY_PROJECT="great_chat"
     }
     stages {
         stage('Initialize') {
@@ -1968,45 +2601,267 @@ pipeline {
                 checkout scm
             }
         }
-        stage('Check for New Image') {
+        stage('Setup Kubernetes Config') {
+            when {
+                expression { return params.DEPLOY_TYPE == 'kubernetes' }
+            }
             steps {
                 script {
-                    // Get the ImageID of the currently running container
-                    def currentImageID = sh(script: "docker inspect -f '{{.Image}}' great_chat || echo 'none'", returnStdout: true).trim()
-                    echo "Current image ID: ${currentImageID}"
+                    // Copy the kubeconfig file to the workspace
+                    sh "sudo cp /root/.kube/config ${env.WORKSPACE}/kubeconfig"
+                    // Change permissions of the kubeconfig file
+                    sh "sudo chmod 644 ${env.WORKSPACE}/kubeconfig"
+                }
+            }
+        }
+        stage('Check & Create Nginx Configuration') {
+            steps {
+                script {
+                    // Check if the Nginx configuration file exists
+                    def configExists = sh(script: "test -f ${NGINX_CONF} && echo 'exists' || echo 'not exists'", returnStdout: true).trim()
 
-                    // Pull the latest image to get its ImageID
-                    sh "docker pull ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
-                    def latestImageID = sh(script: "docker inspect -f '{{.Id}}' ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}", returnStdout: true).trim()
-                    echo "Latest image ID: ${latestImageID}"
+                    if (configExists == 'not exists') {
+                        echo "Nginx configuration file does not exist. Creating it now..."
 
-                    // Check if the ImageIDs are different
-                    if (currentImageID != latestImageID) {
-                        env.NEW_IMAGE_AVAILABLE = 'true'
-                        echo "New image available, proceeding with deployment."
+                        // Create or overwrite the NGINX_CONF file with the content of nginx.conf using sudo tee
+                        sh "sudo cat nginx.conf | sudo tee ${NGINX_CONF} > /dev/null"
+
+                        // Replace placeholders in the configuration file
+                        sh "sudo sed -i 's|SERVER_NAME|${SERVER_NAME}|g' ${NGINX_CONF}"
+                        sh "sudo sed -i 's|DOCKER_PORT|${DOCKER_PORT}|g' ${NGINX_CONF}"
+
+                        echo "Nginx configuration file created."
+
+                        // Ensure Nginx is aware of the new configuration
+                        sh "sudo ln -sf ${NGINX_CONF} /etc/nginx/sites-enabled/"
                     } else {
-                        env.NEW_IMAGE_AVAILABLE = 'false'
-                        echo "No new image available, skipping deployment."
+                        echo "Nginx configuration file already exists."
+                    }                    
+                }
+            }
+        }
+        stage('Retrieve Image Tag from Build Job') {
+            when {
+                expression { params.DEPLOY}
+            }
+            steps {
+                script {
+                    echo "Retrieve image tag from ${BUILD_PROJECT_NAME}"
+
+                    // Construct the API URL for the latest build
+                    def api_url = "https://${JENKINS_DOMAIN}/job/${BUILD_PROJECT_NAME}/lastSuccessfulBuild/api/json"
+
+                    // Log the API URL for debugging purposes
+                    echo "Hitting API URL: ${api_url}"
+                    
+                    withCredentials([usernamePassword(credentialsId: 'fc364086-fb8b-4528-bc7f-1ef3f42b71c7', usernameVariable: 'JENKINS_USER', passwordVariable: 'JENKINS_PASS')]) {
+                        // Execute the curl command to retrieve the JSON response
+                        echo "usernameVariable: ${JENKINS_USER}, passwordVariable: ${JENKINS_PASS}"
+                        def buildInfoJson = sh(script: "curl -u ${JENKINS_USER}:${JENKINS_PASS} ${api_url}", returnStdout: true).trim()
+
+                        // Log the raw JSON response for debugging
+                        echo "Raw JSON response: ${buildInfoJson}"
+
+                        def imageTag = sh(script: """
+                            echo '${buildInfoJson}' | grep -oP '"number":\\s*\\K\\d+' | head -n 1
+                        """, returnStdout: true).trim()
+
+                        echo "Retrieved image tag (build number): ${imageTag}"
+
+
+                        // Check if REGISTRY, REPOSITORY, and imageTag are all defined and not empty
+                        if (REGISTRY && REPOSITORY && imageTag) {
+                            if (params.DEPLOY_TYPE == 'kubernetes') {
+                                // Replace the placeholder in the deployment YAML
+                                sh "sed -i 's|:latest|:${imageTag}|g' ${WORKSPACE}/deployment.yaml"
+                            }   
+                            
+                            if (params.DEPLOY_TYPE == 'docker') {
+                                // Ensure the correct image tag is used in the docker-compose.yml
+                                sh """
+                                sed -i 's|image: .*|image: ${REGISTRY}/${REPOSITORY}:${imageTag}|' docker-compose.yml
+                                """
+                            }
+                        } else {
+                            echo "One or more required variables (REGISTRY, REPOSITORY, imageTag) are not defined or empty. Skipping docker-compose.yml update."
+                        }
                     }
                 }
             }
         }
         stage('Deploy') {
             when {
-                expression {
-                    env.NEW_IMAGE_AVAILABLE == 'true'
-                }
+                expression { params.DEPLOY }
             }
             steps {
                 script {
-                    // Ensure the correct image tag is used in the docker-compose.yml
-                    sh '''
-                    sed -i "s|image: .*|image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}|" docker-compose.yml
-                    '''
-                    // Deploy using Docker Compose
-                    sh 'docker-compose down'
-                    sh 'docker-compose up -d'
+                    if (params.DEPLOY_TYPE == 'docker') {
+                                                
+                        // Copy the .env file to the workspace
+                        sh "sudo cp /root/projectenvs/${ENV_PROJECT_NAME}/.env ${env.WORKSPACE}/"
+                        
+                        // Deploy using Docker Compose
+                        sh 'docker-compose down'
+                        sh 'docker-compose pull'
+                        sh 'docker-compose up -d'
+
+                        // Wait for a few seconds to let the app start
+                        sleep 60
+
+                        // Verify the container is running
+                        def containerRunning = sh(script: "docker ps -q -f name=${ENV_PROJECT_NAME}", returnStdout: true).trim()
+                        if (!containerRunning) {
+                            error "Container ${ENV_PROJECT_NAME} is not running"
+                        } else {
+                            echo "Container ${ENV_PROJECT_NAME} is running"
+                            // Execute curl and scale down Kubernetes deployment if curl is successful
+                            sh """
+                                # Fetch HTTP status code
+                                HTTP_STATUS=\$(curl -s -o /dev/null -w "%{http_code}" -L http://0.0.0.0:${DOCKER_PORT})
+                                echo "HTTP Status: \$HTTP_STATUS"
+                                
+                                # Update Nginx configuration if status code is 200 (OK)
+                                if [ "\$HTTP_STATUS" -eq 200 ]; then
+                                    sudo sed -i 's|proxy_pass .*;|proxy_pass http://0.0.0.0:${DOCKER_PORT};|' ${NGINX_CONF}
+                                    sudo nginx -s reload
+                                    echo 'Nginx configuration updated and reloaded successfully.'
+                                else
+                                    echo 'Service not available. Nginx configuration not updated.'
+                                fi
+
+                                # Scale down Kubernetes deployment if it exists and is running
+                                replicas=\$(kubectl get deployment ${PROJECT_NAME_WITH_DASH}-app -o=jsonpath='{.spec.replicas}') || true
+                                if [ "\$replicas" != "" ] && [ \$replicas -gt 0 ]; then
+                                    kubectl scale deployment ${PROJECT_NAME_WITH_DASH}-app --replicas=0
+                                    echo 'Kubernetes deployment scaled down successfully.'
+                                else
+                                    echo 'No running Kubernetes deployment to scale down.'
+                                fi
+                            """
+                        }
+                    } else if (params.DEPLOY_TYPE == 'kubernetes') {
+                        // Copy the .env file to the workspace
+                        sh "sudo cp /root/projectenvs/${ENV_PROJECT_NAME}/.env ${env.WORKSPACE}/"
+
+                        // Check if the file is copied successfully
+                        if (fileExists("${env.WORKSPACE}/.env")) {
+                            echo ".env file copied successfully."
+                            
+                            // Verify Kubernetes configuration
+                            sh 'kubectl cluster-info'
+                            
+                            // Print current directory
+                            sh 'pwd'
+                            
+                            // Delete existing secret if it exists
+                            sh """
+                            kubectl delete secret ${PROJECT_NAME_WITH_DASH}-secret || true
+                            """
+
+                            // Delete the existing service and deployment
+                            sh """
+                            kubectl delete service ${PROJECT_NAME_WITH_DASH}-service || true
+                            kubectl scale deployment ${PROJECT_NAME_WITH_DASH}-app --replicas=0 || true
+                            kubectl delete deployment ${PROJECT_NAME_WITH_DASH}-app || true
+                            """
+
+                            // Deploy to Kubernetes
+                            sh """
+                            kubectl create secret generic ${PROJECT_NAME_WITH_DASH}-secret --from-env-file=${WORKSPACE}/.env
+                            kubectl apply -f ${WORKSPACE}/service.yaml
+                            kubectl apply -f ${WORKSPACE}/deployment.yaml
+                            """
+                            
+                            // Wait for a few seconds to let the app start
+                            sleep 60
+
+                            // Check deployment status
+                            sh """
+                            kubectl rollout status deployment/${PROJECT_NAME_WITH_DASH}-app
+                            """
+                            
+                            // Verify service and get NodePort
+                            def nodePort = sh(script: "kubectl get service ${PROJECT_NAME_WITH_DASH}-service -o=jsonpath='{.spec.ports[0].nodePort}'", returnStdout: true).trim()
+                            echo "Service NodePort: ${nodePort}"
+
+                            // Get cluster IP address
+                            def clusterIP = sh(script: "kubectl get nodes -o=jsonpath='{.items[0].status.addresses[0].address}'", returnStdout: true).trim()
+                            echo "Cluster IP: ${clusterIP}"
+
+                            // Verify if the service is accessible and delete the Docker container if accessible and update nginx configuration
+                            sh """
+                                HTTP_STATUS=\$(curl -s -o /dev/null -w "%{http_code}" -L http://${clusterIP}:${nodePort})
+                                echo "HTTP Status: \$HTTP_STATUS"
+                                
+                                if [ "\$HTTP_STATUS" -eq 200 ]; then
+                                    echo "Service is reachable at http://${clusterIP}:${nodePort}"
+
+                                    echo "Updating Nginx configuration at ${NGINX_CONF}..."
+                                    sudo sed -i 's|proxy_pass .*;|proxy_pass http://${clusterIP}:${nodePort};|' ${NGINX_CONF}
+                                    
+                                    if [ \$? -ne 0 ]; then
+                                        echo "Failed to update Nginx configuration"
+                                        exit 1
+                                    fi
+                                    
+                                    echo "Reloading Nginx..."
+                                    sudo nginx -s reload
+                                    
+                                    if [ \$? -ne 0 ]; then
+                                        echo "Failed to reload Nginx"
+                                        exit 1
+                                    fi
+                                    
+                                    echo "Nginx reloaded successfully"
+                                    
+                                    DOCKER_CONTAINER=\$(docker ps -q -f name=${ENV_PROJECT_NAME})
+                                    
+                                    if [ "\$DOCKER_CONTAINER" ]; then
+                                        echo "Docker container ${ENV_PROJECT_NAME} is running. Removing it..."
+                                        docker rm -f ${ENV_PROJECT_NAME}
+                                        
+                                        if [ \$? -ne 0 ]; then
+                                            echo "Failed to remove Docker container ${ENV_PROJECT_NAME}"
+                                            exit 1
+                                        fi
+                                        
+                                    else
+                                        echo "Docker container ${ENV_PROJECT_NAME} is not running. Skipping removal"
+                                    fi
+
+                                else
+                                    echo "Service is not reachable at http://${clusterIP}:${nodePort}. HTTP Status: \$HTTP_STATUS"
+                                    exit 1
+                                fi
+                            """
+                        } else {
+                            error ".env file not found in the workspace."
+                        }
+                    }
                     currentBuild.description = 'DEPLOYMENT_EXECUTED'
+                }
+            }
+        }
+        stage('Sentry release') {
+            when {
+                expression { params.DEPLOY }
+            }
+            steps {
+                script {
+                    echo "Sentry Release ..."
+
+                    sh """
+                        # Get the current git commit hash
+                        VERSION=\$(git rev-parse HEAD)
+
+                        sentry-cli releases -o ${SENTRY_ORG} -p ${SENTRY_PROJECT} new \$VERSION
+
+                        # Associate commits with the release
+                        sentry-cli releases -o ${SENTRY_ORG} -p ${SENTRY_PROJECT} set-commits --auto \$VERSION
+
+                        # Deploy the release (optional step for marking the release as deployed)
+                        sentry-cli releases -o ${SENTRY_ORG} -p ${SENTRY_PROJECT} deploys \$VERSION new -e production
+                    """
                 }
             }
         }
@@ -2015,57 +2870,69 @@ pipeline {
         success {
             script {
                 if (currentBuild.description == 'DEPLOYMENT_EXECUTED') {
-                    sh '''
-                    curl -s -X POST --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET https://api.mailjet.com/v3.1/send -H "Content-Type:application/json" -d '{
+                    sh """curl -s \
+                    -X POST \
+                    --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
+                    https://api.mailjet.com/v3.1/send \
+                    -H "Content-Type:application/json" \
+                    -d '{
                         "Messages":[
-                            {
-                                "From": {
-                                    "Email": "$MAIL_JET_EMAIL_ADDRESS",
-                                    "Name": "ArpanSahuOne Jenkins Notification"
-                                },
-                                "To": [
-                                    {
-                                        "Email": "$MY_EMAIL_ADDRESS",
-                                        "Name": "Development Team"
-                                    }
-                                ],
-                                "Subject": "${currentBuild.fullDisplayName} deployed successfully",
-                                "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed",
-                                "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
-                            }
+                                {
+                                        "From": {
+                                                "Email": "$MAIL_JET_EMAIL_ADDRESS",
+                                                "Name": "ArpanSahuOne Jenkins Notification"
+                                        },
+                                        "To": [
+                                                {
+                                                        "Email": "$MY_EMAIL_ADDRESS",
+                                                        "Name": "Development Team"
+                                                }
+                                        ],
+                                        "Subject": "Jenkins Build Pipeline your project ${currentBuild.fullDisplayName} Ran Successfully",
+                                        "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed",
+                                        "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
+                                }
                         ]
-                    }'
-                    '''
+                    }'"""
                 }
-                // Trigger the common_readme job on success
-                build job: 'common_readme', parameters: [string(name: 'project_git_url', value: 'https://github.com/arpansahu/great_chat'), string(name: 'environment', value: 'prod')], wait: false
+                // Trigger the common_readme job on success when last commit is not Automatic Update from common_readme
+                def commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
+                if (!commitMessage.contains("Automatic Update")) {
+                    def expandedProjectUrl = "https://github.com/arpansahu/${ENV_PROJECT_NAME}"
+                    build job: 'common_readme', parameters: [
+                        string(name: 'project_git_url', value: expandedProjectUrl),
+                        string(name: 'environment', value: 'prod')
+                    ], wait: false
+                } else {
+                    echo "Skipping common_readme job trigger due to commit message: ${commitMessage}"
+                }
             }
         }
         failure {
-            script {
-                // Send deployment failure notification
-                sh '''
-                curl -s -X POST --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET https://api.mailjet.com/v3.1/send -H "Content-Type:application/json" -d '{
-                    "Messages":[
+            sh """curl -s \
+            -X POST \
+            --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
+            https://api.mailjet.com/v3.1/send \
+            -H "Content-Type:application/json" \
+            -d '{
+                "Messages":[
                         {
-                            "From": {
-                                "Email": "$MAIL_JET_EMAIL_ADDRESS",
-                                "Name": "ArpanSahuOne Jenkins Notification"
-                            },
-                            "To": [
-                                {
-                                    "Email": "$MY_EMAIL_ADDRESS",
-                                    "Name": "Development Team"
-                                }
-                            ],
-                            "Subject": "${currentBuild.fullDisplayName} deployment failed",
+                                "From": {
+                                        "Email": "$MAIL_JET_EMAIL_ADDRESS",
+                                        "Name": "ArpanSahuOne Jenkins Notification"
+                                },
+                                "To": [
+                                        {
+                                                "Email": "$MY_EMAIL_ADDRESS",
+                                                "Name": "Developer Team"
+                                        }
+                                ],
+                            "Subject": "Jenkins Build Pipeline your project ${currentBuild.fullDisplayName} Ran Failed",
                             "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} deployment failed",
                             "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is not deployed, Build Failed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
                         }
-                    ]
-                }'
-                '''
-            }
+                ]
+            }'"""
         }
     }
 }
@@ -2081,7 +2948,7 @@ Make sure to use Pipeline project and name it whatever you want I have named it 
 
 * Configure another Jenkins project from jenkins ui located at https://jenkins.arpansahu.me
 
-Make sure to use Pipeline project and name it whatever you want I have named it as {project_name}_build
+Make sure to use Pipeline project and name it whatever you want I have named it as great_chat_build
 
 ![Jenkins Build Pipeline Configuration](/Jenkins-build.png)
 
@@ -2466,8 +3333,18 @@ vi /root/pgadmin_venv/lib/python3.10/site-packages/pgadmin4/config.py
 1. Edit Nginx Configuration
 
     ```bash
-    sudo vi /etc/nginx/sites-available/arpansahu
+    sudo vi /etc/nginx/sites-available/services
     ```
+
+    if /etc/nginx/sites-available/services does not exists
+
+        1. Create a new configuration file: Create a new file in the Nginx configuration directory. The location of this directory varies depending on your  operating system and Nginx installation, but it’s usually found at /etc/nginx/sites-available/.
+
+        ```bash
+            touch /etc/nginx/sites-available/services
+            vi /etc/nginx/sites-available/services
+        ```
+
 
 2. Add this server configuration
 
@@ -2554,9 +3431,20 @@ Keep in mind that the instructions provided here assume a basic setup. For produ
 1. Edit Nginx Configuration
 
     ```bash
-    sudo vi /etc/nginx/sites-available/arpansahu
+    sudo vi /etc/nginx/sites-available/services
     ```
 
+    if /etc/nginx/sites-available/services does not exists
+
+        1. Create a new configuration file: Create a new file in the Nginx configuration directory. The location of this directory varies depending on your  operating system and Nginx installation, but it’s usually found at /etc/nginx/sites-available/.
+
+        ```bash
+            touch /etc/nginx/sites-available/services
+            vi /etc/nginx/sites-available/services
+        ```
+
+
+    
 2. Add this server configuration
 
     ```bash
@@ -2612,8 +3500,18 @@ Keep in mind that the instructions provided here assume a basic setup. For produ
     1. Edit Nginx Configuration
 
     ```bash
-    sudo vi /etc/nginx/sites-available/arpansahu
+    sudo vi /etc/nginx/sites-available/services
     ```
+
+    if /etc/nginx/sites-available/services does not exists
+
+        1. Create a new configuration file: Create a new file in the Nginx configuration directory. The location of this directory varies depending on your  operating system and Nginx installation, but it’s usually found at /etc/nginx/sites-available/.
+
+        ```bash
+            touch /etc/nginx/sites-available/services
+            vi /etc/nginx/sites-available/services
+        ```
+
 
     2. Add this server configuration
 
@@ -2820,11 +3718,21 @@ Redis Commander d'ont have native password protection enabled
 
     You’ll be prompted to enter a password.
 
-2. Creating Server Block in Nginx config file
+2. Edit Nginx Configuration
 
     ```bash
-    sudo vi /etc/nginx/sites-available/arpansahu
+    sudo vi /etc/nginx/sites-available/services
     ```
+
+    if /etc/nginx/sites-available/services does not exists
+
+        1. Create a new configuration file: Create a new file in the Nginx configuration directory. The location of this directory varies depending on your  operating system and Nginx installation, but it’s usually found at /etc/nginx/sites-available/.
+
+        ```bash
+            touch /etc/nginx/sites-available/services
+            vi /etc/nginx/sites-available/services
+        ```
+
 
 3. Add this server block to it.
 
@@ -3190,6 +4098,198 @@ You can connect to my MiniIo Server using terminal
 ```
 
 
+
+# Website Uptime Monitor
+
+This project monitors the uptime of specified websites and sends an email alert if any website is down or returns a non-2xx status code. The project uses a shell script to set up a virtual environment, install dependencies, run the monitoring script, and then clean up the virtual environment.
+
+## Prerequisites
+
+- Python 3
+- Pip (Python package installer)
+- Mailjet account for email alerts
+- Cron for scheduling the script
+
+## Setup
+
+### 1. Clone the Repository
+
+```sh
+git clone https://github.com/yourusername/website-uptime-monitor.git
+cd website-uptime-monitor
+```
+
+### 2. Create a `.env` File
+
+Create a `.env` file in the root directory and add the following content:
+
+```env
+MAILJET_API_KEY=your_mailjet_api_key
+MAILJET_SECRET_KEY=your_mailjet_secret_key
+SENDER_EMAIL=your_sender_email@example.com
+RECEIVER_EMAIL=your_receiver_email@example.com
+```
+
+## Running the Script
+
+To run the script manually, give permissions and execute:
+
+```sh
+chmod +x ./setup_and_run.sh
+./setup_and_run.sh
+```
+
+```sh
+chmod +x ./docker_cleanup_mail.sh
+./docker_cleanup_mail.sh
+```
+
+## Setting Up a Cron Job
+
+To run the script automatically at regular intervals, set up a cron job:
+
+1. Edit the crontab:
+
+```sh
+crontab -e
+```
+
+2. Add the following line to run the script every 5 hours:
+
+```sh
+0 */5 * * * /bin/bash /root/arpansahu-one-scripts/setup_and_run.sh >> /root/logs/website_up_time.log 2>&1
+0 0 * * * export MAILJET_API_KEY="MAILJET_API_KEY" && export MAILJET_SECRET_KEY="MAILJET_SECRET_KEY" && export SENDER_EMAIL="SENDER_EMAIL" && export RECEIVER_EMAIL="RECEIVER_EMAIL" && /usr/bin/docker system prune -af --volumes > /root/logs/docker_prune.log 2>&1 && /root/arpansahu-one-scripts/docker_cleanup_mail.sh
+```
+
+# Integrating Jenkins
+
+* Now Create a file named Jenkinsfile at the root of Git Repo and add following lines to file
+
+```bash
+pipeline {
+    agent { label 'local' }
+    environment {
+        ENV_PROJECT_NAME = "arpansahu_one_scripts"
+    }
+    stages {
+        stage('Initialize') {
+            steps {
+                script {
+                    echo "Current workspace path is: ${env.WORKSPACE}"
+                }
+            }
+        }
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+    }
+    post {
+        success {
+            script {
+                // Retrieve the latest commit message
+                def commitMessage = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
+                if (currentBuild.description == 'DEPLOYMENT_EXECUTED') {
+                    sh """curl -s \
+                    -X POST \
+                    --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
+                    https://api.mailjet.com/v3.1/send \
+                    -H "Content-Type:application/json" \
+                    -d '{
+                        "Messages":[
+                                {
+                                        "From": {
+                                                "Email": "$MAIL_JET_EMAIL_ADDRESS",
+                                                "Name": "ArpanSahuOne Jenkins Notification"
+                                        },
+                                        "To": [
+                                                {
+                                                        "Email": "$MY_EMAIL_ADDRESS",
+                                                        "Name": "Development Team"
+                                                }
+                                        ],
+                                        "Subject": "Jenkins Build Pipeline your project ${currentBuild.fullDisplayName} Ran Successfully",
+                                        "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed",
+                                        "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is now deployed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
+                                }
+                        ]
+                    }'"""
+                }
+                // Trigger the common_readme job for all repositories"
+                build job: 'common_readme', parameters: [string(name: 'environment', value: 'prod')], wait: false
+               
+            }
+        }
+        failure {
+            sh """curl -s \
+            -X POST \
+            --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
+            https://api.mailjet.com/v3.1/send \
+            -H "Content-Type:application/json" \
+            -d '{
+                "Messages":[
+                        {
+                                "From": {
+                                        "Email": "$MAIL_JET_EMAIL_ADDRESS",
+                                        "Name": "ArpanSahuOne Jenkins Notification"
+                                },
+                                "To": [
+                                        {
+                                                "Email": "$MY_EMAIL_ADDRESS",
+                                                "Name": "Developer Team"
+                                        }
+                                ],
+                            "Subject": "Jenkins Build Pipeline your project ${currentBuild.fullDisplayName} Ran Failed",
+                            "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} deployment failed",
+                            "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} is not deployed, Build Failed </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
+                        }
+                ]
+            }'"""
+        }
+    }
+}
+```
+
+Note: agent {label 'local'} is used to specify which node will execute the jenkins job deployment. So local linux server is labelled with 'local' are the project with this label will be executed in local machine node.
+
+* Configure a Jenkins project from jenkins ui located at https://jenkins.arpansahu.me
+
+Make sure to use Pipeline project and name it whatever you want I have named it as per great_chat
+
+![Jenkins Pipeline Configuration](https://github.com/arpansahu/arpansahu-one-scripts/raw/main/Jenkinsfile.png)
+
+In this above picture you can see credentials right? you can add your github credentials and harbor credentials use harbor-credentials as id for harbor credentials.
+from Manage Jenkins on home Page --> Manage Credentials
+
+and add your GitHub credentials from there
+
+* Add a .env file to you project using following command (This step is no more required stage('Dependencies'))
+
+    ```bash
+    sudo vi  /var/lib/jenkins/workspace/arpansahu_one_script/.env
+    ```
+
+    Your workspace name may be different.
+
+    Add all the env variables as required and mentioned in the Readme File.
+
+* Add Global Jenkins Variables from Dashboard --> Manage --> Jenkins
+  Configure System
+ 
+  * MAIL_JET_API_KEY
+  * MAIL_JET_API_SECRET
+  * MAIL_JET_EMAIL_ADDRESS
+  * MY_EMAIL_ADDRESS
+
+Now you are good to go.
+
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+
 ## Documentation
 
 [![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
@@ -3200,13 +4300,17 @@ You can connect to my MiniIo Server using terminal
 [![Javascript](https://img.shields.io/badge/JavaScript-323330?style=for-the-badge&logo=javascript&logoColor=F7DF1E)](https://www.javascript.com/)
 [![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/docs/)
 [![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/docs/)
-[![Heroku](https://img.shields.io/badge/-Heroku-430098?style=for-the-badge&logo=heroku&logoColor=white)](https://heroku.com/)
 [![Github](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://www.github.com/)
 [![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Harbor](https://img.shields.io/badge/HARBOR-TEXT?style=for-the-badge&logo=harbor&logoColor=white&color=blue)](https://goharbor.io/)
+[![Kubernetes](https://img.shields.io/badge/kubernetes-326ce5.svg?&style=for-the-badge&logo=kubernetes&logoColor=white)](https://kubernetes.io/)
 [![Jenkins](https://img.shields.io/badge/Jenkins-D24939?style=for-the-badge&logo=Jenkins&logoColor=white)](https://www.jenkins.io/)
-[![AWS](https://img.shields.io/badge/Amazon_AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)](https://aws.amazon.com/)
 [![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)](https://nginx.org/en/)
+[![MINIIO](https://img.shields.io/badge/MINIO-TEXT?style=for-the-badge&logo=minio&logoColor=white&color=%23C72E49)](https://min.io/)
 [![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://ubuntu.com/)
+[![Mail Jet](https://img.shields.io/badge/MAILJET-9933CC?style=for-the-badge&logo=minutemailer&logoColor=white)](https://mailjet.com/)
+[![Django Channels](https://img.shields.io/badge/CHANNELS-092E20?style=for-the-badge&logo=channel4&logoColor=white)](https://channels.readthedocs.io)
+[![Web Sockets](https://img.shields.io/badge/WEBSOCKETS-1C47CB?style=for-the-badge&logo=socketdotio&logoColor=white)](https://websocket.org/)
 
 ## Environment Variables
 
@@ -3222,8 +4326,6 @@ MAIL_JET_API_KEY=
 
 MAIL_JET_API_SECRET=
 
-MY_EMAIL_ADDRESS=
-
 AWS_ACCESS_KEY_ID=
 
 AWS_SECRET_ACCESS_KEY=
@@ -3238,6 +4340,16 @@ PROTOCOL=
 
 DATABASE_URL=
 
-REDISCLOUD_URL=
+REDIS_CLOUD_URL=
+
+# SENTRY
+SENTRY_ENVIRONMENT=
+
+SENTRY_DSH_URL=
+
+# deploy_kube.sh requirements
+HARBOR_USERNAME=
+
+HARBOR_PASSWORD=
 
 

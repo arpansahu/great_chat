@@ -6,7 +6,8 @@ spec:
   selector:
     app: great-chat
   ports:
-  - protocol: TCP
-    port: 8002
-    targetPort: 8002
-  type: ClusterIP
+    - protocol: TCP
+      port: 8002
+      targetPort: 8002
+      nodePort: 32002
+  type: NodePort
