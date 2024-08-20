@@ -17,7 +17,7 @@ import dj_database_url
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-REDISCLOUD_URL = config('REDISCLOUD_URL')
+REDIS_CLOUD_URL = config('REDIS_CLOUD_URL')
 AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
@@ -270,7 +270,7 @@ MAIL_JET_API_SECRET = config('MAIL_JET_API_SECRET')
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': config('REDISCLOUD_URL'),
+        'LOCATION': config('REDIS_CLOUD_URL'),
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }
@@ -289,7 +289,7 @@ else:
         "default": {
             "BACKEND": "channels_redis.core.RedisChannelLayer",
             "CONFIG": {
-                "hosts": [(config('REDISCLOUD_URL'))],
+                "hosts": [(config('REDIS_CLOUD_URL'))],
             },
         },
     }
