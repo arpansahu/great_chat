@@ -175,21 +175,14 @@ CACHES = {
 Use these Channels Settings
 
 ```python
-if not DEBUG:
-    CHANNEL_LAYERS = {
-        'default': {
-            "BACKEND": "channels.layers.InMemoryChannelLayer",
-        }
-    }
-else:
-    CHANNEL_LAYERS = {
-        "default": {
-            "BACKEND": "channels_redis.core.RedisChannelLayer",
-            "CONFIG": {
-                "hosts": [(config('REDIS_CLOUD_URL'))],
-            },
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(config('REDIS_CLOUD_URL'))],
         },
-    }
+    },
+}
 ```
 
 Change settings.py static files and media files settings | Now I have added support for BlackBlaze Static Storage also which also based on AWS S3 protocols 
@@ -322,6 +315,7 @@ python manage.py test_channels
 ```bash
 python manage.py sync_media_to_s3
 ```
+
 
 ## Readme Manager
 
