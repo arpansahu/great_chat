@@ -61,21 +61,14 @@ CACHES = {
 Use these Channels Settings
 
 ```python
-if not DEBUG:
-    CHANNEL_LAYERS = {
-        'default': {
-            "BACKEND": "channels.layers.InMemoryChannelLayer",
-        }
-    }
-else:
-    CHANNEL_LAYERS = {
-        "default": {
-            "BACKEND": "channels_redis.core.RedisChannelLayer",
-            "CONFIG": {
-                "hosts": [(config('REDIS_CLOUD_URL'))],
-            },
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(config('REDIS_CLOUD_URL'))],
         },
-    }
+    },
+}
 ```
 
 [STATIC_FILES]
