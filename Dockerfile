@@ -11,4 +11,4 @@ EXPOSE 8002
 
 # Run collectstatic and daphne in a single command
 
-CMD bash -c "python manage.py collectstatic --noinput && daphne -b 0.0.0.0 -p 8002 great_chat.asgi:application"
+CMD bash -c "python manage.py collectstatic --noinput && uvicorn great_chat.asgi:application --host 0.0.0.0 --port 8002"

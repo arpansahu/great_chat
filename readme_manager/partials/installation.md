@@ -44,34 +44,13 @@ Run Server
   daphne -b 0.0.0.0 -p [PROJECT_DOCKER_PORT] [JENKINS PROJECT NAME].asgi:application
 ```
 
-Use these CACHE settings
-
-```python
-CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': config('REDIS_CLOUD_URL'),
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-        }
-    }
-}
-```
-
-Use these Channels Settings
-
-```python
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [(config('REDIS_CLOUD_URL'))],
-        },
-    },
-}
-```
-
 [STATIC_FILES]
+
+[CACHE]
+
+[CHANNELS]
+
+[SENTRY]
 
 ## Custom Django Management Commands
 

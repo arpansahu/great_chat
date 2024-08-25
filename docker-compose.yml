@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     image: harbor.arpansahu.me/library/great_chat:latest  # This will be used when the image is not built locally
     env_file: ./.env
-    command: bash -c "python manage.py makemigrations && python manage.py migrate && daphne -b 0.0.0.0 -p 8002 great_chat.asgi:application"
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && uvicorn great_chat.asgi:application --host 0.0.0.0 --port 8002"
     container_name: great_chat
     volumes:
       - .:/app  # Ensure this matches the WORKDIR in your Dockerfile
