@@ -259,36 +259,26 @@ LOGOUT_URL = 'logout'
 
 LOGIN_REDIRECT_URL = "/"
 
-
-MAIL_JET_API_KEY = MAIL_JET_API_KEY
-MAIL_JET_API_SECRET = MAIL_JET_API_SECRET
-
-
 #Caching
-if not DEBUG:
-    CACHES = {
-        'default': {
-            'BACKEND': 'django_redis.cache.RedisCache',
-            'LOCATION': REDIS_CLOUD_URL,
-            'OPTIONS': {
-                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            },
-            'KEY_PREFIX': PROJECT_NAME
-        }
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': REDIS_CLOUD_URL,
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        },
+        'KEY_PREFIX': PROJECT_NAME
     }
-else:
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-            'LOCATION': 'unique-snowflake',
-        }
-    }
+}
+
 
 CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [(config('REDIS_CLOUD_URL'))],
+    'default': {
+        # This example is assuming you use redis, in which case `channels_redis` is another dependency.
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [REDIS_CLOUD_URL],
         },
     },
 }
