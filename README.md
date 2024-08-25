@@ -94,6 +94,7 @@ Channels preserve the synchronous behavior of Django and add a layer of asynchro
 [![MINIIO](https://img.shields.io/badge/MINIO-TEXT?style=for-the-badge&logo=minio&logoColor=white&color=%23C72E49)](https://min.io/)
 [![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://ubuntu.com/)
 [![Mail Jet](https://img.shields.io/badge/MAILJET-9933CC?style=for-the-badge&logo=minutemailer&logoColor=white)](https://mailjet.com/)
+[![Sentry Badge](https://img.shields.io/badge/Sentry-362D59?logo=sentry&logoColor=fff&style=for-the-badge)](https://sentry.io)
 [![Django Channels](https://img.shields.io/badge/CHANNELS-092E20?style=for-the-badge&logo=channel4&logoColor=white)](https://channels.readthedocs.io)
 [![Web Sockets](https://img.shields.io/badge/WEBSOCKETS-1C47CB?style=for-the-badge&logo=socketdotio&logoColor=white)](https://websocket.org/)
 
@@ -156,33 +157,6 @@ Run Server
   or 
 
   daphne -b 0.0.0.0 -p 8002 great_chat.asgi:application
-```
-
-Use these CACHE settings
-
-```python
-CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': config('REDIS_CLOUD_URL'),
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-        }
-    }
-}
-```
-
-Use these Channels Settings
-
-```python
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [(config('REDIS_CLOUD_URL'))],
-        },
-    },
-}
 ```
 
 Change settings.py static files and media files settings | Now I have added support for BlackBlaze Static Storage also which also based on AWS S3 protocols 
@@ -288,6 +262,119 @@ python manage.py collectstatic
 ```
 
 and you are good to go
+
+
+Use these CACHE settings
+
+```python
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': REDIS_CLOUD_URL,
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        },
+        'KEY_PREFIX': PROJECT_NAME
+    }
+}
+
+```
+
+Use these Channels Settings
+
+```python
+CHANNEL_LAYERS = {
+    'default': {
+        # This example is assuming you use redis, in which case `channels_redis` is another dependency.
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [REDIS_CLOUD_URL],
+        },
+    },
+}
+```
+
+Use these Sentry Settings for Logging
+
+```python
+def get_git_commit_hash():
+    try:
+        return subprocess.check_output(['git', 'rev-parse', 'HEAD']).decode('utf-8').strip()
+    except Exception:
+        return None
+
+sentry_sdk.init(
+    dsn=SENTRY_DSH_URL,
+    integrations=[
+            DjangoIntegration(
+                transaction_style='url',
+                middleware_spans=True,
+                signals_spans=True,
+                signals_denylist=[
+                    django.db.models.signals.pre_init,
+                    django.db.models.signals.post_init,
+                ],
+                cache_spans=False,
+            ),
+        ],
+    traces_sample_rate=1.0,  # Adjust this according to your needs
+    send_default_pii=True,  # To capture personal identifiable information (optional)
+    release=get_git_commit_hash(),  # Set the release to the current git commit hash
+    environment=SENTRY_ENVIRONMENT,  # Or "staging", "development", etc.
+    profiles_sample_rate=1.0,
+)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+        'sentry': {
+            'level': 'ERROR',  # Change this to WARNING or INFO if needed
+            'class': 'sentry_sdk.integrations.logging.EventHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'sentry'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.request': {
+            'handlers': ['console', 'sentry'],
+            'level': 'ERROR',  # Only log errors to Sentry
+            'propagate': False,
+        },
+        'django.db.backends': {
+            'handlers': ['console', 'sentry'],
+            'level': 'ERROR',  # Only log errors to Sentry
+            'propagate': False,
+        },
+        'django.security': {
+            'handlers': ['console', 'sentry'],
+            'level': 'WARNING',  # You can set this to INFO or DEBUG as needed
+            'propagate': False,
+        },
+        # You can add more loggers here if needed
+    },
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+    },
+}
+```
+
+Also for setting up relays include Loader Script in base.html
+
+```html
+<script src="https://js.sentry-cdn.com/{random_unique_code_get_from_sentry_ui}.min.js" crossorigin="anonymous"></script>
+```
 
 
 ## Custom Django Management Commands
@@ -1075,7 +1162,7 @@ EXPOSE 8002
 
 # Run collectstatic and daphne in a single command
 
-CMD bash -c "python manage.py collectstatic --noinput && daphne -b 0.0.0.0 -p 8002 great_chat.asgi:application"
+CMD bash -c "python manage.py collectstatic --noinput && uvicorn great_chat.asgi:application --host 0.0.0.0 --port 8002"
 ```
 
 Create a file named docker-compose.yml and add following lines in it
@@ -1088,7 +1175,7 @@ services:
       dockerfile: Dockerfile
     image: harbor.arpansahu.me/library/great_chat:latest  # This will be used when the image is not built locally
     env_file: ./.env
-    command: bash -c "python manage.py makemigrations && python manage.py migrate && daphne -b 0.0.0.0 -p 8002 great_chat.asgi:application"
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && uvicorn great_chat.asgi:application --host 0.0.0.0 --port 8002"
     container_name: great_chat
     volumes:
       - .:/app  # Ensure this matches the WORKDIR in your Dockerfile
@@ -1550,6 +1637,7 @@ spec:
           ports:
             - containerPort: 8002
               name: daphne
+  revisionHistoryLimit: 0
 ```
 
 3. Create a service.yaml file and fill it with the below contents.
@@ -4306,6 +4394,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 [![MINIIO](https://img.shields.io/badge/MINIO-TEXT?style=for-the-badge&logo=minio&logoColor=white&color=%23C72E49)](https://min.io/)
 [![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://ubuntu.com/)
 [![Mail Jet](https://img.shields.io/badge/MAILJET-9933CC?style=for-the-badge&logo=minutemailer&logoColor=white)](https://mailjet.com/)
+[![Sentry Badge](https://img.shields.io/badge/Sentry-362D59?logo=sentry&logoColor=fff&style=for-the-badge)](https://sentry.io)
 [![Django Channels](https://img.shields.io/badge/CHANNELS-092E20?style=for-the-badge&logo=channel4&logoColor=white)](https://channels.readthedocs.io)
 [![Web Sockets](https://img.shields.io/badge/WEBSOCKETS-1C47CB?style=for-the-badge&logo=socketdotio&logoColor=white)](https://websocket.org/)
 
