@@ -233,8 +233,8 @@ if not DEBUG:
         DEFAULT_FILE_STORAGE = f'{PROJECT_NAME}.storage_backends.PublicMediaStorage'
 
         # s3 private media settings
-        PRIVATE_MEDIA_LOCATION = 'portfolio/borcelle_crm/private'
-        PRIVATE_FILE_STORAGE = 'borcelle_crm.storage_backends.PrivateMediaStorage'
+        PRIVATE_MEDIA_LOCATION = f'portfolio/{PROJECT_NAME}/private'
+        PRIVATE_FILE_STORAGE = f'{PROJECT_NAME}.storage_backends.PrivateMediaStorage'
 else:
     # Static files (CSS, JavaScript, Images)
     # https://docs.djangoproject.com/en/3.2/howto/static-files/
