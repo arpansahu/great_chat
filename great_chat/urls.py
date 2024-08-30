@@ -4,7 +4,7 @@ from django.contrib.auth import views as auth_views
 from django.views.generic import RedirectView
 from django.conf.urls.static import static
 from django.conf import settings
-
+import time
 
 from account.views import (
     CustomPasswordResetView,
