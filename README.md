@@ -107,7 +107,13 @@ Channels preserve the synchronous behavior of Django and add a layer of asynchro
 Available at: https://great-chat.arpansahu.me
 
 admin login details:--
-username: admin@arpansahu.me
+email: admin@arpansahu.me
+password: showmecode
+
+Since this is a chat app you can test it truly if you have another user too.
+
+extra user details:--
+email: technorigger95@gmail.com
 password: showmecode
 
 ## License
@@ -139,6 +145,12 @@ Run update_data Command
 Creating Super User
 ```bash
   python manage.py createsuperuser
+```
+
+
+Running Necessary Management Commands
+```bash
+  python manage.py create_chatgroup
 ```
 
 Installing Redis On Local (For ubuntu) for other Os Please refer to their website https://redis.io/
