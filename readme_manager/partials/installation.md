@@ -22,6 +22,12 @@ Creating Super User
   python manage.py createsuperuser
 ```
 
+
+Running Necessary Management Commands
+```bash
+  python manage.py create_chatgroup
+```
+
 Installing Redis On Local (For ubuntu) for other Os Please refer to their website https://redis.io/
 ```bash
   curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
