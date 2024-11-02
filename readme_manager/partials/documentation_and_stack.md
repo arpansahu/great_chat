@@ -19,3 +19,4 @@
 [![Sentry Badge](https://img.shields.io/badge/Sentry-362D59?logo=sentry&logoColor=fff&style=for-the-badge)](https://sentry.io)
 [![Django Channels](https://img.shields.io/badge/CHANNELS-092E20?style=for-the-badge&logo=channel4&logoColor=white)](https://channels.readthedocs.io)
 [![Web Sockets](https://img.shields.io/badge/WEBSOCKETS-1C47CB?style=for-the-badge&logo=socketdotio&logoColor=white)](https://websocket.org/)
+[![Rancher](https://img.shields.io/badge/Rancher-0075A8?style=for-the-badge&logo=rancher&logoColor=white)](https://rancher.com/)
