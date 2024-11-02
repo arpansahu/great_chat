@@ -67,7 +67,7 @@
       <ul class="navbar-nav">
         {% if request.user.is_admin %}
           <li class="nav-item">
-            <a href="/admin">Admin Panel</a>
+            <a href="{% url 'admin:index' %}">Admin Panel</a>
           </li>
         {% endif %}
         <li class="nav-item">

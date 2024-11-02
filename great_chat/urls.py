@@ -41,8 +41,8 @@ def large_resource(request):
 
 urlpatterns = [
     # Admin URL
-    path('admin/', admin.site.urls, name='admin'),
-
+    path('admin/', admin.site.urls),
+    
     path('', home_view, name='home'),
     path('group_chat_home/', group_chat_home_view, name='group_chat_home'),
 
