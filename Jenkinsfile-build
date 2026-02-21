@@ -2,18 +2,48 @@ pipeline {
     agent any
     parameters {
         booleanParam(name: 'skip_checks', defaultValue: false, description: 'Skip the Check for Changes stage')
+        booleanParam(name: 'SKIP_TESTS', defaultValue: false, description: 'Skip test stages')
     }
     environment {
-        REGISTRY = "harbor.arpansahu.me"
-        REPOSITORY = "library/great_chat"
         IMAGE_TAG = "${env.BUILD_ID}"
         COMMIT_FILE = "${env.WORKSPACE}/last_commit.txt"
-        ENV_PROJECT_NAME = "great_chat"
+        BUILD_STATUS = 'NOT_BUILT'  // Initialize to prevent undefined errors
     }
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
+            }
+        }
+        stage('Setup Environment') {
+            steps {
+                script {
+                    // Load .env from Jenkins credentials
+                    withCredentials([file(credentialsId: 'great_chat_env_file', variable: 'ENV_FILE')]) {
+                        // Remove existing .env file if it exists (handles read-only files)
+                        sh 'rm -f .env || true'
+                        
+                        def envContent = readFile(file: env.ENV_FILE)
+                        writeFile(file: '.env', text: envContent)
+                        
+                        // Parse and set environment variables
+                        def envVars = envContent.split('\n').findAll { it.trim() && !it.startsWith('#') }
+                        envVars.each { line ->
+                            def parts = line.split('=', 2)
+                            if (parts.size() == 2) {
+                                def key = parts[0].trim()
+                                def value = parts[1].trim()
+                                env."${key}" = value
+                            }
+                        }
+                        
+                        // Set Jenkins-specific variables from .env
+                        env.BUILD_PROJECT_NAME = "${env.ENV_PROJECT_NAME}_build"
+                        env.PROJECT_NAME_WITH_DASH = env.ENV_PROJECT_NAME.replace('_', '-')
+                        env.REGISTRY = env.DOCKER_REGISTRY
+                        env.REPOSITORY = "${env.DOCKER_REPOSITORY}/${env.DOCKER_IMAGE_NAME}"
+                    }
+                }
             }
         }
         stage('Check for Changes') {
@@ -65,14 +95,55 @@ pipeline {
                 }
             }
         }
-        stage('Dependencies') {
+        stage('Run Unit Tests') {
             when {
-                expression { return BUILD_STATUS != 'NOT_BUILT' }
+                expression { return BUILD_STATUS != 'NOT_BUILT' && !params.SKIP_TESTS }
             }
             steps {
                 script {
-                    // Copy .env file to the workspace
-                    sh "sudo cp /root/projectenvs/${ENV_PROJECT_NAME}/.env ${env.WORKSPACE}/"
+                    echo "Running unit tests..."
+                    sh """
+                    docker run --rm -v \$(pwd):/app -w /app --env-file .env python:3.10.7 \\
+                        bash -c 'pip install -q -r requirements.txt && \\
+                                 python -m pytest -m "not ui and not todo" --ignore=tests -v --tb=short'
+                    """
+                }
+            }
+        }
+        stage('Run UI Tests') {
+            when {
+                expression { return BUILD_STATUS != 'NOT_BUILT' && !params.SKIP_TESTS }
+            }
+            steps {
+                script {
+                    echo "Running UI tests with Playwright..."
+                    sh """
+                    docker run --rm -v \$(pwd):/app -w /app --env-file .env \\
+                        mcr.microsoft.com/playwright/python:v1.40.0-jammy bash -c '
+                            pip install -q -r requirements.txt
+                            playwright install chromium
+                            python manage.py migrate --settings=great_chat.test_settings --verbosity=0
+                            python manage.py runserver 0.0.0.0:8000 --settings=great_chat.test_settings &
+                            SERVER_PID=\\\$!
+                            
+                            # Wait for server to be ready
+                            for i in {1..30}; do
+                                if curl -s http://127.0.0.1:8000/ > /dev/null 2>&1; then
+                                    echo "Server is ready"
+                                    break
+                                fi
+                                sleep 1
+                            done
+                            
+                            # Run UI tests
+                            pytest */test_ui.py -m "ui and not todo" -v --tb=short -x
+                            TEST_RESULT=\\\$?
+                            
+                            # Cleanup
+                            kill \\\$SERVER_PID 2>/dev/null || true
+                            exit \\\$TEST_RESULT
+                        '
+                    """
                 }
             }
         }
@@ -84,63 +155,77 @@ pipeline {
                 script {
                     // Ensure Docker is running and can be accessed
                     sh 'docker --version'
-
-                    // Log the image details
-                    echo "Building Docker image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
-
-                    // Build the Docker image
+ using env vars
+                withCredentials([file(credentialsId: 'great_chat_env_file', variable: 'ENV_FILE')]) {
                     sh """
-                    docker build -t ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG} .
-                    docker tag ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG} ${REGISTRY}/${REPOSITORY}:latest
+                    # Load env vars for email
+                    export \$(cat ${ENV_FILE} | grep -v '^#' | xargs)
+                    
+                    curl -s \\
+                    -X POST \\
+                    --user \${MAIL_JET_API_KEY}:\${MAIL_JET_API_SECRET} \\
+                    https://api.mailjet.com/v3.1/send \\
+                    -H "Content-Type:application/json" \\
+                    -d '{
+                        "Messages":[
+                                {
+                                        "From": {
+                                                "Email": "'\${MAIL_JET_EMAIL_ADDRESS}'",
+                                                "Name": "ArpanSahuOne Jenkins Notification"
+                                        },
+                                        "To": [
+                                                {
+                                                        "Email": "'\${MY_EMAIL_ADDRESS}'",
+                                                        "Name": "Development Team"
+                                                }
+                                        ],
+                                        "Subject": "${currentBuild.description}",
+                                        "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} : ${currentBuild.description}",
+                                        "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} : ${currentBuild.description} </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
+                                }
+                        ]
+                    }'
                     """
                 }
-            }
-        }
-        stage('Push Image') {
-            when {
-                expression { return BUILD_STATUS != 'NOT_BUILT' }
-            }
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'harbor-credentials', passwordVariable: 'DOCKER_REGISTRY_PASSWORD', usernameVariable: 'DOCKER_REGISTRY_USERNAME')]) {
-                    script {
-                        // Log in to Docker registry using environment variables without direct interpolation
-                        sh '''
-                        echo $DOCKER_REGISTRY_PASSWORD | docker login ${REGISTRY} -u $DOCKER_REGISTRY_USERNAME --password-stdin
-                        '''
 
-                        // Push the Docker image to the registry
-                        sh '''
-                        docker push ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}
-                        docker push ${REGISTRY}/${REPOSITORY}:latest
-                        '''
-                    }
-                }
+                // Trigger deploy job dynamically
+                build job: "${env.ENV_PROJECT_NAME}_deploy", parameters: [booleanParam(name: 'DEPLOY', value: true)], wait: false
             }
         }
-    }
-    post {
-        success {
+        failure {
             script {
-                if (!currentBuild.description) {
-                    currentBuild.description = "Image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG} built and pushed successfully"
-                }
-                
-                // Send success notification email
-                sh """curl -s \
-                -X POST \
-                --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \
-                https://api.mailjet.com/v3.1/send \
-                -H "Content-Type:application/json" \
-                -d '{
-                    "Messages":[
-                            {
-                                    "From": {
-                                            "Email": "$MAIL_JET_EMAIL_ADDRESS",
-                                            "Name": "ArpanSahuOne Jenkins Notification"
-                                    },
-                                    "To": [
-                                            {
-                                                    "Email": "$MY_EMAIL_ADDRESS",
+                // Send failure notification email using env vars
+                withCredentials([file(credentialsId: 'great_chat_env_file', variable: 'ENV_FILE')]) {
+                    sh """
+                    # Load env vars for email
+                    export \$(cat ${ENV_FILE} | grep -v '^#' | xargs)
+                    
+                    curl -s \\
+                    -X POST \\
+                    --user \${MAIL_JET_API_KEY}:\${MAIL_JET_API_SECRET} \\
+                    https://api.mailjet.com/v3.1/send \\
+                    -H "Content-Type:application/json" \\
+                    -d '{
+                        "Messages":[
+                                {
+                                        "From": {
+                                                "Email": "'\${MAIL_JET_EMAIL_ADDRESS}'",
+                                                "Name": "ArpanSahuOne Jenkins Notification"
+                                        },
+                                        "To": [
+                                                {
+                                                        "Email": "'\${MY_EMAIL_ADDRESS}'",
+                                                        "Name": "Development Team"
+                                                }
+                                        ],
+                                        "Subject": "${currentBuild.fullDisplayName} build failed",
+                                        "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} build failed ${currentBuild.description} ",
+                                        "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} build failed </h3> <br> <p> ${currentBuild.description}  </p>"
+                                }
+                        ]
+                    }'
+                    """
+                }                               "Email": "$MY_EMAIL_ADDRESS",
                                                     "Name": "Development Team"
                                             }
                                     ],
