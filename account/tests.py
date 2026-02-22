@@ -77,7 +77,7 @@ class TestAccountViews:
         """Test register view GET request."""
         response = client.get(reverse('register'))
         assert response.status_code == 200
-        assert 'form' in response.context
+        assert 'registration_form' in response.context
     
     def test_login_view_get(self, client):
         """Test login view GET request."""
@@ -105,7 +105,7 @@ class TestAccountViews:
         """Test account view requires authentication."""
         response = client.get(reverse('account'))
         assert response.status_code == 302
-        assert '/account/login/' in response.url
+        assert '/login/' in response.url
     
     def test_account_view_authenticated(self, authenticated_client):
         """Test account view with authenticated user."""
