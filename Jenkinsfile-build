@@ -174,16 +174,7 @@ pipeline {
                         ]
                     }'
                     """
-                }                               "Email": "$MY_EMAIL_ADDRESS",
-                                                    "Name": "Development Team"
-                                            }
-                                    ],
-                                    "Subject": "${currentBuild.description}",
-                                    "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} : ${currentBuild.description}",
-                                    "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} : ${currentBuild.description} </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
-                            }
-                    ]
-                }'"""
+                }
 
                 // Trigger great_chat job only if the build is stable
                 build job: 'great_chat', parameters: [booleanParam(name: 'DEPLOY', value: true)], wait: false
