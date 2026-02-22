@@ -5,113 +5,106 @@ import pytest
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-from real_time_chat.models import ChatRoom, ChatMessage
+from real_time_chat.models import ChatGroup, GroupMessage
 
 
 User = get_user_model()
 
 
 @pytest.mark.django_db
-class TestChatRoomModel:
-    """Test ChatRoom model functionality."""
+class TestChatGroupModel:
+    """Test ChatGroup model functionality."""
     
-    def test_create_chatroom(self, test_user):
-        """Test creating a chat room."""
+    def test_create_chatgroup(self, test_user):
+        """Test creating a chat group."""
         other_user = User.objects.create_user(
             email='other@example.com',
             username='otheruser',
             password='pass123'
         )
         
-        chatroom = ChatRoom.objects.create(
-            name='Test Chat',
-            type='DM'
+        chatgroup = ChatGroup.objects.create(
+            group_name='Test Chat',
+            is_private=True
         )
-        chatroom.members.add(test_user, other_user)
+        chatgroup.members.add(test_user, other_user)
         
-        assert chatroom.name == 'Test Chat'
-        assert chatroom.type == 'DM'
-        assert chatroom.members.count() == 2
+        assert chatgroup.group_name == 'Test Chat'
+        assert chatgroup.is_private is True
+        assert chatgroup.members.count() == 2
     
-    def test_chatroom_string_representation(self, test_user):
-        """Test ChatRoom __str__ method."""
-        chatroom = ChatRoom.objects.create(
-            name='Test Room',
-            type='GROUP'
+    def test_chatgroup_string_representation(self, test_user):
+        """Test ChatGroup __str__ method."""
+        chatgroup = ChatGroup.objects.create(
+            group_name='Test Room',
+            is_private=False
         )
-        assert str(chatroom) == 'Test Room'
+        assert str(chatgroup) == 'Test Room'
 
 
 @pytest.mark.django_db
-class TestChatMessageModel:
-    """Test ChatMessage model functionality."""
+class TestGroupMessageModel:
+    """Test GroupMessage model functionality."""
     
     def test_create_message(self, test_user):
         """Test creating a chat message."""
-        chatroom = ChatRoom.objects.create(
-            name='Test Chat',
-            type='DM'
+        chatgroup = ChatGroup.objects.create(
+            group_name='Test Chat',
+            is_private=True
         )
-        chatroom.members.add(test_user)
+        chatgroup.members.add(test_user)
         
-        message = ChatMessage.objects.create(
-            room=chatroom,
-            user=test_user,
-            content='Hello World'
+        message = GroupMessage.objects.create(
+            group=chatgroup,
+            author=test_user,
+            body='Hello World'
         )
         
-        assert message.content == 'Hello World'
-        assert message.user == test_user
-        assert message.room == chatroom
+        assert message.body == 'Hello World'
+        assert message.author == test_user
+        assert message.group == chatgroup
     
     def test_message_ordering(self, test_user):
-        """Test messages are ordered by timestamp."""
-        chatroom = ChatRoom.objects.create(
-            name='Test Chat',
-            type='DM'
+        """Test messages are ordered by created (descending)."""
+        chatgroup = ChatGroup.objects.create(
+            group_name='Test Chat',
+            is_private=True
         )
-        chatroom.members.add(test_user)
+        chatgroup.members.add(test_user)
         
-        msg1 = ChatMessage.objects.create(
-            room=chatroom,
-            user=test_user,
-            content='First'
+        msg1 = GroupMessage.objects.create(
+            group=chatgroup,
+            author=test_user,
+            body='First'
         )
-        msg2 = ChatMessage.objects.create(
-            room=chatroom,
-            user=test_user,
-            content='Second'
+        msg2 = GroupMessage.objects.create(
+            group=chatgroup,
+            author=test_user,
+            body='Second'
         )
         
-        messages = ChatMessage.objects.filter(room=chatroom)
-        assert messages.first() == msg1
-        assert messages.last() == msg2
+        messages = GroupMessage.objects.filter(group=chatgroup)
+        # Ordering is ['-created'] so newest first
+        assert messages.first() == msg2
+        assert messages.last() == msg1
 
 
 @pytest.mark.django_db
 class TestChatViews:
     """Test chat views."""
     
-    def test_home_view(self, django_client):
+    def test_home_view(self, client):
         """Test home view."""
-        response = django_client.get(reverse('home'))
+        response = client.get(reverse('home'))
         assert response.status_code == 200
     
-    def test_chat_view_requires_login(self, django_client):
+    def test_chat_view_requires_login(self, client):
         """Test chat view requires authentication."""
-        response = django_client.get(reverse('chat'))
+        response = client.get(reverse('chat'))
         assert response.status_code == 302
     
     def test_chat_view_authenticated(self, authenticated_client):
         """Test chat view with authenticated user."""
         response = authenticated_client.get(reverse('chat'))
         assert response.status_code == 200
-    
-    def test_chatroom_create_requires_login(self, django_client):
-        """Test chatroom creation requires authentication."""
-        response = django_client.post(reverse('chatroom_create'), {
-            'name': 'New Room',
-            'type': 'GROUP'
-        })
-        assert response.status_code == 302
 

@@ -19,12 +19,10 @@ User = get_user_model()
 
 
 @pytest.fixture(scope='session')
-def django_db_setup():
-    """Set up Django database for testing."""
-    settings.DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ':memory:',
-    }
+def django_db_setup(django_db_setup, django_db_blocker):
+    """Configure Django database for testing."""
+    # Use default django_db_setup but keep using the existing SQLite database
+    pass
 
 
 @pytest.fixture
@@ -33,9 +31,11 @@ def test_user(db):
     user = User.objects.create_user(
         email='testuser@example.com',
         username='testuser',
-        password='testpass123',
-        name='Test User'
+        password='testpass123'
     )
+    user.name = 'Test User'
+    user.is_active = True
+    user.save()
     return user
 
 
@@ -45,9 +45,10 @@ def admin_user(db):
     admin = User.objects.create_superuser(
         email='admin@example.com',
         username='admin',
-        password='adminpass123',
-        name='Admin User'
+        password='adminpass123'
     )
+    admin.name = 'Admin User'
+    admin.save()
     return admin
 
 

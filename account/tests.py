@@ -73,24 +73,24 @@ class TestAccountModel:
 class TestAccountViews:
     """Test account views."""
     
-    def test_register_view_get(self, django_client):
+    def test_register_view_get(self, client):
         """Test register view GET request."""
-        response = django_client.get(reverse('register'))
+        response = client.get(reverse('register'))
         assert response.status_code == 200
         assert 'form' in response.context
     
-    def test_login_view_get(self, django_client):
+    def test_login_view_get(self, client):
         """Test login view GET request."""
-        response = django_client.get(reverse('login'))
+        response = client.get(reverse('login'))
         assert response.status_code == 200
     
-    def test_login_view_post_valid(self, django_client, test_user):
+    def test_login_view_post_valid(self, client, test_user):
         """Test login with valid credentials."""
         # Activate the user first
         test_user.is_active = True
         test_user.save()
         
-        response = django_client.post(reverse('login'), {
+        response = client.post(reverse('login'), {
             'email': test_user.email,
             'password': 'testpass123'
         })
@@ -101,9 +101,9 @@ class TestAccountViews:
         response = authenticated_client.get(reverse('logout'))
         assert response.status_code == 302
     
-    def test_account_view_requires_login(self, django_client):
+    def test_account_view_requires_login(self, client):
         """Test account view requires authentication."""
-        response = django_client.get(reverse('account'))
+        response = client.get(reverse('account'))
         assert response.status_code == 302
         assert '/account/login/' in response.url
     

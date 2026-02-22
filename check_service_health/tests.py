@@ -12,18 +12,18 @@ from io import StringIO
 class TestHealthCheckViews:
     """Test health check views."""
     
-    def test_health_check_view(self, django_client):
+    def test_health_check_view(self, client):
         """Test health check endpoint."""
-        response = django_client.get(reverse('health_check'))
+        response = client.get(reverse('health_check'))
         assert response.status_code == 200
         data = response.json()
         assert 'status' in data
         assert data['status'] in ['healthy', 'ok']
     
-    def test_readiness_check(self, django_client):
+    def test_readiness_check(self, client):
         """Test readiness check endpoint if exists."""
         try:
-            response = django_client.get(reverse('readiness'))
+            response = client.get(reverse('readiness'))
             assert response.status_code in [200, 404]
         except Exception:
             # Endpoint may not exist
