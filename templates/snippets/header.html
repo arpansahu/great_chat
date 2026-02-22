@@ -93,8 +93,9 @@
 
 <!-- Specific JS goes HERE -->
 {% block javascripts %}
+<link rel="stylesheet" href="{% static 'css/external/flatpickr.min.css' %}">
 <script src="{% static 'js/autocomplete.js' %}"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="{% static 'js/external/flatpickr.min.js' %}"></script>
 <script>
   new Autocomplete('#autocomplete', {
     search: input => {
