@@ -90,9 +90,13 @@ def page(browser):
 
 
 @pytest.fixture
-def live_server_url():
-    """Return the URL of the live server for UI tests."""
-    return os.getenv('TEST_SERVER_URL', 'http://127.0.0.1:8000')
+def live_server_url(live_server):
+    """Return the URL of the live server for UI tests.
+    
+    Uses pytest-django's live_server fixture which runs a test server
+    with the same test database as the tests.
+    """
+    return live_server.url
 
 
 @pytest.fixture
