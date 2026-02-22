@@ -143,45 +143,6 @@ pipeline {
         }
         failure {
             script {
-                // Send failure notification email using env vars
-                withCredentials([file(credentialsId: 'great_chat_env_file', variable: 'ENV_FILE')]) {
-                    sh """
-                    # Load env vars for email
-                    export \$(cat ${ENV_FILE} | grep -v '^#' | xargs)
-                    
-                    curl -s \\
-                    -X POST \\
-                    --user \${MAIL_JET_API_KEY}:\${MAIL_JET_API_SECRET} \\
-                    https://api.mailjet.com/v3.1/send \\
-                    -H "Content-Type:application/json" \\
-                    -d '{
-                        "Messages":[
-                                {
-                                        "From": {
-                                                "Email": "'\${MAIL_JET_EMAIL_ADDRESS}'",
-                                                "Name": "ArpanSahuOne Jenkins Notification"
-                                        },
-                                        "To": [
-                                                {
-                                                        "Email": "'\${MY_EMAIL_ADDRESS}'",
-                                                        "Name": "Development Team"
-                                                }
-                                        ],
-                                        "Subject": "${currentBuild.fullDisplayName} build failed",
-                                        "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} build failed ${currentBuild.description} ",
-                                        "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} build failed </h3> <br> <p> ${currentBuild.description}  </p>"
-                                }
-                        ]
-                    }'
-                    """
-                }
-
-                // Trigger great_chat job only if the build is stable
-                build job: 'great_chat', parameters: [booleanParam(name: 'DEPLOY', value: true)], wait: false
-            }
-        }
-        failure {
-            script {
                 // Send failure notification email
                 sh """curl -s \
                 -X POST \
