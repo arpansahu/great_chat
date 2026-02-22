@@ -18,11 +18,17 @@
   <link href="{% static 'assets/css/nucleo-svg.css' %}" rel="stylesheet" />
 
   <!-- Font Awesome Icons -->
-  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="{% static 'fontawesome/css/all.min.css' %}" />
   
   <link href="{% static 'assets/css/nucleo-svg.css' %}" rel="stylesheet" />
   <!-- CSS Files -->
   <link id="pagestyle" href="{% static 'assets/css/soft-ui-dashboard.css' %}" rel="stylesheet" />
+  
+  <!-- Modern UI Styles -->
+  <link href="{% static 'css/modern-styles.css' %}" rel="stylesheet" />
+  <link href="{% static 'css/animations.css' %}" rel="stylesheet" />
+  <link href="{% static 'css/chat-components.css' %}" rel="stylesheet" />
+  <link href="{% static 'css/ui-components.css' %}" rel="stylesheet" />
 
   <script src="{% static 'js/sweetalert2.js' %}"></script>
   <!-- Jquery/AJAX -->
@@ -33,7 +39,7 @@
   {% comment %} <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script> {% endcomment %}
 
   <!-- Specific CSS goes HERE -->
-  <link rel="stylesheet" href="https://unpkg.com/@trevoreyre/autocomplete-js/dist/style.css"/>
+  <link rel="stylesheet" href="{% static 'css/autocomplete.css' %}"/>
   <!-- Sentry SDK for JavaScript -->
   <script src="https://js.sentry-cdn.com/8280b82dc3d8b64eb411adb4ea3d3065.min.js" crossorigin="anonymous"></script>
 
@@ -70,6 +76,7 @@
 
   {% include "snippets/scripts.html" %}
   <script src="{% static 'js/jquery.js' %}"></script>
+  <script src="{% static 'js/chat-enhancements.js' %}"></script>
   {% block javascripts %}{% endblock %}
 </body>
 </html>

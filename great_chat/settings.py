@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import subprocess
 from decouple import config
 import dj_database_url
 import sentry_sdk
@@ -39,12 +40,16 @@ REDIS_CLOUD_URL = config('REDIS_CLOUD_URL')
 
 MAIL_JET_API_KEY = config('MAIL_JET_API_KEY')
 MAIL_JET_API_SECRET = config('MAIL_JET_API_SECRET')
+MAIL_JET_EMAIL_ADDRESS = config('MAIL_JET_EMAIL_ADDRESS')
+MY_EMAIL_ADDRESS = config('MY_EMAIL_ADDRESS')
 
 DOMAIN = config('DOMAIN')
 PROTOCOL = config('PROTOCOL')
 
 SENTRY_ENVIRONMENT = config('SENTRY_ENVIRONMENT')  # production Or "staging", "development", etc.
 SENTRY_DSH_URL = config('SENTRY_DSH_URL')
+SENTRY_ORG = config('SENTRY_ORG')
+SENTRY_PROJECT = config('SENTRY_PROJECT')
 
 PROJECT_NAME = 'great_chat'
 # ===============================================================================
@@ -157,6 +162,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
+# CRITICAL: STATIC_ROOT must be defined regardless of USE_S3
+# Required for collectstatic command even when using cloud storage
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 if not DEBUG:
     if BUCKET_TYPE == 'AWS':
         AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
@@ -240,8 +249,6 @@ else:
     # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
     STATIC_URL = '/static/'
-
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
     MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -285,31 +292,39 @@ CHANNEL_LAYERS = {
 
 # Get the current git commit hash
 def get_git_commit_hash():
+    """Get git commit hash, suppress errors in Docker where .git may not exist."""
     try:
-        return subprocess.check_output(['git', 'rev-parse', 'HEAD']).decode('utf-8').strip()
+        return subprocess.check_output(
+            ['git', 'rev-parse', 'HEAD'],
+            stderr=subprocess.DEVNULL  # Suppress errors in Docker
+        ).decode('utf-8').strip()
     except Exception:
         return None
 
-sentry_sdk.init(
-    dsn=SENTRY_DSH_URL,
-    integrations=[
-            DjangoIntegration(
-                transaction_style='url',
-                middleware_spans=True,
-                # signals_spans=True,
-                # signals_denylist=[
-                #     django.db.models.signals.pre_init,
-                #     django.db.models.signals.post_init,
-                # ],
-                # cache_spans=False,
-            ),
-        ],
-    traces_sample_rate=1.0,  # Adjust this according to your needs
-    send_default_pii=True,  # To capture personal identifiable information (optional)
-    release=get_git_commit_hash(),  # Set the release to the current git commit hash
-    environment=SENTRY_ENVIRONMENT,  # Or "staging", "development", etc.
-    # profiles_sample_rate=1.0,
-)
+# Adjust sampling based on environment
+# Lower rate for development to avoid rate limits
+if SENTRY_ENVIRONMENT == 'production':
+    traces_sample_rate = 0.1
+elif SENTRY_ENVIRONMENT == 'development':
+    traces_sample_rate = 0.0  # Disable for local dev
+else:
+    traces_sample_rate = 0.5
+
+# Only initialize Sentry if not in local development
+if SENTRY_DSH_URL and not (DEBUG and SENTRY_ENVIRONMENT == 'development'):
+    sentry_sdk.init(
+        dsn=SENTRY_DSH_URL,
+        integrations=[
+                DjangoIntegration(
+                    transaction_style='url',
+                    middleware_spans=True,
+                ),
+            ],
+        traces_sample_rate=traces_sample_rate,
+        send_default_pii=True,
+        release=get_git_commit_hash(),
+        environment=SENTRY_ENVIRONMENT,
+    )
 
 LOGGING = {
     'version': 1,
@@ -355,4 +370,16 @@ LOGGING = {
     },
 }
 
-CSRF_TRUSTED_ORIGINS = ['https://great-chat.arpansahu.me']
+# CSRF Settings - Allow localhost for development
+if DEBUG:
+    CSRF_TRUSTED_ORIGINS = [
+        'http://localhost:8000',
+        'http://127.0.0.1:8000',
+        'http://localhost',
+        'http://127.0.0.1',
+    ]
+else:
+    CSRF_TRUSTED_ORIGINS = [
+        'https://great-chat.arpansahu.me',
+        'https://great-chat.arpansahu.space',
+    ]

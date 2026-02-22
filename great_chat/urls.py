@@ -30,6 +30,7 @@ from real_time_chat.views import (
      delete_group_chat_view,
      leave_group_chat_view, 
      chat_file_upload,
+     delete_message_view,
 )
 
 def trigger_error(request):
@@ -51,6 +52,7 @@ urlpatterns = [
 
     #utlity for chat
     path('chat/file_upload/<str:group_name>',chat_file_upload , name='chat-file-upload'),
+    path('chat/delete_message/<int:message_id>/', delete_message_view, name='delete-message'),
 
     #public chat
     path('chat', ChatView.as_view(), name='chat'), 
@@ -102,7 +104,9 @@ urlpatterns = [
     path('large_resource/', large_resource)
 ] 
 
+# Serve static and media files in DEBUG mode
 if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 handler404 = 'account.views.error_404'

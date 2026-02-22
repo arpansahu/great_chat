@@ -1,4 +1,6 @@
 /venv/
+staticfiles/
+media/
 
 # Default ignored files
 /shelf/
@@ -36,6 +38,8 @@
 ######################
 *.log
 *.sqlite
+*.db
+db.sqlite3
 
 # OS generated files #
 ######################

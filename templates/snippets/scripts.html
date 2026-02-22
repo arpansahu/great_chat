@@ -14,7 +14,33 @@
   <script src="{% static 'js/github-buttons.js' %}"></script>
 
   <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
-  <script src="{% static 'assets/js/soft-ui-dashboard.min.js' %}"></script>
+  <script src="{% static 'assets/js/soft-ui-dashboard.min.js' %}" defer></script>
+
+  <!-- Safe initialization wrapper -->
+  <script>
+    // Wrap soft-ui-dashboard functions to prevent errors on missing elements
+    document.addEventListener('DOMContentLoaded', function() {
+      try {
+        // Initialize tooltips if they exist
+        if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+          var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+          tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+          });
+        }
+      } catch (error) {
+        console.log('Tooltip initialization skipped:', error.message);
+      }
+    });
+
+    // Prevent soft-ui-dashboard errors
+    window.addEventListener('error', function(e) {
+      if (e.message && e.message.includes('classList')) {
+        e.preventDefault();
+        return true;
+      }
+    });
+  </script>
 
   <script src="{% static 'js/autocomplete.js' %}"></script>
   <script src="{% static 'js/flatpickr.js' %}"></script>

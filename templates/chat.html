@@ -44,29 +44,29 @@
 
     #chat_container {
         min-height: 55vh;
-        max-height: 55vh; /* Reduced by an additional 20% */
+        max-height: 55vh;
         overflow-y: auto;
         scrollbar-width: thin;
-        scrollbar-color: #ffffff #ece5dd; /* thumb color and track color */
+        scrollbar-color: #b3b3b3 #ece5dd;
+        padding: 16px;
     }
 
     #chat_container::-webkit-scrollbar {
-        width: 12px;
+        width: 8px;
     }
 
     #chat_container::-webkit-scrollbar-track {
-        background: #ece5dd; /* Track color to match background */
+        background: #ece5dd;
     }
 
     #chat_container::-webkit-scrollbar-thumb {
-        background-color: #ffffff; /* Scroll thumb color */
+        background-color: #b3b3b3;
         border-radius: 10px;
-        box-shadow: 0 0 10px rgba(255, 255, 255, 0.8); /* Glowing effect */
-        border: 3px solid #ece5dd; /* Matching the background */
+        border: 2px solid #ece5dd;
     }
 
     #chat_container::-webkit-scrollbar-thumb:hover {
-        background-color: #FAFDF3; /* Slightly darker on hover */
+        background-color: #999999;
     }
 
     .chat-input-container {
@@ -75,45 +75,48 @@
         border-radius: 12px;
         overflow: hidden;
         background-color: white;
-        padding: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        padding: 8px 12px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        gap: 8px;
     }
     
     .chat-input-container input {
         flex-grow: 1;
         border: none;
-        padding: 10px;
-        border-radius: 12px;
-        margin-right: 10px;
-        height: 40px; /* Set a fixed height */
+        padding: 10px 12px;
+        border-radius: 24px;
+        background-color: #f0f2f5;
+        height: 42px;
         box-sizing: border-box;
+        font-size: 15px;
+    }
+    
+    .chat-input-container input:focus {
+        outline: none;
+        background-color: #e8eaed;
     }
     
     .chat-input-container .btn {
-        background-color: #075E54;
+        background-color: #00a884;
         border: none;
-        width: 40px; /* Set a fixed width */
-        height: 40px; /* Set a fixed height */
+        width: 42px;
+        height: 42px;
         border-radius: 50%;
         color: white;
         display: flex;
         align-items: center;
         justify-content: center;
         padding: 0;
-        margin-right: 5px; /* Add margin for spacing between buttons */
+        transition: background-color 0.2s;
     }
     
     .chat-input-container .btn i {
-        font-size: 20px;
-        color: white; /* Ensure the icons have the same color */
+        font-size: 18px;
+        color: white;
     }
     
     .chat-input-container .btn:hover {
-        background-color: #064C47;
-    }
-    
-    .chat-input-container .btn:last-child {
-        margin-right: 0; /* Remove margin for the last button */
+        background-color: #008069;
     }
 
     .new-message {
@@ -141,9 +144,40 @@
 
     .whatsapp-background {
         height: 100vh;
-        background-color: #ece5dd;
-        background-image: radial-gradient(circle, rgba(0,0,0,0.1) 1px, transparent 1px);
-        background-size: 20px 20px;
+        background-color: #efeae2;
+        background-image: 
+            repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.03) 10px, rgba(0,0,0,0.03) 11px),
+            repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(0,0,0,0.03) 10px, rgba(0,0,0,0.03) 11px);
+    }
+    
+    .chat-header {
+        background-color: #075e54;
+        color: white;
+        padding: 12px 16px;
+        border-radius: 12px 12px 0 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    
+    .chat-header img {
+        border: 2px solid #ffffff33;
+    }
+    
+    .chat-header-info {
+        flex-grow: 1;
+    }
+    
+    .chat-header-name {
+        font-weight: 500;
+        font-size: 16px;
+        margin-bottom: 2px;
+    }
+    
+    .chat-header-status {
+        font-size: 13px;
+        opacity: 0.8;
     }
 
     #online-icon {
@@ -165,37 +199,35 @@
 <div class="container-fluid py-4">
     <div class="row justify-content-center">
         <div class="col-12 col-md-6 col-lg-4">
-            <div class="card mb-4" style="background-color: #ece5dd;">
-                {% comment %} group chat {% endcomment %}
-                {% if chat_group.group_name and not chat_group.is_private and not chat_group.is_public %}
-                <div class="row-cols-1 text-center rounded-3" style="background-color: #ece5dd; color: white;">
-                    <a href="{% url 'group_chat_members' group_name=chat_group.group_name %}">
-                        <img id="profile-photo" src="{{ chat_group.group_photo.url }}" class="rounded-circle mb-3" alt="Group Photo" width="50" height="50">
-                        {{ chat_group.group_name }}
-                    </a>
-                    <span id="online" style="margin-left: 2px; font-weight: bold;"></span>
-                </div>
-                {% endif %}
-                <div class="row-cols-1 text-center rounded-3" style="background-color: #ece5dd; color: white;">
-                    <div style="display: flex; align-items: center; justify-content: center;">
-                        {% comment %} private chat {% endcomment %}
-                        {% if other_user %}
-                            <div id="online-icon" style="background-color: gray;"></div>
-                            <a href="{% url 'profile' %}?email_id={{ other_user.email }}">
-                            <img id="profile-photo" src="{{ other_user.profile_photo.url }}" class="rounded-circle mb-3" alt="Profile Photo" width="50" height="50">
-                            </a>
-                            <span id="other_user_name" style="margin-left: 2px; font-weight: bold; font-size:smaller">{{other_user.name}}</span>
-                            <span id="other_user_username" style="margin-left: 2px; font-size: smaller;">@{{other_user.username}}</span>
-                        {% comment %} public chat {% endcomment %}
-                        {% else %}
-                            <a href="{% url 'chat' %}" style="margin: 5px">
-                                {{ chat_group.group_name }}
-                            </a>
-                            <div id="online-icon" style="background-color: gray;"></div>
-                            <span id="online-count" class="fade-in-scale" style="font-weight: bold;"></span>
-                            <span id="online" style="margin-left: 2px; font-weight: bold;">Online</span>
-                        {% endif %}
-                    </div>
+            <div class="card mb-4" style="background-color: transparent; border: none;">
+                {% comment %} Chat Header {% endcomment %}
+                <div class="chat-header">
+                    {% if chat_group.group_name and not chat_group.is_private and not chat_group.is_public %}
+                        <a href="{% url 'group_chat_members' group_name=chat_group.group_name %}">
+                            <img id="profile-photo" src="{{ chat_group.group_photo.url }}" class="rounded-circle" alt="Group Photo" width="50" height="50" style="object-fit: cover;">
+                        </a>
+                        <div class="chat-header-info">
+                            <div class="chat-header-name">{{ chat_group.group_name }}</div>
+                            <div class="chat-header-status" id="online"></div>
+                        </div>
+                    {% elif other_user %}
+                        <a href="{% url 'profile' %}?email_id={{ other_user.email }}">
+                            <img id="profile-photo" src="{{ other_user.profile_photo.url }}" class="rounded-circle" alt="Profile Photo" width="50" height="50" style="object-fit: cover;">
+                        </a>
+                        <div class="chat-header-info">
+                            <div class="chat-header-name">{{ other_user.name }}</div>
+                            <div class="chat-header-status">@{{ other_user.username }}</div>
+                        </div>
+                        <div id="online-icon" style="background-color: gray; width: 10px; height: 10px; border-radius: 50%;"></div>
+                    {% else %}
+                        <div class="chat-header-info">
+                            <div class="chat-header-name">{{ chat_group.group_name }}</div>
+                            <div class="chat-header-status">
+                                <span id="online-count"></span> <span id="online">Online</span>
+                            </div>
+                        </div>
+                        <div id="online-icon" style="background-color: gray; width: 10px; height: 10px; border-radius: 50%;"></div>
+                    {% endif %}
                 </div>
                 <div id='chat_container' class="overflow-y-auto grow whatsapp-background">
                     <ul id='chat_messages' class="flex flex-col justify-end gap-2 p-4">
@@ -204,21 +236,21 @@
                     {% endfor %}
                     </ul>
                 </div>
-               <div class="row-cols-1 rounded-3">
-                    <form id="chat_message_form" method="POST" action="{% url 'home' %}" class="chat-input-container" 
+                <div class="chat-input-container" style="background-color: #f0f2f5; padding: 12px;">
+                    <form id="chat_message_form" method="POST" action="{% url 'home' %}" style="display: flex; align-items: center; gap: 8px; width: 100%;"
                         hx-ext="ws"
                         ws-connect="/ws/chatroom/{{ chatroom_name }}"
                         ws-send
                         _="on htmx:wsAfter reset() me">
                         {% csrf_token %}
-                        <input type="text" name="body" placeholder="Add a message ..." class="form-control" maxlength="300" autofocus="True" required="" id="id_body" aria-label="Message input" >
+                        <input type="text" name="body" placeholder="Type a message" class="form-control" maxlength="300" autofocus="True" required="" id="id_body" aria-label="Message input" >
                         <!-- File Upload Button -->
-                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#fileUploadModal" aria-label="Upload file" style="margin-top: 15px">
-                            <i class="fa fa-paperclip" aria-hidden="true"></i>
+                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#fileUploadModal" aria-label="Upload file" title="Attach file">
+                            <i class="fas fa-paperclip" aria-hidden="true"></i>
                         </button>
                         <!-- Send Message Button -->
-                        <button type="submit" class="btn send-button" aria-label="Send message" style="margin-top: 15px">
-                            <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                        <button type="submit" class="btn send-button" aria-label="Send message" title="Send">
+                            <i class="fas fa-paper-plane" aria-hidden="true"></i>
                         </button>
                     </form>
                 </div>

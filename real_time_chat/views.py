@@ -293,3 +293,18 @@ def search_users(request):
             payload.append(objs.email)
 
     return JsonResponse({'status': 200, 'data': payload})
+
+@login_required
+def delete_message_view(request, message_id):
+    """Delete a message - only the author can delete their own message"""
+    message = get_object_or_404(GroupMessage, id=message_id)
+    
+    # Check if the user is the author of the message
+    if request.user != message.author:
+        return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=403)
+    
+    if request.method == 'POST':
+        message.delete()
+        return JsonResponse({'status': 'success', 'message': 'Message deleted'})
+    
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
