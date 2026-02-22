@@ -1,12 +1,5 @@
 pipeline {
     agent any
-    parameters {
-        booleanParam(
-            name: 'RUN_TESTS',
-            defaultValue: true,
-            description: 'Run tests before building. Set to false for faster builds.'
-        )
-    }
     environment {
         IMAGE_TAG = "${env.BUILD_ID}"
     }
@@ -48,9 +41,6 @@ pipeline {
             }
         }
         stage('Run Unit Tests') {
-            when {
-                expression { return params.RUN_TESTS }
-            }
             steps {
                 script {
                     echo "Running unit tests..."
@@ -63,9 +53,6 @@ pipeline {
             }
         }
         stage('Run UI Tests') {
-            when {
-                expression { return params.RUN_TESTS }
-            }
             steps {
                 script {
                     echo "Running UI tests with Playwright..."
