@@ -89,9 +89,32 @@ pipeline {
         stage('Build Image') {
             steps {
                 script {
-                    // Ensure Docker is running and can be accessed
-                    sh 'docker --version'
- using env vars
+                    // Build Docker image
+                    sh """
+                    docker build -t ${env.REPOSITORY}:${env.IMAGE_TAG} -t ${env.REPOSITORY}:latest .
+                    """
+                }
+            }
+        }
+        stage('Push to Registry') {
+            steps {
+                script {
+                    // Login to Docker registry
+                    withCredentials([usernamePassword(credentialsId: 'docker_credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh """
+                        echo \$DOCKER_PASSWORD | docker login ${env.REGISTRY} -u \$DOCKER_USERNAME --password-stdin
+                        docker push ${env.REPOSITORY}:${env.IMAGE_TAG}
+                        docker push ${env.REPOSITORY}:latest
+                        """
+                    }
+                }
+            }
+        }
+    }
+    post {
+        success {
+            script {
+                // Send success notification email using env vars
                 withCredentials([file(credentialsId: 'great_chat_env_file', variable: 'ENV_FILE')]) {
                     sh """
                     # Load env vars for email
