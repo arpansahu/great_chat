@@ -68,9 +68,12 @@ def admin_client(admin_user):
     return client
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def browser():
     """Create a Playwright browser instance for UI tests."""
+    import os
+    # Disable Django async detection to avoid conflicts with Playwright
+    os.environ['DJANGO_ALLOW_ASYNC_UNSAFE'] = 'true'
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         yield browser
@@ -112,8 +115,10 @@ def create_test_users(db):
         user = User.objects.create_user(
             email=f'user{i}@example.com',
             username=f'user{i}',
-            password='testpass123',
-            name=f'User {i}'
+            password='testpass123'
         )
+        user.name = f'User {i}'
+        user.is_active = True
+        user.save()
         users.append(user)
     return users
