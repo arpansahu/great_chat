@@ -1,0 +1,118 @@
+"""
+Pytest configuration and fixtures for Great Chat project.
+"""
+import pytest
+import os
+import django
+from django.conf import settings
+from django.test import Client
+from django.contrib.auth import get_user_model
+from playwright.sync_api import sync_playwright
+
+
+# Set up Django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'great_chat.settings')
+django.setup()
+
+
+User = get_user_model()
+
+
+@pytest.fixture(scope='session')
+def django_db_setup():
+    """Set up Django database for testing."""
+    settings.DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:',
+    }
+
+
+@pytest.fixture
+def test_user(db):
+    """Create a test user."""
+    user = User.objects.create_user(
+        email='testuser@example.com',
+        username='testuser',
+        password='testpass123',
+        name='Test User'
+    )
+    return user
+
+
+@pytest.fixture
+def admin_user(db):
+    """Create an admin user."""
+    admin = User.objects.create_superuser(
+        email='admin@example.com',
+        username='admin',
+        password='adminpass123',
+        name='Admin User'
+    )
+    return admin
+
+
+@pytest.fixture
+def authenticated_client(test_user):
+    """Create an authenticated Django test client."""
+    client = Client()
+    client.force_login(test_user)
+    return client
+
+
+@pytest.fixture
+def admin_client(admin_user):
+    """Create an authenticated admin Django test client."""
+    client = Client()
+    client.force_login(admin_user)
+    return client
+
+
+@pytest.fixture(scope='session')
+def browser():
+    """Create a Playwright browser instance for UI tests."""
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        yield browser
+        browser.close()
+
+
+@pytest.fixture
+def page(browser):
+    """Create a new browser page for each UI test."""
+    context = browser.new_context()
+    page = context.new_page()
+    yield page
+    context.close()
+
+
+@pytest.fixture
+def live_server_url():
+    """Return the URL of the live server for UI tests."""
+    return os.getenv('TEST_SERVER_URL', 'http://127.0.0.1:8000')
+
+
+@pytest.fixture
+def login_user(page, live_server_url):
+    """Helper function to login a user in UI tests."""
+    def _login(email='testuser@example.com', password='testpass123'):
+        page.goto(f'{live_server_url}/login/')
+        page.fill('input[name="username"]', email)
+        page.fill('input[name="password"]', password)
+        page.click('button[type="submit"]')
+        page.wait_for_load_state('networkidle')
+    return _login
+
+
+@pytest.fixture
+def create_test_users(db):
+    """Create multiple test users for testing."""
+    users = []
+    for i in range(3):
+        user = User.objects.create_user(
+            email=f'user{i}@example.com',
+            username=f'user{i}',
+            password='testpass123',
+            name=f'User {i}'
+        )
+        users.append(user)
+    return users
