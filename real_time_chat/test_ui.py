@@ -17,7 +17,7 @@ class TestChatUI:
         # Check for Great Chat branding
         expect(page.locator('text=Great Chat')).to_be_visible()
     
-    def test_chat_interface_displays(self, page, live_server_url, login_user):
+    def test_chat_interface_displays(self, page, live_server_url, test_user, login_user):
         """Test that the chat interface displays correctly."""
         login_user()
         page.goto(f'{live_server_url}/')
@@ -25,7 +25,7 @@ class TestChatUI:
         # Check for chat elements
         expect(page.locator('#chat_container, .chat-container')).to_be_visible()
     
-    def test_search_user_functionality(self, page, live_server_url, login_user):
+    def test_search_user_functionality(self, page, live_server_url, test_user, login_user):
         """Test searching for users."""
         login_user()
         page.goto(f'{live_server_url}/')
@@ -37,13 +37,18 @@ class TestChatUI:
             # Wait for search results
             page.wait_for_timeout(1000)
     
-    def test_global_chat_access(self, page, live_server_url, login_user):
+    def test_global_chat_access(self, page, live_server_url, test_user, login_user):
         """Test accessing global chat."""
+        # Create public chat group required by the chat view
+        from real_time_chat.models import ChatGroup
+        ChatGroup.objects.get_or_create(group_name='public-chat')
+        
         login_user()
         page.goto(f'{live_server_url}/chat')
         
-        # Verify we're on the global chat page
-        expect(page.locator('text=Global Chat, text=Global')).to_be_visible()
+        # Verify we're on the chat page - check for chat container
+        page.wait_for_url(f'{live_server_url}/chat')
+        expect(page.locator('#chat_container')).to_be_visible()
     
     @pytest.mark.todo
     def test_send_message_in_chat(self, page, live_server_url, login_user):

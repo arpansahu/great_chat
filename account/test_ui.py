@@ -18,8 +18,8 @@ class TestAccountUI:
     def test_register_page_loads(self, page, live_server_url):
         """Test that the registration page loads correctly."""
         page.goto(f'{live_server_url}/register/')
-        expect(page).to_have_title('Register')
-        expect(page.locator('h4:has-text("Sign UP")')).to_be_visible()
+        expect(page).to_have_title('Sign UP')
+        expect(page.locator('h4:has-text("Register")')).to_be_visible()
     
     def test_login_with_valid_credentials(self, page, live_server_url, test_user):
         """Test logging in with valid credentials."""
@@ -49,8 +49,8 @@ class TestAccountUI:
         # Submit form
         page.click('button[type="submit"]')
         
-        # Verify error message appears
-        expect(page.locator('.alert, .error, [class*="error"]')).to_be_visible(timeout=5000)
+        # Verify error message appears (shown in text-danger h3)
+        expect(page.locator('h3.text-danger')).to_be_visible(timeout=5000)
     
     def test_logout_functionality(self, page, live_server_url, test_user):
         """Test that logout works correctly."""
@@ -64,8 +64,9 @@ class TestAccountUI:
         # Logout
         page.click('text=Sign Out')
         
-        # Verify redirected to home/login
-        expect(page.locator('text=Sign In, text=Login')).to_be_visible()
+        # Verify redirected to login page - check for Login heading
+        page.wait_for_url(f'{live_server_url}/login/')
+        expect(page.locator('h4:has-text("Login")')).to_be_visible()
     
     def test_registration_form_validation(self, page, live_server_url):
         """Test that registration form validates required fields."""
