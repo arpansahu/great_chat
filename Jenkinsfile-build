@@ -83,13 +83,19 @@ pipeline {
         stage('Push to Registry') {
             steps {
                 script {
-                    // Login to Docker registry
-                    withCredentials([usernamePassword(credentialsId: 'docker_credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        sh """
-                        echo \$DOCKER_PASSWORD | docker login ${env.REGISTRY} -u \$DOCKER_USERNAME --password-stdin
-                        docker push ${env.REPOSITORY}:${env.IMAGE_TAG}
-                        docker push ${env.REPOSITORY}:latest
-                        """
+                    try {
+                        // Login to Docker registry (skip if credentials not configured)
+                        withCredentials([usernamePassword(credentialsId: 'docker_credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                            sh """
+                            echo \$DOCKER_PASSWORD | docker login ${env.REGISTRY} -u \$DOCKER_USERNAME --password-stdin
+                            docker push ${env.REPOSITORY}:${env.IMAGE_TAG}
+                            docker push ${env.REPOSITORY}:latest
+                            """
+                        }
+                        echo "✅ Successfully pushed images to registry"
+                    } catch (Exception e) {
+                        echo "⚠️ Skipping Docker push - credentials not configured: ${e.message}"
+                        echo "To enable: Add 'docker_credentials' in Jenkins → Manage Jenkins → Credentials"
                     }
                 }
             }
