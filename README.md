@@ -10341,40 +10341,58 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 To run this project, you will need to add the following environment variables to your .env file
 
-SECRET_KEY=
+# Core Django Settings
+SECRET_KEY=your-secret-key-here
+DEBUG=False
+ALLOWED_HOSTS=yourdomain.com localhost 127.0.0.1
 
-DEBUG=
+# Email Configuration (Mailjet)
+MAIL_JET_API_KEY=your-mailjet-api-key
+MAIL_JET_API_SECRET=your-mailjet-api-secret
+MAIL_JET_EMAIL_ADDRESS=noreply@yourdomain.com
+MY_EMAIL_ADDRESS=your@email.com
 
-ALLOWED_HOSTS=
+# Cloud Storage (MinIO/S3/Blackblaze)
+AWS_ACCESS_KEY_ID=your-access-key
+AWS_SECRET_ACCESS_KEY=your-secret-key
+AWS_STORAGE_BUCKET_NAME=your-bucket-name
+BUCKET_TYPE=MINIO
+# For MinIO
+AWS_S3_ENDPOINT_URL=https://minio.yourdomain.com
 
-MAIL_JET_API_KEY=
+# Database
+DATABASE_URL=postgres://user:password@host:port/dbname
 
-MAIL_JET_API_SECRET=
+# Redis Cache
+REDIS_CLOUD_URL=rediss://default:password@host:port
 
-AWS_ACCESS_KEY_ID=
+# Domain Configuration
+DOMAIN=yourdomain.com
+PROTOCOL=https
 
-AWS_SECRET_ACCESS_KEY=
+# Docker Configuration
+DOCKER_PORT=8002
+SERVER_NAME=great-chat.yourdomain.com
 
-AWS_STORAGE_BUCKET_NAME=
+# Docker Registry (Harbor)
+DOCKER_REGISTRY=harbor.arpansahu.space
+DOCKER_REPOSITORY=library
+DOCKER_IMAGE_NAME=great_chat
 
-BUCKET_TYPE=
+# Jenkins
+JENKINS_DOMAIN=jenkins.yourdomain.com
 
-DOMAIN=
+# Sentry Error Tracking
+SENTRY_DSH_URL=https://xxxxx@sentry.io/projectid
+SENTRY_ORG=your-org
+SENTRY_PROJECT=great_chat
+SENTRY_ENVIRONMENT=production
 
-PROTOCOL=
-
-DATABASE_URL=
-
-REDIS_CLOUD_URL=
-
-# SENTRY
-SENTRY_ENVIRONMENT=
-
-SENTRY_DSH_URL=
+# Project Naming
+ENV_PROJECT_NAME=great_chat
 
 # deploy_kube.sh requirements
-HARBOR_USERNAME=
-
-HARBOR_PASSWORD=
+HARBOR_USERNAME=your-harbor-username
+HARBOR_PASSWORD=your-harbor-password
 
 
