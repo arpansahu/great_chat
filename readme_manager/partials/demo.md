@@ -1,7 +1,7 @@
 Available at: https://[DOMAIN_NAME]
 
 admin login details:--
-email: admin@arpansahu.me
+email: admin@arpansahu.space
 password: showmecode
 
 Since this is a chat app you can test it truly if you have another user too.

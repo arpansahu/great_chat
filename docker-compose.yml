@@ -3,7 +3,7 @@ services:
     build:  # This section will be used when running locally
       context: .
       dockerfile: Dockerfile
-    image: harbor.arpansahu.me/library/great_chat:latest  # This will be used when the image is not built locally
+    image: harbor.arpansahu.space/library/great_chat:latest  # This will be used when the image is not built locally
     env_file: ./.env
     command: bash -c "python manage.py makemigrations && python manage.py migrate && uvicorn great_chat.asgi:application --host 0.0.0.0 --port 8002"
     container_name: great_chat

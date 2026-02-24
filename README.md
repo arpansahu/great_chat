@@ -110,10 +110,10 @@ Channels preserve the synchronous behavior of Django and add a layer of asynchro
 
 ## Demo
 
-Available at: https://great-chat.arpansahu.me
+Available at: https://great-chat.arpansahu.space
 
 admin login details:--
-email: admin@arpansahu.me
+email: admin@arpansahu.space
 password: showmecode
 
 Since this is a chat app you can test it truly if you have another user too.
@@ -2228,7 +2228,7 @@ services:
     build:  # This section will be used when running locally
       context: .
       dockerfile: Dockerfile
-    image: harbor.arpansahu.me/library/great_chat:latest  # This will be used when the image is not built locally
+    image: harbor.arpansahu.space/library/great_chat:latest  # This will be used when the image is not built locally
     env_file: ./.env
     command: bash -c "python manage.py makemigrations && python manage.py migrate && uvicorn great_chat.asgi:application --host 0.0.0.0 --port 8002"
     container_name: great_chat
@@ -3344,7 +3344,7 @@ error_log                   /var/log/nginx/supersecure.error.log;
 
 server {
     listen         80;
-    server_name    great-chat.arpansahu.me;
+    server_name    great-chat.arpansahu.space;
     # force https-redirects
     if ($scheme = http) {
         return 301 https://$server_name$request_uri;
@@ -3362,8 +3362,8 @@ server {
     }
 
     listen 443 ssl; # managed by Certbot
-    ssl_certificate /etc/letsencrypt/live/arpansahu.me/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/arpansahu.me/privkey.pem; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/arpansahu.space/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/arpansahu.space/privkey.pem; # managed by Certbot
     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 }
@@ -10275,7 +10275,7 @@ pipeline {
 
 Note: agent {label 'local'} is used to specify which node will execute the jenkins job deployment. So local linux server is labelled with 'local' are the project with this label will be executed in local machine node.
 
-* Configure a Jenkins project from jenkins ui located at https://jenkins.arpansahu.me
+* Configure a Jenkins project from jenkins ui located at https://jenkins.arpansahu.space
 
 Make sure to use Pipeline project and name it whatever you want I have named it as per great_chat
 
