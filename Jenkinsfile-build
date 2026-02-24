@@ -73,9 +73,16 @@ pipeline {
         stage('Build Image') {
             steps {
                 script {
-                    // Build Docker image
+                    // Ensure Docker is running
+                    sh 'docker --version'
+
+                    // Log the image details
+                    echo "Building Docker image: ${env.REGISTRY}/${env.REPOSITORY}:${env.IMAGE_TAG}"
+
+                    // Build the Docker image
                     sh """
-                    docker build -t ${env.REPOSITORY}:${env.IMAGE_TAG} -t ${env.REPOSITORY}:latest .
+                    docker build -t ${env.REGISTRY}/${env.REPOSITORY}:${env.IMAGE_TAG} .
+                    docker tag ${env.REGISTRY}/${env.REPOSITORY}:${env.IMAGE_TAG} ${env.REGISTRY}/${env.REPOSITORY}:latest
                     """
                 }
             }
@@ -83,19 +90,16 @@ pipeline {
         stage('Push to Registry') {
             steps {
                 script {
-                    try {
-                        // Login to Docker registry (skip if credentials not configured)
-                        withCredentials([usernamePassword(credentialsId: 'docker_credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                            sh """
-                            echo \$DOCKER_PASSWORD | docker login ${env.REGISTRY} -u \$DOCKER_USERNAME --password-stdin
-                            docker push ${env.REPOSITORY}:${env.IMAGE_TAG}
-                            docker push ${env.REPOSITORY}:latest
-                            """
-                        }
-                        echo "✅ Successfully pushed images to registry"
-                    } catch (Exception e) {
-                        echo "⚠️ Skipping Docker push - credentials not configured: ${e.message}"
-                        echo "To enable: Add 'docker_credentials' in Jenkins → Manage Jenkins → Credentials"
+                    // Login to Docker registry
+                    withCredentials([usernamePassword(credentialsId: 'harbor-credentials', passwordVariable: 'DOCKER_REGISTRY_PASSWORD', usernameVariable: 'DOCKER_REGISTRY_USERNAME')]) {
+                        sh '''
+                        echo $DOCKER_REGISTRY_PASSWORD | docker login ${REGISTRY} -u $DOCKER_REGISTRY_USERNAME --password-stdin
+                        '''
+
+                        sh '''
+                        docker push ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}
+                        docker push ${REGISTRY}/${REPOSITORY}:latest
+                        '''
                     }
                 }
             }
@@ -104,6 +108,11 @@ pipeline {
     post {
         success {
             script {
+                // Set build description
+                if (!currentBuild.description) {
+                    currentBuild.description = "Image: ${env.REGISTRY}/${env.REPOSITORY}:${env.IMAGE_TAG} built and pushed successfully"
+                }
+                
                 // Send success notification email using env vars
                 withCredentials([file(credentialsId: 'great_chat_env_file', variable: 'ENV_FILE')]) {
                     sh """
