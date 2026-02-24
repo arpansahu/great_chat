@@ -64,7 +64,7 @@ pipeline {
                             
                             # Run UI tests with pytest-django live_server
                             # No need to manually start runserver - live_server fixture handles it
-                            pytest */test_ui.py -m "ui and not todo" -v --tb=short -x
+                            pytest */test_ui.py -m "ui and not todo" -v --tb=short
                         '
                     """
                 }
