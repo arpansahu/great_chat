@@ -50,7 +50,7 @@ class TestAccountUI:
         page.click('button[type="submit"]')
         
         # Verify error message appears (shown in text-danger h3)
-        expect(page.locator('h3.text-danger')).to_be_visible(timeout=5000)
+        expect(page.locator('h3.text-danger')).to_be_visible()
     
     def test_logout_functionality(self, page, live_server_url, test_user):
         """Test that logout works correctly."""
