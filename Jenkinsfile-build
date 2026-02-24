@@ -113,38 +113,32 @@ pipeline {
                     currentBuild.description = "Image: ${env.REGISTRY}/${env.REPOSITORY}:${env.IMAGE_TAG} built and pushed successfully"
                 }
                 
-                // Send success notification email using env vars
-                withCredentials([file(credentialsId: 'great_chat_env_file', variable: 'ENV_FILE')]) {
-                    sh """
-                    # Load env vars for email
-                    export \$(cat ${ENV_FILE} | grep -v '^#' | xargs)
-                    
-                    curl -s \\
-                    -X POST \\
-                    --user \${MAIL_JET_API_KEY}:\${MAIL_JET_API_SECRET} \\
-                    https://api.mailjet.com/v3.1/send \\
-                    -H "Content-Type:application/json" \\
-                    -d '{
-                        "Messages":[
-                                {
-                                        "From": {
-                                                "Email": "'\${MAIL_JET_EMAIL_ADDRESS}'",
-                                                "Name": "ArpanSahuOne Jenkins Notification"
-                                        },
-                                        "To": [
-                                                {
-                                                        "Email": "'\${MY_EMAIL_ADDRESS}'",
-                                                        "Name": "Development Team"
-                                                }
-                                        ],
-                                        "Subject": "${currentBuild.description}",
-                                        "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} : ${currentBuild.description}",
-                                        "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} : ${currentBuild.description} </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
-                                }
-                        ]
-                    }'
-                    """
-                }
+                // Send success notification email
+                sh """curl -s \\
+                -X POST \\
+                --user $MAIL_JET_API_KEY:$MAIL_JET_API_SECRET \\
+                https://api.mailjet.com/v3.1/send \\
+                -H "Content-Type:application/json" \\
+                -d '{
+                    "Messages":[
+                            {
+                                    "From": {
+                                            "Email": "$MAIL_JET_EMAIL_ADDRESS",
+                                            "Name": "ArpanSahuOne Jenkins Notification"
+                                    },
+                                    "To": [
+                                            {
+                                                    "Email": "$MY_EMAIL_ADDRESS",
+                                                    "Name": "Development Team"
+                                            }
+                                    ],
+                                    "Subject": "${currentBuild.description}",
+                                    "TextPart": "Hola Development Team, your project ${currentBuild.fullDisplayName} : ${currentBuild.description}",
+                                    "HTMLPart": "<h3>Hola Development Team, your project ${currentBuild.fullDisplayName} : ${currentBuild.description} </h3> <br> <p> Build Url: ${env.BUILD_URL}  </p>"
+                            }
+                    ]
+                }'
+                """
 
                 // Trigger deploy job dynamically
                 build job: "${env.ENV_PROJECT_NAME}_deploy", parameters: [booleanParam(name: 'DEPLOY', value: true)], wait: false
