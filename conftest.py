@@ -85,7 +85,8 @@ def page(browser):
     """Create a new browser page for each UI test."""
     context = browser.new_context()
     page = context.new_page()
-    # Set default navigation timeout to 60 seconds for flaky tests
+    # Set default timeouts to 60 seconds for flaky tests
+    page.set_default_timeout(60000)
     page.set_default_navigation_timeout(60000)
     yield page
     context.close()
