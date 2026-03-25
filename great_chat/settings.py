@@ -33,6 +33,8 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS').split(' ')
 AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_ENDPOINT_URL = config('AWS_S3_ENDPOINT_URL', default='')
+AWS_S3_CUSTOM_DOMAIN = config('AWS_S3_CUSTOM_DOMAIN', default='')
 BUCKET_TYPE = config('BUCKET_TYPE')
 
 DATABASE_URL = config('DATABASE_URL')
@@ -220,7 +222,9 @@ if not DEBUG:
 
     elif BUCKET_TYPE == 'MINIO':
         AWS_S3_REGION_NAME = 'us-east-1'  # MinIO doesn't require this, but boto3 does
-        AWS_S3_ENDPOINT_URL = 'https://minio.arpansahu.space'
+        # Use AWS_S3_ENDPOINT_URL from environment or fallback to old default
+        if not AWS_S3_ENDPOINT_URL:
+            AWS_S3_ENDPOINT_URL = 'https://minioapi.arpansahu.space'  # Updated default to API endpoint
         AWS_DEFAULT_ACL = 'public-read'
         AWS_S3_OBJECT_PARAMETERS = {
             'CacheControl': 'max-age=86400',
@@ -233,12 +237,19 @@ if not DEBUG:
 
         # s3 static settings
         AWS_STATIC_LOCATION = f'portfolio/{PROJECT_NAME}/static'
-        STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}/{AWS_STATIC_LOCATION}/'
+        # Use AWS_S3_CUSTOM_DOMAIN if provided, otherwise construct from bucket name
+        if AWS_S3_CUSTOM_DOMAIN:
+            STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_STATIC_LOCATION}/'
+        else:
+            STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}/{AWS_STATIC_LOCATION}/'
         STATICFILES_STORAGE = f'{PROJECT_NAME}.storage_backends.StaticStorage'
 
         # s3 public media settings
         AWS_PUBLIC_MEDIA_LOCATION = f'portfolio/{PROJECT_NAME}/media'
-        MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}/{AWS_PUBLIC_MEDIA_LOCATION}/'
+        if AWS_S3_CUSTOM_DOMAIN:
+            MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_PUBLIC_MEDIA_LOCATION}/'
+        else:
+            MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}/{AWS_PUBLIC_MEDIA_LOCATION}/'
         DEFAULT_FILE_STORAGE = f'{PROJECT_NAME}.storage_backends.PublicMediaStorage'
 
         # s3 private media settings
