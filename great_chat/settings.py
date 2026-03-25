@@ -225,6 +225,11 @@ if not DEBUG:
         # Use AWS_S3_ENDPOINT_URL from environment or fallback to old default
         if not AWS_S3_ENDPOINT_URL:
             AWS_S3_ENDPOINT_URL = 'https://minioapi.arpansahu.space'  # Updated default to API endpoint
+        
+        # Custom domain for serving files
+        if not AWS_S3_CUSTOM_DOMAIN:
+            AWS_S3_CUSTOM_DOMAIN = f'minioapi.arpansahu.space/{AWS_STORAGE_BUCKET_NAME}'
+        
         AWS_DEFAULT_ACL = 'public-read'
         AWS_S3_OBJECT_PARAMETERS = {
             'CacheControl': 'max-age=86400',
@@ -237,24 +242,50 @@ if not DEBUG:
 
         # s3 static settings
         AWS_STATIC_LOCATION = f'portfolio/{PROJECT_NAME}/static'
-        # Use AWS_S3_CUSTOM_DOMAIN if provided, otherwise construct from bucket name
-        if AWS_S3_CUSTOM_DOMAIN:
-            STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_STATIC_LOCATION}/'
-        else:
-            STATIC_URL = f'https://{AWS_STORAGE_BUCKET_NAME}/{AWS_STATIC_LOCATION}/'
-        STATICFILES_STORAGE = f'{PROJECT_NAME}.storage_backends.StaticStorage'
+        STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_STATIC_LOCATION}/'
 
         # s3 public media settings
         AWS_PUBLIC_MEDIA_LOCATION = f'portfolio/{PROJECT_NAME}/media'
-        if AWS_S3_CUSTOM_DOMAIN:
-            MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_PUBLIC_MEDIA_LOCATION}/'
-        else:
-            MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}/{AWS_PUBLIC_MEDIA_LOCATION}/'
-        DEFAULT_FILE_STORAGE = f'{PROJECT_NAME}.storage_backends.PublicMediaStorage'
+        MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_PUBLIC_MEDIA_LOCATION}/'
 
         # s3 private media settings
-        PRIVATE_MEDIA_LOCATION = f'portfolio/{PROJECT_NAME}/private'
-        PRIVATE_FILE_STORAGE = f'{PROJECT_NAME}.storage_backends.PrivateMediaStorage'
+        AWS_PRIVATE_MEDIA_LOCATION = f'portfolio/{PROJECT_NAME}/private'
+
+    # Use your custom storage classes with modern STORAGES dict (Django 4.2+ only)
+    STORAGES = {
+        'default': {
+            'BACKEND': f'{PROJECT_NAME}.storage_backends.PublicMediaStorage',
+            'OPTIONS': {
+                'location': AWS_PUBLIC_MEDIA_LOCATION,
+                'bucket_name': AWS_STORAGE_BUCKET_NAME,
+                'endpoint_url': AWS_S3_ENDPOINT_URL,
+                'access_key': AWS_ACCESS_KEY_ID,
+                'secret_key': AWS_SECRET_ACCESS_KEY,
+            },
+        },
+        'staticfiles': {
+            'BACKEND': f'{PROJECT_NAME}.storage_backends.StaticStorage',
+            'OPTIONS': {
+                'location': AWS_STATIC_LOCATION,
+                'bucket_name': AWS_STORAGE_BUCKET_NAME,
+                'endpoint_url': AWS_S3_ENDPOINT_URL,
+                'access_key': AWS_ACCESS_KEY_ID,
+                'secret_key': AWS_SECRET_ACCESS_KEY,
+            },
+        },
+        'private': {
+            'BACKEND': f'{PROJECT_NAME}.storage_backends.PrivateMediaStorage',
+            'OPTIONS': {
+                'location': AWS_PRIVATE_MEDIA_LOCATION,
+                'bucket_name': AWS_STORAGE_BUCKET_NAME,
+                'endpoint_url': AWS_S3_ENDPOINT_URL,
+                'access_key': AWS_ACCESS_KEY_ID,
+                'secret_key': AWS_SECRET_ACCESS_KEY,
+                'default_acl': 'private',
+                'custom_domain': False,  # Disable custom domain for private files
+            },
+        },
+    }
 else:
     # Static files (CSS, JavaScript, Images)
     # https://docs.djangoproject.com/en/3.2/howto/static-files/
